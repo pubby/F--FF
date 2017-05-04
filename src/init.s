@@ -47,6 +47,20 @@ waitFrame1:
     bit PPUSTATUS
     bpl waitFrame1
 
+    lda #0
+    tax
+:
+    sta $000, x
+    sta $100, x
+    sta $200, x
+    sta $300, x
+    sta $400, x
+    sta $500, x
+    sta $600, x
+    sta $700, x
+    inx
+    bne :-
+
 waitFrame2:
     bit PPUSTATUS
     bpl waitFrame2

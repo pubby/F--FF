@@ -17,7 +17,7 @@ version := 0.01
 # Space-separated list of assembly language files that make up the
 # PRG ROM.  If it gets too long for one line, you can add a backslash
 # (the \ character) at the end of the line and continue on the next.
-objlist := nrom init main globals palette gamepad rng line line_unrolled
+objlist := nrom init main globals palette rng line line_unrolled sprites
 
 
 AS65 := ca65
@@ -50,7 +50,7 @@ clean:
 
 objlistntsc := $(foreach o,$(objlist),$(objdir)/$(o).o)
 
-map.txt $(title).nes: nrom128.cfg $(objlistntsc)
+map.txt $(title).nes: uxrom.cfg $(objlistntsc)
 	$(LD65) -o $(title).nes -m map.txt -C $^
 
 $(objdir)/%.o: $(srcdir)/%.s $(srcdir)/nes.inc $(srcdir)/globals.inc
