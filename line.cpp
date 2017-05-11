@@ -21,6 +21,34 @@ unsigned flip(int p, unsigned char b)
     return b;
 }
 
+char const* sbc(int p)
+{
+    if(p)
+        return "sbc";
+    return "adc";
+}
+
+char const* adc(int p)
+{
+    if(p)
+        return "adc";
+    return "sbc";
+}
+
+char const* bcs(int p)
+{
+    if(p)
+        return "bcs";
+    return "bcc";
+}
+
+char const* bcc(int p)
+{
+    if(p)
+        return "bcc";
+    return "bcs";
+}
+
 int main(int argc, char** argv)
 {
     if(argc != 2)
@@ -50,7 +78,7 @@ int main(int argc, char** argv)
     for(int p = 0; p != 2; ++p)
     {
         char const* pp = p ? "NP" : "PP";
-        std::fprintf(fp, ".segment \"UNROLLED\"\n");
+        std::fprintf(fp, ".segment \"LINE_UNROLLED\"\n");
         std::fprintf(fp, "    nop\n");
         if(p == 1)
             std::fprintf(fp, "    nop\n");
@@ -62,74 +90,76 @@ int main(int argc, char** argv)
             std::fprintf(fp, "    lda #%u\n", flip(p, 0b0100));
             std::fprintf(fp, "    ora nt_buffer+%i*32, x\n", i);
             std::fprintf(fp, "    sta nt_buffer+%i*32, x\n", i);
+            std::fprintf(fp, "    cpx to_x\n");
+            std::fprintf(fp, "    beq %sxy%i_return\n", pp, i);
             std::fprintf(fp, "    tya\n");
             std::fprintf(fp, "    %s\n", p ? "dex" : "inx");
-            std::fprintf(fp, "    sbc Dy\n");
-            std::fprintf(fp, "    bcc %sxy%i_adc_SWx__\n", pp, i);
+            std::fprintf(fp, "    %s Dy\n", sbc(p));
+            std::fprintf(fp, "    %s %sxy%i_adc_SWx__\n", bcc(p), pp, i);
             // fall-through
 
             std::fprintf(fp, "%sxy%i_NWx__:\n", pp, i);
-            std::fprintf(fp, "    sbc Dy\n");
-            std::fprintf(fp, "    bcs %sxy%i_NWxNE\n", pp, i);
-            std::fprintf(fp, "    adc rounded_Dx\n");
+            std::fprintf(fp, "    %s Dy\n", sbc(p));
+            std::fprintf(fp, "    %s %sxy%i_NWxNE\n", bcs(p), pp, i);
+            std::fprintf(fp, "    %s rounded_Dx\n", adc(p));
             // fall-through
 
             std::fprintf(fp, "%sxy%i_NWxSE:\n", pp, i);
-            std::fprintf(fp, "    cpx to_x\n");
-            std::fprintf(fp, "    beq %sxy%i_return\n", pp, i);
             std::fprintf(fp, "    tay\n");
             std::fprintf(fp, "    lda #%u\n", flip(p, 0b1001));
             std::fprintf(fp, "    ora nt_buffer+%i*32, x\n", i);
             std::fprintf(fp, "    sta nt_buffer+%i*32, x\n", i);
+            std::fprintf(fp, "    cpx to_x\n");
+            std::fprintf(fp, "    beq %sxy%i_return\n", pp, i);
             std::fprintf(fp, "    tya\n");
             std::fprintf(fp, "    %s\n", p ? "dex" : "inx");
-            std::fprintf(fp, "    sbc Dy\n");
-            std::fprintf(fp, "    bcs %sxy%i_SWx__\n", pp, i);
+            std::fprintf(fp, "    %s Dy\n", sbc(p));
+            std::fprintf(fp, "    %s %sxy%i_SWx__\n", bcs(p), pp, i);
             if(last_i)
                 std::fprintf(fp, "    rts\n    nop\n    nop\n    nop\n    nop\n");
             else
             {
-                std::fprintf(fp, "    adc rounded_Dx\n");
+                std::fprintf(fp, "    %s rounded_Dx\n", adc(p));
                 std::fprintf(fp, "    jmp %sxy%i_NWx__\n", pp, i+1);
             }
 
             std::fprintf(fp, "%sxy%i_NWxNE:\n", pp, i);
-            std::fprintf(fp, "    cpx to_x\n");
-            std::fprintf(fp, "    beq %sxy%i_return\n", pp, i);
             std::fprintf(fp, "    tay\n");
             std::fprintf(fp, "    lda #%u\n", flip(p, 0b1100));
             std::fprintf(fp, "    ora nt_buffer+%i*32, x\n", i);
             std::fprintf(fp, "    sta nt_buffer+%i*32, x\n", i);
+            std::fprintf(fp, "    cpx to_x\n");
+            std::fprintf(fp, "    beq %sxy%i_return\n", pp, i);
             std::fprintf(fp, "    tya\n");
             std::fprintf(fp, "    %s\n", p ? "dex" : "inx");
-            std::fprintf(fp, "    sbc Dy\n");
-            std::fprintf(fp, "    bcs %sxy%i_NWx__\n", pp, i);
+            std::fprintf(fp, "    %s Dy\n", sbc(p));
+            std::fprintf(fp, "    %s %sxy%i_NWx__\n", bcs(p), pp, i);
             std::fprintf(fp, "%sxy%i_adc_SWx__:\n", pp, i);
-            std::fprintf(fp, "    adc rounded_Dx\n");
+            std::fprintf(fp, "    %s rounded_Dx\n", adc(p));
             // fall-through
 
             std::fprintf(fp, "%sxy%i_SWx__:\n", pp, i);
-            std::fprintf(fp, "    sbc Dy\n");
-            std::fprintf(fp, "    bcc %sxy%i_fill_SWx__\n", pp, i);
+            std::fprintf(fp, "    %s Dy\n", sbc(p));
+            std::fprintf(fp, "    %s %sxy%i_fill_SWx__\n", bcc(p), pp, i);
             //fall-through
 
             std::fprintf(fp, "%sxy%i_SWxSE:\n", pp, i);
-            std::fprintf(fp, "    cpx to_x\n");
-            std::fprintf(fp, "    beq %sxy%i_return\n", pp, i);
             std::fprintf(fp, "    tay\n");
             std::fprintf(fp, "    lda #%u\n", flip(p, 0b0011));
             std::fprintf(fp, "%sxy%i_store___xSE:\n", pp, i);
             std::fprintf(fp, "    ora nt_buffer+%i*32, x\n", i);
             std::fprintf(fp, "    sta nt_buffer+%i*32, x\n", i);
+            std::fprintf(fp, "    cpx to_x\n");
+            std::fprintf(fp, "    beq %sxy%i_return\n", pp, i);
             std::fprintf(fp, "    tya\n");
             std::fprintf(fp, "    %s\n", p ? "dex" : "inx");
-            std::fprintf(fp, "    sbc Dy\n");
-            std::fprintf(fp, "    bcs %sxy%i_SWx__\n", pp, i);
+            std::fprintf(fp, "    %s Dy\n", sbc(p));
+            std::fprintf(fp, "    %s %sxy%i_SWx__\n", bcs(p), pp, i);
             if(last_i)
                 std::fprintf(fp, "    rts\n    nop\n    nop\n    nop\n    nop\n");
             else
             {
-                std::fprintf(fp, "    adc rounded_Dx\n");
+                std::fprintf(fp, "    %s rounded_Dx\n", adc(p));
                 std::fprintf(fp, "    jmp %sxy%i_NWx__\n", pp, i+1);
             }
 
@@ -149,9 +179,7 @@ int main(int argc, char** argv)
             std::fprintf(fp, "    jmp %sxy%i_store___xNE\n", pp, i);
 
             std::fprintf(fp, "%sxy%i_fill_SWx__:\n", pp, i);
-            std::fprintf(fp, "    adc rounded_Dx\n");
-            std::fprintf(fp, "    cpx to_x\n");
-            std::fprintf(fp, "    beq %sxy%i_return\n", pp, i);
+            std::fprintf(fp, "    %s rounded_Dx\n", adc(p));
             std::fprintf(fp, "    tay\n");
             std::fprintf(fp, "    lda #%u\n", flip(p, 0b0010));
             std::fprintf(fp, "    ora nt_buffer+%i*32, x\n", i);

@@ -1,140 +1,254 @@
 .include "globals.inc"
+.include "intercept.inc"
 
 .export draw_line3, draw_line5
 
-.segment "TABLES_256"
+.segment "LINE_TABLES"
 subpixel_table:
 .repeat 256, i
-    .byt (((i & %11111100) * (3 - (i & %11))) + 3) / 4
+    .byt (((i & %11111100) * (3 - (i & %11))) + 0) / 4
 .endrepeat
 
-.segment "CODE"
-
-.macro scale_by_ratio intercept, intercept_scale, numer, denom
-@loop:
-    lsr intercept_scale+1
-    beq zeroScaleHighByte
-    ror intercept_scale+0
-    lsr denom+2
-    ror denom+1
-    lda numer+0
-    rra denom+0
-    tax
-    lda numer+1
-    adc denom+1
-    tay
-    lda numer+2
-    adc denom+2
-    bcs @loop ; if denom >= numer
-    sta denom+2
-    sty denom+1
-    stx denom+0
-    sec
-    .repeat 2, i
-        lda intercept+i
-        sbc intercept_scale+i
-        sta intercept+i
-    .endrepeat
-    jmp @loop
-zeroScaleHighByte:
-@loop:
-    lsr intercept_scale+0
-    beq return
-    lsr denom+2
-    ror denom+1
-    lda numer+0
-    rra denom+0
-    tax
-    lda numer+1
-    adc denom+1
-    tay
-    lda numer+2
-    adc denom+2
-    bcs @loop ; if denom >= numer
-    sta numer+2
-    sty numer+1
-    stx numer+0
-    sec
-    lda intercept+0
-    sbc intercept_scale+0
-    sta intercept+0
-    bcs @loop
-    dec intercept+1
-    jmp @loop
-return:
+.segment "LINE"
+; NOTE: This returns in A, but it won't set the zero flag correctly.
+; Use TAX or something to set the zero flag.
+.macro compute_out_code xvar, yvar
     lda #0
-    sta numer+2
-    sta numer+1
-    rts
+    ldx yvar+1
+    beq :++
+    bpl :+
+    ora #%1010
+:
+    eor #%1000
+:
+    ldx xvar+1
+    beq :++
+    bpl :+
+    ora #%0101
+:
+    eor #%0100
+:
 .endmacro
 
-.proc clip_to_x_left
+.macro clip xop
+    compute_out_code to_x, to_y
+    sta to_out_code
+    compute_out_code from_x, from_y
+    sta from_out_code
+    tax                 ; Store from_out_code in X temporarily.
+    bne :+              ; Flag set by TAX.
+    jmp clipTo
+:
+    and to_out_code
+    beq :+
+    jmp trivialReject
+:
+clipFromLoop:
+    ; A = 0
+    sta from_x_sub
+    sta from_y_sub
+    sta Dx_sub
+    sta Dy_sub
     sec
-    lda from_x+0
-    sbc to_x+0
-    sta Dx+0
-    lda #0
-    sbc to_x+1
-    sta Dx+1
+    .if .xmatch(xop,add)
+        sub16into to_x, from_x, Dx
+    .else
+        sub16into from_x, to_x, Dx
+    .endif
+    sec
+    sub16into to_y, from_y, Dy
 
+    txa                 ; load from_out_code
+    lsr
+    bcc @notXLeft
+        calc_intercept_low add, from_y_sub, Dy_sub, from_x_sub, Dx_sub
+        lda #0
+        sta from_x+0
+        sta from_x+1
+        jmp doneClipFrom
+@notXLeft:
+    lsr
+    bcc @notYTop
+        calc_intercept_low xop, from_x_sub, Dx_sub, from_y_sub, Dy_sub
+        lda #0
+        sta from_y+0
+        sta from_y+1
+        jmp doneClipFrom
+@notYTop:
+    lsr
+    bcc @notXRight
+        dec from_x+1
+        calc_intercept_high add, from_y_sub, Dy_sub, from_x_sub, Dx_sub
+        lda #$FF
+        sta from_x+0
+@notXRight:
+doneClipFrom:
+    compute_out_code from_x, from_y
+    tax                 ; Store from_out_code in X temporarily.
+    beq clipTo          ; Flag set by TAX.
+    and to_out_code
+    beq jumpClipFromLoop
+trivialReject:
+    rts
+jumpClipFromLoop:
+    jmp clipFromLoop
+
+clipTo:
+    ldx to_out_code
+    bne clipToLoop
+    jmp accept
+clipToLoop:
+    lda #0
+    sta to_x_sub
+    sta to_y_sub
+    sta Dx_sub
+    sta Dy_sub
     sec
-    lda to_y+0
+    .if .xmatch(xop,add)
+        sub16into to_x, from_x, Dx
+    .else
+        sub16into from_x, to_x, Dx
+    .endif
+    sec
+    sub16into to_y, from_y, Dy
+
+    txa                 ; load to_out_code
+    lsr
+    bcc @notXLeft
+        calc_intercept_low sub, to_y_sub, Dy_sub, to_x_sub, Dx_sub
+        lda #0
+        sta to_x+0
+        sta to_x+1
+        jmp doneClipTo
+@notXLeft:
+    lsr
+    lsr
+    bcc @notXRight
+        dec to_x+1
+        calc_intercept_high sub, to_y_sub, Dy_sub, to_x_sub, Dx_sub
+        lda #$FF
+        sta to_x+0
+        jmp doneClipTo
+@notXRight:
+    lsr
+    bcc @notYBottom
+        dec to_y+1
+        .if .xmatch(xop,add)
+            calc_intercept_high sub, to_x_sub, Dx_sub, to_y_sub, Dy_sub
+        .else
+            calc_intercept_high add, to_x_sub, Dx_sub, to_y_sub, Dy_sub
+        .endif
+        lda #$FF
+        sta to_y+0
+@notYBottom:
+doneClipTo:
+    compute_out_code to_x, to_y
+    tax                 ; Store to_out_code in X temporarily.
+    beq accept          ; Flag set by TAX.
+    jmp clipToLoop
+accept:
+    sec
+    .if .xmatch(xop,add)
+        sub16into to_x, from_x, Dx
+    .else
+        sub16into from_x, to_x, Dx
+    .endif
+    sec
+    sub16into to_y, from_y, Dy
+
+    ;lda #0
+    ;sta from_x+1
+    ;sta to_x+1
+    ;sta from_y+1
+    ;sta to_y+1
+    ; fall-through into invoking code.
+.endmacro
+
+.proc draw_line5
+    bankswitch 0
+    sec
+    lax to_y+0
     sbc from_y+0
     sta Dy+0
     lda to_y+1
-    sbc #0
+    tay
+    sbc from_y+1
     sta Dy+1
-
+    bvc :+
+    eor #$80
+:
+    bpl posDy
+    sec
     lda #0
-    sta to_x_sub
-    sta Dx_sub
-    sta to_y_sub
-    sta Dy_sub
+    sbc Dx+0
+    sta Dx+0
+    lda #0
+    sbc Dx+1
+    sta Dx+1
 
-    ;scale_by_ratio to_y_sub, Dy_sub, to_x_sub, Dx_sub
-    scale_by_ratio to_y, Dy, to_x_sub, Dx_sub
-.endproc
+    ; Swap to and from.
+    lda from_y+0
+    sta to_y+0
+    stx from_y+0
 
-.proc draw_line5
+    lda from_y+1
+    sta to_y+1
+    sty from_y+1
+
+    lda from_x+0
+    ldx to_x+0
+    stx from_x+0
+    sta to_x+0
+
+    lda from_x+1
+    ldx to_x+1
+    stx from_x+1
+    sta to_x+1
+posDy:
+
+    ; Now find Dx
+    sec
+    sub16into to_x, from_x, Dx
+    bvc :+
+    eor #$80
+:
+    bmi :+
+    jmp posDx
+:
+    sec
+    lax #0
+    sbc Dx+0
+    sta Dx+0
+    txa
+    sbc Dx+1
+    sta Dx+1
+    ; Neg Dx
+    .scope clipNegX
+        clip sub
+    .endscope
+    jmp doneClip
+posDx:
+    .scope clipPosX
+        clip add
+    .endscope
+doneClip:
+
 rounded_from_x = 0
 rounded_from_y = 1
 rounded_to_x = 2
-rounded_to_y = 3
-    bankswitch 0
 
-    lda #0
-    sta inter
-    lda to_x+1
-    beq :+
-    jsr clip_to_x_left
-    lda to_y
-    sta inter
+    lda from_y
+    cmp #22*8
+    bcc :+
+    rts
 :
+
 
     ldx #%11111100
     lda from_y
-    cmp to_y
-    bcc dontSwapY
-    ; Swap Y variables and calculate.
-    tay
-    sbc to_y            ; Carry will remain set.
-    sta Dy
-
-    lda to_y
-    sta from_y
-    sax rounded_from_y
-
-    tya
-    sta to_y            ; is this needed?
-    sax rounded_to_y
-
-    sbc rounded_from_y  ; Carry set from last sbc. (and will remain set)
-    sax rounded_Dy
-    jmp doneSettingY
 dontSwapY:
     sax rounded_from_y
     lda to_y
-    sax rounded_to_y
     sec
     sbc rounded_from_y  ; Carry will remain set.
     sax rounded_Dy
@@ -143,17 +257,18 @@ dontSwapY:
     sta Dy
 doneSettingY:
 
+
     lda from_x
     sax rounded_from_x 
-    lda to_x
-    sax rounded_to_x
-    sbc rounded_from_x
-    bcc reverseX
-    sax rounded_Dx
-    lda to_x
+    lax to_x
     sbc from_x
     sta Dx
-    lda rounded_Dx
+    txa                 ; Reload to_x.
+    and #%11111100
+    sta rounded_to_x
+    sbc rounded_from_x
+    bcc reverseX
+    sta rounded_Dx
     cmp Dy
     bcc secondOctant
 
@@ -169,20 +284,22 @@ doneSettingY:
     lsr
     lsr
     lsr
-    adc #0
+    adc #255
     sta to_x
 
-    dec Dy              ; Needed for this octant only.
-                        ; (cmp clears carry every iteration)
+    lda from_x
+    lsr
+    lsr
+    alr #%11111110      ; Clears carry for iteration code.
+    tax
+
     lda from_y
     and #%00000011
     ora rounded_Dx
     tay
     lda subpixel_table, y
-    sta subroutine_temp
-    ;dec subroutine_temp
-
-    jmp lsrFromXCallTemp
+    eor #$FF
+    jmp (ptr_temp)
 secondOctant:
     lda from_x
     and #%00000011
@@ -202,12 +319,18 @@ secondOctant:
     jmp lsrFromYCallTemp
 reverseX:
     sec
-    lda from_x
+    lda rounded_from_x
     sbc rounded_to_x    ; Carry remains set.
-    sax rounded_Dx
-    lda from_x
-    sbc to_x
+    sta rounded_Dx
+
+    sec ; TODO
+    lda #0
+    sbc Dx
     sta Dx
+
+    ;lda from_x
+    ;sbc to_x
+    ;sta Dx
     lda rounded_Dx
     cmp Dy
     bcc fourthOctant
@@ -227,8 +350,14 @@ reverseX:
     lsr
     lsr
     lsr
-    sbc #0
+    sbc #255
     sta to_x
+
+    lda from_x
+    lsr
+    lsr
+    lsr
+    tax
 
     lda from_y
     and #%00000011
@@ -236,8 +365,8 @@ reverseX:
     tay
     lda subpixel_table, y
     sta subroutine_temp
-
-    jmp lsrFromXCallTemp
+    sec
+    jmp (ptr_temp)
 fourthOctant:
     lda from_x
     and #%00000011
@@ -256,13 +385,27 @@ fourthOctant:
     sta ptr_temp+1
 
 lsrFromYCallTemp:
-    lda Dy
+    lda from_y
+    lsr
+    lsr
+    lsr
+    ;sbc #0
+    sta from_y
+    lda to_y
     lsr
     lsr
     lsr
     adc #0
-    beq return
+    sec
+    sbc from_y
     tay
+
+    ;adc #0
+    ;beq return
+    ;tay
+    ;bcc :+
+    ;iny
+;:
 
 lsrFromXCallTemp:
     lda from_x
@@ -271,6 +414,7 @@ lsrFromXCallTemp:
     lsr
     tax
 
+    ;clc ; TODO
     sec
     lda subroutine_temp
     jmp (ptr_temp)

@@ -2,6 +2,7 @@
 
 .segment "ZEROPAGE"
 
+debug: .res 1
 subroutine_temp: .res 1
 ptr_temp: .res 2
 
@@ -25,6 +26,9 @@ to_x:       .res 2
 to_y_sub:   .res 1
 to_y:       .res 2
 
+from_out_code: .res 1
+to_out_code:   .res 1
+
 Dx_sub: .res 1
 Dx:     .res 2
 Dy_sub: .res 1
@@ -40,7 +44,7 @@ fy: .res 2
 inter: .res 1
 
 .segment "BSS" ; RAM
-nt_buffer: .res 1024
+nt_buffer: .res 32*24
 
 .segment "SMALL_TABLES"
 banktable:

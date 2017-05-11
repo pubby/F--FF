@@ -1,61 +1,63 @@
 .include "globals.inc"
-.segment "UNROLLED"
+.segment "LINE_UNROLLED"
     nop
 PPxy0:
 PPxy0_store___xNE:
     lda #4
     ora nt_buffer+0*32, x
     sta nt_buffer+0*32, x
-    tya
-    inx
-    sbc Dy
-    bcc PPxy0_adc_SWx__
-PPxy0_NWx__:
-    sbc Dy
-    bcs PPxy0_NWxNE
-    adc rounded_Dx
-PPxy0_NWxSE:
     cpx to_x
     beq PPxy0_return
+    tya
+    inx
+    adc Dy
+    bcs PPxy0_adc_SWx__
+PPxy0_NWx__:
+    adc Dy
+    bcc PPxy0_NWxNE
+    sbc rounded_Dx
+PPxy0_NWxSE:
     tay
     lda #9
     ora nt_buffer+0*32, x
     sta nt_buffer+0*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy0_SWx__
-    adc rounded_Dx
-    jmp PPxy1_NWx__
-PPxy0_NWxNE:
     cpx to_x
     beq PPxy0_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy0_SWx__
+    sbc rounded_Dx
+    jmp PPxy1_NWx__
+PPxy0_NWxNE:
     tay
     lda #12
     ora nt_buffer+0*32, x
     sta nt_buffer+0*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy0_NWx__
-PPxy0_adc_SWx__:
-    adc rounded_Dx
-PPxy0_SWx__:
-    sbc Dy
-    bcc PPxy0_fill_SWx__
-PPxy0_SWxSE:
     cpx to_x
     beq PPxy0_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy0_NWx__
+PPxy0_adc_SWx__:
+    sbc rounded_Dx
+PPxy0_SWx__:
+    adc Dy
+    bcs PPxy0_fill_SWx__
+PPxy0_SWxSE:
     tay
     lda #3
 PPxy0_store___xSE:
     ora nt_buffer+0*32, x
     sta nt_buffer+0*32, x
+    cpx to_x
+    beq PPxy0_return
     tya
     inx
-    sbc Dy
-    bcs PPxy0_SWx__
-    adc rounded_Dx
+    adc Dy
+    bcc PPxy0_SWx__
+    sbc rounded_Dx
     jmp PPxy1_NWx__
 PPxy0_return:
     rts
@@ -67,9 +69,7 @@ PPxy0___xNE:
     tay
     jmp PPxy0_store___xNE
 PPxy0_fill_SWx__:
-    adc rounded_Dx
-    cpx to_x
-    beq PPxy0_return
+    sbc rounded_Dx
     tay
     lda #2
     ora nt_buffer+0*32, x
@@ -79,56 +79,58 @@ PPxy1_store___xNE:
     lda #4
     ora nt_buffer+1*32, x
     sta nt_buffer+1*32, x
-    tya
-    inx
-    sbc Dy
-    bcc PPxy1_adc_SWx__
-PPxy1_NWx__:
-    sbc Dy
-    bcs PPxy1_NWxNE
-    adc rounded_Dx
-PPxy1_NWxSE:
     cpx to_x
     beq PPxy1_return
+    tya
+    inx
+    adc Dy
+    bcs PPxy1_adc_SWx__
+PPxy1_NWx__:
+    adc Dy
+    bcc PPxy1_NWxNE
+    sbc rounded_Dx
+PPxy1_NWxSE:
     tay
     lda #9
     ora nt_buffer+1*32, x
     sta nt_buffer+1*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy1_SWx__
-    adc rounded_Dx
-    jmp PPxy2_NWx__
-PPxy1_NWxNE:
     cpx to_x
     beq PPxy1_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy1_SWx__
+    sbc rounded_Dx
+    jmp PPxy2_NWx__
+PPxy1_NWxNE:
     tay
     lda #12
     ora nt_buffer+1*32, x
     sta nt_buffer+1*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy1_NWx__
-PPxy1_adc_SWx__:
-    adc rounded_Dx
-PPxy1_SWx__:
-    sbc Dy
-    bcc PPxy1_fill_SWx__
-PPxy1_SWxSE:
     cpx to_x
     beq PPxy1_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy1_NWx__
+PPxy1_adc_SWx__:
+    sbc rounded_Dx
+PPxy1_SWx__:
+    adc Dy
+    bcs PPxy1_fill_SWx__
+PPxy1_SWxSE:
     tay
     lda #3
 PPxy1_store___xSE:
     ora nt_buffer+1*32, x
     sta nt_buffer+1*32, x
+    cpx to_x
+    beq PPxy1_return
     tya
     inx
-    sbc Dy
-    bcs PPxy1_SWx__
-    adc rounded_Dx
+    adc Dy
+    bcc PPxy1_SWx__
+    sbc rounded_Dx
     jmp PPxy2_NWx__
 PPxy1_return:
     rts
@@ -140,9 +142,7 @@ PPxy1___xNE:
     tay
     jmp PPxy1_store___xNE
 PPxy1_fill_SWx__:
-    adc rounded_Dx
-    cpx to_x
-    beq PPxy1_return
+    sbc rounded_Dx
     tay
     lda #2
     ora nt_buffer+1*32, x
@@ -152,56 +152,58 @@ PPxy2_store___xNE:
     lda #4
     ora nt_buffer+2*32, x
     sta nt_buffer+2*32, x
-    tya
-    inx
-    sbc Dy
-    bcc PPxy2_adc_SWx__
-PPxy2_NWx__:
-    sbc Dy
-    bcs PPxy2_NWxNE
-    adc rounded_Dx
-PPxy2_NWxSE:
     cpx to_x
     beq PPxy2_return
+    tya
+    inx
+    adc Dy
+    bcs PPxy2_adc_SWx__
+PPxy2_NWx__:
+    adc Dy
+    bcc PPxy2_NWxNE
+    sbc rounded_Dx
+PPxy2_NWxSE:
     tay
     lda #9
     ora nt_buffer+2*32, x
     sta nt_buffer+2*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy2_SWx__
-    adc rounded_Dx
-    jmp PPxy3_NWx__
-PPxy2_NWxNE:
     cpx to_x
     beq PPxy2_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy2_SWx__
+    sbc rounded_Dx
+    jmp PPxy3_NWx__
+PPxy2_NWxNE:
     tay
     lda #12
     ora nt_buffer+2*32, x
     sta nt_buffer+2*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy2_NWx__
-PPxy2_adc_SWx__:
-    adc rounded_Dx
-PPxy2_SWx__:
-    sbc Dy
-    bcc PPxy2_fill_SWx__
-PPxy2_SWxSE:
     cpx to_x
     beq PPxy2_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy2_NWx__
+PPxy2_adc_SWx__:
+    sbc rounded_Dx
+PPxy2_SWx__:
+    adc Dy
+    bcs PPxy2_fill_SWx__
+PPxy2_SWxSE:
     tay
     lda #3
 PPxy2_store___xSE:
     ora nt_buffer+2*32, x
     sta nt_buffer+2*32, x
+    cpx to_x
+    beq PPxy2_return
     tya
     inx
-    sbc Dy
-    bcs PPxy2_SWx__
-    adc rounded_Dx
+    adc Dy
+    bcc PPxy2_SWx__
+    sbc rounded_Dx
     jmp PPxy3_NWx__
 PPxy2_return:
     rts
@@ -213,9 +215,7 @@ PPxy2___xNE:
     tay
     jmp PPxy2_store___xNE
 PPxy2_fill_SWx__:
-    adc rounded_Dx
-    cpx to_x
-    beq PPxy2_return
+    sbc rounded_Dx
     tay
     lda #2
     ora nt_buffer+2*32, x
@@ -225,56 +225,58 @@ PPxy3_store___xNE:
     lda #4
     ora nt_buffer+3*32, x
     sta nt_buffer+3*32, x
-    tya
-    inx
-    sbc Dy
-    bcc PPxy3_adc_SWx__
-PPxy3_NWx__:
-    sbc Dy
-    bcs PPxy3_NWxNE
-    adc rounded_Dx
-PPxy3_NWxSE:
     cpx to_x
     beq PPxy3_return
+    tya
+    inx
+    adc Dy
+    bcs PPxy3_adc_SWx__
+PPxy3_NWx__:
+    adc Dy
+    bcc PPxy3_NWxNE
+    sbc rounded_Dx
+PPxy3_NWxSE:
     tay
     lda #9
     ora nt_buffer+3*32, x
     sta nt_buffer+3*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy3_SWx__
-    adc rounded_Dx
-    jmp PPxy4_NWx__
-PPxy3_NWxNE:
     cpx to_x
     beq PPxy3_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy3_SWx__
+    sbc rounded_Dx
+    jmp PPxy4_NWx__
+PPxy3_NWxNE:
     tay
     lda #12
     ora nt_buffer+3*32, x
     sta nt_buffer+3*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy3_NWx__
-PPxy3_adc_SWx__:
-    adc rounded_Dx
-PPxy3_SWx__:
-    sbc Dy
-    bcc PPxy3_fill_SWx__
-PPxy3_SWxSE:
     cpx to_x
     beq PPxy3_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy3_NWx__
+PPxy3_adc_SWx__:
+    sbc rounded_Dx
+PPxy3_SWx__:
+    adc Dy
+    bcs PPxy3_fill_SWx__
+PPxy3_SWxSE:
     tay
     lda #3
 PPxy3_store___xSE:
     ora nt_buffer+3*32, x
     sta nt_buffer+3*32, x
+    cpx to_x
+    beq PPxy3_return
     tya
     inx
-    sbc Dy
-    bcs PPxy3_SWx__
-    adc rounded_Dx
+    adc Dy
+    bcc PPxy3_SWx__
+    sbc rounded_Dx
     jmp PPxy4_NWx__
 PPxy3_return:
     rts
@@ -286,9 +288,7 @@ PPxy3___xNE:
     tay
     jmp PPxy3_store___xNE
 PPxy3_fill_SWx__:
-    adc rounded_Dx
-    cpx to_x
-    beq PPxy3_return
+    sbc rounded_Dx
     tay
     lda #2
     ora nt_buffer+3*32, x
@@ -298,56 +298,58 @@ PPxy4_store___xNE:
     lda #4
     ora nt_buffer+4*32, x
     sta nt_buffer+4*32, x
-    tya
-    inx
-    sbc Dy
-    bcc PPxy4_adc_SWx__
-PPxy4_NWx__:
-    sbc Dy
-    bcs PPxy4_NWxNE
-    adc rounded_Dx
-PPxy4_NWxSE:
     cpx to_x
     beq PPxy4_return
+    tya
+    inx
+    adc Dy
+    bcs PPxy4_adc_SWx__
+PPxy4_NWx__:
+    adc Dy
+    bcc PPxy4_NWxNE
+    sbc rounded_Dx
+PPxy4_NWxSE:
     tay
     lda #9
     ora nt_buffer+4*32, x
     sta nt_buffer+4*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy4_SWx__
-    adc rounded_Dx
-    jmp PPxy5_NWx__
-PPxy4_NWxNE:
     cpx to_x
     beq PPxy4_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy4_SWx__
+    sbc rounded_Dx
+    jmp PPxy5_NWx__
+PPxy4_NWxNE:
     tay
     lda #12
     ora nt_buffer+4*32, x
     sta nt_buffer+4*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy4_NWx__
-PPxy4_adc_SWx__:
-    adc rounded_Dx
-PPxy4_SWx__:
-    sbc Dy
-    bcc PPxy4_fill_SWx__
-PPxy4_SWxSE:
     cpx to_x
     beq PPxy4_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy4_NWx__
+PPxy4_adc_SWx__:
+    sbc rounded_Dx
+PPxy4_SWx__:
+    adc Dy
+    bcs PPxy4_fill_SWx__
+PPxy4_SWxSE:
     tay
     lda #3
 PPxy4_store___xSE:
     ora nt_buffer+4*32, x
     sta nt_buffer+4*32, x
+    cpx to_x
+    beq PPxy4_return
     tya
     inx
-    sbc Dy
-    bcs PPxy4_SWx__
-    adc rounded_Dx
+    adc Dy
+    bcc PPxy4_SWx__
+    sbc rounded_Dx
     jmp PPxy5_NWx__
 PPxy4_return:
     rts
@@ -359,9 +361,7 @@ PPxy4___xNE:
     tay
     jmp PPxy4_store___xNE
 PPxy4_fill_SWx__:
-    adc rounded_Dx
-    cpx to_x
-    beq PPxy4_return
+    sbc rounded_Dx
     tay
     lda #2
     ora nt_buffer+4*32, x
@@ -371,56 +371,58 @@ PPxy5_store___xNE:
     lda #4
     ora nt_buffer+5*32, x
     sta nt_buffer+5*32, x
-    tya
-    inx
-    sbc Dy
-    bcc PPxy5_adc_SWx__
-PPxy5_NWx__:
-    sbc Dy
-    bcs PPxy5_NWxNE
-    adc rounded_Dx
-PPxy5_NWxSE:
     cpx to_x
     beq PPxy5_return
+    tya
+    inx
+    adc Dy
+    bcs PPxy5_adc_SWx__
+PPxy5_NWx__:
+    adc Dy
+    bcc PPxy5_NWxNE
+    sbc rounded_Dx
+PPxy5_NWxSE:
     tay
     lda #9
     ora nt_buffer+5*32, x
     sta nt_buffer+5*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy5_SWx__
-    adc rounded_Dx
-    jmp PPxy6_NWx__
-PPxy5_NWxNE:
     cpx to_x
     beq PPxy5_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy5_SWx__
+    sbc rounded_Dx
+    jmp PPxy6_NWx__
+PPxy5_NWxNE:
     tay
     lda #12
     ora nt_buffer+5*32, x
     sta nt_buffer+5*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy5_NWx__
-PPxy5_adc_SWx__:
-    adc rounded_Dx
-PPxy5_SWx__:
-    sbc Dy
-    bcc PPxy5_fill_SWx__
-PPxy5_SWxSE:
     cpx to_x
     beq PPxy5_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy5_NWx__
+PPxy5_adc_SWx__:
+    sbc rounded_Dx
+PPxy5_SWx__:
+    adc Dy
+    bcs PPxy5_fill_SWx__
+PPxy5_SWxSE:
     tay
     lda #3
 PPxy5_store___xSE:
     ora nt_buffer+5*32, x
     sta nt_buffer+5*32, x
+    cpx to_x
+    beq PPxy5_return
     tya
     inx
-    sbc Dy
-    bcs PPxy5_SWx__
-    adc rounded_Dx
+    adc Dy
+    bcc PPxy5_SWx__
+    sbc rounded_Dx
     jmp PPxy6_NWx__
 PPxy5_return:
     rts
@@ -432,9 +434,7 @@ PPxy5___xNE:
     tay
     jmp PPxy5_store___xNE
 PPxy5_fill_SWx__:
-    adc rounded_Dx
-    cpx to_x
-    beq PPxy5_return
+    sbc rounded_Dx
     tay
     lda #2
     ora nt_buffer+5*32, x
@@ -444,56 +444,58 @@ PPxy6_store___xNE:
     lda #4
     ora nt_buffer+6*32, x
     sta nt_buffer+6*32, x
-    tya
-    inx
-    sbc Dy
-    bcc PPxy6_adc_SWx__
-PPxy6_NWx__:
-    sbc Dy
-    bcs PPxy6_NWxNE
-    adc rounded_Dx
-PPxy6_NWxSE:
     cpx to_x
     beq PPxy6_return
+    tya
+    inx
+    adc Dy
+    bcs PPxy6_adc_SWx__
+PPxy6_NWx__:
+    adc Dy
+    bcc PPxy6_NWxNE
+    sbc rounded_Dx
+PPxy6_NWxSE:
     tay
     lda #9
     ora nt_buffer+6*32, x
     sta nt_buffer+6*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy6_SWx__
-    adc rounded_Dx
-    jmp PPxy7_NWx__
-PPxy6_NWxNE:
     cpx to_x
     beq PPxy6_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy6_SWx__
+    sbc rounded_Dx
+    jmp PPxy7_NWx__
+PPxy6_NWxNE:
     tay
     lda #12
     ora nt_buffer+6*32, x
     sta nt_buffer+6*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy6_NWx__
-PPxy6_adc_SWx__:
-    adc rounded_Dx
-PPxy6_SWx__:
-    sbc Dy
-    bcc PPxy6_fill_SWx__
-PPxy6_SWxSE:
     cpx to_x
     beq PPxy6_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy6_NWx__
+PPxy6_adc_SWx__:
+    sbc rounded_Dx
+PPxy6_SWx__:
+    adc Dy
+    bcs PPxy6_fill_SWx__
+PPxy6_SWxSE:
     tay
     lda #3
 PPxy6_store___xSE:
     ora nt_buffer+6*32, x
     sta nt_buffer+6*32, x
+    cpx to_x
+    beq PPxy6_return
     tya
     inx
-    sbc Dy
-    bcs PPxy6_SWx__
-    adc rounded_Dx
+    adc Dy
+    bcc PPxy6_SWx__
+    sbc rounded_Dx
     jmp PPxy7_NWx__
 PPxy6_return:
     rts
@@ -505,9 +507,7 @@ PPxy6___xNE:
     tay
     jmp PPxy6_store___xNE
 PPxy6_fill_SWx__:
-    adc rounded_Dx
-    cpx to_x
-    beq PPxy6_return
+    sbc rounded_Dx
     tay
     lda #2
     ora nt_buffer+6*32, x
@@ -517,56 +517,58 @@ PPxy7_store___xNE:
     lda #4
     ora nt_buffer+7*32, x
     sta nt_buffer+7*32, x
-    tya
-    inx
-    sbc Dy
-    bcc PPxy7_adc_SWx__
-PPxy7_NWx__:
-    sbc Dy
-    bcs PPxy7_NWxNE
-    adc rounded_Dx
-PPxy7_NWxSE:
     cpx to_x
     beq PPxy7_return
+    tya
+    inx
+    adc Dy
+    bcs PPxy7_adc_SWx__
+PPxy7_NWx__:
+    adc Dy
+    bcc PPxy7_NWxNE
+    sbc rounded_Dx
+PPxy7_NWxSE:
     tay
     lda #9
     ora nt_buffer+7*32, x
     sta nt_buffer+7*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy7_SWx__
-    adc rounded_Dx
-    jmp PPxy8_NWx__
-PPxy7_NWxNE:
     cpx to_x
     beq PPxy7_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy7_SWx__
+    sbc rounded_Dx
+    jmp PPxy8_NWx__
+PPxy7_NWxNE:
     tay
     lda #12
     ora nt_buffer+7*32, x
     sta nt_buffer+7*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy7_NWx__
-PPxy7_adc_SWx__:
-    adc rounded_Dx
-PPxy7_SWx__:
-    sbc Dy
-    bcc PPxy7_fill_SWx__
-PPxy7_SWxSE:
     cpx to_x
     beq PPxy7_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy7_NWx__
+PPxy7_adc_SWx__:
+    sbc rounded_Dx
+PPxy7_SWx__:
+    adc Dy
+    bcs PPxy7_fill_SWx__
+PPxy7_SWxSE:
     tay
     lda #3
 PPxy7_store___xSE:
     ora nt_buffer+7*32, x
     sta nt_buffer+7*32, x
+    cpx to_x
+    beq PPxy7_return
     tya
     inx
-    sbc Dy
-    bcs PPxy7_SWx__
-    adc rounded_Dx
+    adc Dy
+    bcc PPxy7_SWx__
+    sbc rounded_Dx
     jmp PPxy8_NWx__
 PPxy7_return:
     rts
@@ -578,9 +580,7 @@ PPxy7___xNE:
     tay
     jmp PPxy7_store___xNE
 PPxy7_fill_SWx__:
-    adc rounded_Dx
-    cpx to_x
-    beq PPxy7_return
+    sbc rounded_Dx
     tay
     lda #2
     ora nt_buffer+7*32, x
@@ -590,56 +590,58 @@ PPxy8_store___xNE:
     lda #4
     ora nt_buffer+8*32, x
     sta nt_buffer+8*32, x
-    tya
-    inx
-    sbc Dy
-    bcc PPxy8_adc_SWx__
-PPxy8_NWx__:
-    sbc Dy
-    bcs PPxy8_NWxNE
-    adc rounded_Dx
-PPxy8_NWxSE:
     cpx to_x
     beq PPxy8_return
+    tya
+    inx
+    adc Dy
+    bcs PPxy8_adc_SWx__
+PPxy8_NWx__:
+    adc Dy
+    bcc PPxy8_NWxNE
+    sbc rounded_Dx
+PPxy8_NWxSE:
     tay
     lda #9
     ora nt_buffer+8*32, x
     sta nt_buffer+8*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy8_SWx__
-    adc rounded_Dx
-    jmp PPxy9_NWx__
-PPxy8_NWxNE:
     cpx to_x
     beq PPxy8_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy8_SWx__
+    sbc rounded_Dx
+    jmp PPxy9_NWx__
+PPxy8_NWxNE:
     tay
     lda #12
     ora nt_buffer+8*32, x
     sta nt_buffer+8*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy8_NWx__
-PPxy8_adc_SWx__:
-    adc rounded_Dx
-PPxy8_SWx__:
-    sbc Dy
-    bcc PPxy8_fill_SWx__
-PPxy8_SWxSE:
     cpx to_x
     beq PPxy8_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy8_NWx__
+PPxy8_adc_SWx__:
+    sbc rounded_Dx
+PPxy8_SWx__:
+    adc Dy
+    bcs PPxy8_fill_SWx__
+PPxy8_SWxSE:
     tay
     lda #3
 PPxy8_store___xSE:
     ora nt_buffer+8*32, x
     sta nt_buffer+8*32, x
+    cpx to_x
+    beq PPxy8_return
     tya
     inx
-    sbc Dy
-    bcs PPxy8_SWx__
-    adc rounded_Dx
+    adc Dy
+    bcc PPxy8_SWx__
+    sbc rounded_Dx
     jmp PPxy9_NWx__
 PPxy8_return:
     rts
@@ -651,9 +653,7 @@ PPxy8___xNE:
     tay
     jmp PPxy8_store___xNE
 PPxy8_fill_SWx__:
-    adc rounded_Dx
-    cpx to_x
-    beq PPxy8_return
+    sbc rounded_Dx
     tay
     lda #2
     ora nt_buffer+8*32, x
@@ -663,56 +663,58 @@ PPxy9_store___xNE:
     lda #4
     ora nt_buffer+9*32, x
     sta nt_buffer+9*32, x
-    tya
-    inx
-    sbc Dy
-    bcc PPxy9_adc_SWx__
-PPxy9_NWx__:
-    sbc Dy
-    bcs PPxy9_NWxNE
-    adc rounded_Dx
-PPxy9_NWxSE:
     cpx to_x
     beq PPxy9_return
+    tya
+    inx
+    adc Dy
+    bcs PPxy9_adc_SWx__
+PPxy9_NWx__:
+    adc Dy
+    bcc PPxy9_NWxNE
+    sbc rounded_Dx
+PPxy9_NWxSE:
     tay
     lda #9
     ora nt_buffer+9*32, x
     sta nt_buffer+9*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy9_SWx__
-    adc rounded_Dx
-    jmp PPxy10_NWx__
-PPxy9_NWxNE:
     cpx to_x
     beq PPxy9_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy9_SWx__
+    sbc rounded_Dx
+    jmp PPxy10_NWx__
+PPxy9_NWxNE:
     tay
     lda #12
     ora nt_buffer+9*32, x
     sta nt_buffer+9*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy9_NWx__
-PPxy9_adc_SWx__:
-    adc rounded_Dx
-PPxy9_SWx__:
-    sbc Dy
-    bcc PPxy9_fill_SWx__
-PPxy9_SWxSE:
     cpx to_x
     beq PPxy9_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy9_NWx__
+PPxy9_adc_SWx__:
+    sbc rounded_Dx
+PPxy9_SWx__:
+    adc Dy
+    bcs PPxy9_fill_SWx__
+PPxy9_SWxSE:
     tay
     lda #3
 PPxy9_store___xSE:
     ora nt_buffer+9*32, x
     sta nt_buffer+9*32, x
+    cpx to_x
+    beq PPxy9_return
     tya
     inx
-    sbc Dy
-    bcs PPxy9_SWx__
-    adc rounded_Dx
+    adc Dy
+    bcc PPxy9_SWx__
+    sbc rounded_Dx
     jmp PPxy10_NWx__
 PPxy9_return:
     rts
@@ -724,9 +726,7 @@ PPxy9___xNE:
     tay
     jmp PPxy9_store___xNE
 PPxy9_fill_SWx__:
-    adc rounded_Dx
-    cpx to_x
-    beq PPxy9_return
+    sbc rounded_Dx
     tay
     lda #2
     ora nt_buffer+9*32, x
@@ -736,56 +736,58 @@ PPxy10_store___xNE:
     lda #4
     ora nt_buffer+10*32, x
     sta nt_buffer+10*32, x
-    tya
-    inx
-    sbc Dy
-    bcc PPxy10_adc_SWx__
-PPxy10_NWx__:
-    sbc Dy
-    bcs PPxy10_NWxNE
-    adc rounded_Dx
-PPxy10_NWxSE:
     cpx to_x
     beq PPxy10_return
+    tya
+    inx
+    adc Dy
+    bcs PPxy10_adc_SWx__
+PPxy10_NWx__:
+    adc Dy
+    bcc PPxy10_NWxNE
+    sbc rounded_Dx
+PPxy10_NWxSE:
     tay
     lda #9
     ora nt_buffer+10*32, x
     sta nt_buffer+10*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy10_SWx__
-    adc rounded_Dx
-    jmp PPxy11_NWx__
-PPxy10_NWxNE:
     cpx to_x
     beq PPxy10_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy10_SWx__
+    sbc rounded_Dx
+    jmp PPxy11_NWx__
+PPxy10_NWxNE:
     tay
     lda #12
     ora nt_buffer+10*32, x
     sta nt_buffer+10*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy10_NWx__
-PPxy10_adc_SWx__:
-    adc rounded_Dx
-PPxy10_SWx__:
-    sbc Dy
-    bcc PPxy10_fill_SWx__
-PPxy10_SWxSE:
     cpx to_x
     beq PPxy10_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy10_NWx__
+PPxy10_adc_SWx__:
+    sbc rounded_Dx
+PPxy10_SWx__:
+    adc Dy
+    bcs PPxy10_fill_SWx__
+PPxy10_SWxSE:
     tay
     lda #3
 PPxy10_store___xSE:
     ora nt_buffer+10*32, x
     sta nt_buffer+10*32, x
+    cpx to_x
+    beq PPxy10_return
     tya
     inx
-    sbc Dy
-    bcs PPxy10_SWx__
-    adc rounded_Dx
+    adc Dy
+    bcc PPxy10_SWx__
+    sbc rounded_Dx
     jmp PPxy11_NWx__
 PPxy10_return:
     rts
@@ -797,9 +799,7 @@ PPxy10___xNE:
     tay
     jmp PPxy10_store___xNE
 PPxy10_fill_SWx__:
-    adc rounded_Dx
-    cpx to_x
-    beq PPxy10_return
+    sbc rounded_Dx
     tay
     lda #2
     ora nt_buffer+10*32, x
@@ -809,56 +809,58 @@ PPxy11_store___xNE:
     lda #4
     ora nt_buffer+11*32, x
     sta nt_buffer+11*32, x
-    tya
-    inx
-    sbc Dy
-    bcc PPxy11_adc_SWx__
-PPxy11_NWx__:
-    sbc Dy
-    bcs PPxy11_NWxNE
-    adc rounded_Dx
-PPxy11_NWxSE:
     cpx to_x
     beq PPxy11_return
+    tya
+    inx
+    adc Dy
+    bcs PPxy11_adc_SWx__
+PPxy11_NWx__:
+    adc Dy
+    bcc PPxy11_NWxNE
+    sbc rounded_Dx
+PPxy11_NWxSE:
     tay
     lda #9
     ora nt_buffer+11*32, x
     sta nt_buffer+11*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy11_SWx__
-    adc rounded_Dx
-    jmp PPxy12_NWx__
-PPxy11_NWxNE:
     cpx to_x
     beq PPxy11_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy11_SWx__
+    sbc rounded_Dx
+    jmp PPxy12_NWx__
+PPxy11_NWxNE:
     tay
     lda #12
     ora nt_buffer+11*32, x
     sta nt_buffer+11*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy11_NWx__
-PPxy11_adc_SWx__:
-    adc rounded_Dx
-PPxy11_SWx__:
-    sbc Dy
-    bcc PPxy11_fill_SWx__
-PPxy11_SWxSE:
     cpx to_x
     beq PPxy11_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy11_NWx__
+PPxy11_adc_SWx__:
+    sbc rounded_Dx
+PPxy11_SWx__:
+    adc Dy
+    bcs PPxy11_fill_SWx__
+PPxy11_SWxSE:
     tay
     lda #3
 PPxy11_store___xSE:
     ora nt_buffer+11*32, x
     sta nt_buffer+11*32, x
+    cpx to_x
+    beq PPxy11_return
     tya
     inx
-    sbc Dy
-    bcs PPxy11_SWx__
-    adc rounded_Dx
+    adc Dy
+    bcc PPxy11_SWx__
+    sbc rounded_Dx
     jmp PPxy12_NWx__
 PPxy11_return:
     rts
@@ -870,9 +872,7 @@ PPxy11___xNE:
     tay
     jmp PPxy11_store___xNE
 PPxy11_fill_SWx__:
-    adc rounded_Dx
-    cpx to_x
-    beq PPxy11_return
+    sbc rounded_Dx
     tay
     lda #2
     ora nt_buffer+11*32, x
@@ -882,56 +882,58 @@ PPxy12_store___xNE:
     lda #4
     ora nt_buffer+12*32, x
     sta nt_buffer+12*32, x
-    tya
-    inx
-    sbc Dy
-    bcc PPxy12_adc_SWx__
-PPxy12_NWx__:
-    sbc Dy
-    bcs PPxy12_NWxNE
-    adc rounded_Dx
-PPxy12_NWxSE:
     cpx to_x
     beq PPxy12_return
+    tya
+    inx
+    adc Dy
+    bcs PPxy12_adc_SWx__
+PPxy12_NWx__:
+    adc Dy
+    bcc PPxy12_NWxNE
+    sbc rounded_Dx
+PPxy12_NWxSE:
     tay
     lda #9
     ora nt_buffer+12*32, x
     sta nt_buffer+12*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy12_SWx__
-    adc rounded_Dx
-    jmp PPxy13_NWx__
-PPxy12_NWxNE:
     cpx to_x
     beq PPxy12_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy12_SWx__
+    sbc rounded_Dx
+    jmp PPxy13_NWx__
+PPxy12_NWxNE:
     tay
     lda #12
     ora nt_buffer+12*32, x
     sta nt_buffer+12*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy12_NWx__
-PPxy12_adc_SWx__:
-    adc rounded_Dx
-PPxy12_SWx__:
-    sbc Dy
-    bcc PPxy12_fill_SWx__
-PPxy12_SWxSE:
     cpx to_x
     beq PPxy12_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy12_NWx__
+PPxy12_adc_SWx__:
+    sbc rounded_Dx
+PPxy12_SWx__:
+    adc Dy
+    bcs PPxy12_fill_SWx__
+PPxy12_SWxSE:
     tay
     lda #3
 PPxy12_store___xSE:
     ora nt_buffer+12*32, x
     sta nt_buffer+12*32, x
+    cpx to_x
+    beq PPxy12_return
     tya
     inx
-    sbc Dy
-    bcs PPxy12_SWx__
-    adc rounded_Dx
+    adc Dy
+    bcc PPxy12_SWx__
+    sbc rounded_Dx
     jmp PPxy13_NWx__
 PPxy12_return:
     rts
@@ -943,9 +945,7 @@ PPxy12___xNE:
     tay
     jmp PPxy12_store___xNE
 PPxy12_fill_SWx__:
-    adc rounded_Dx
-    cpx to_x
-    beq PPxy12_return
+    sbc rounded_Dx
     tay
     lda #2
     ora nt_buffer+12*32, x
@@ -955,56 +955,58 @@ PPxy13_store___xNE:
     lda #4
     ora nt_buffer+13*32, x
     sta nt_buffer+13*32, x
-    tya
-    inx
-    sbc Dy
-    bcc PPxy13_adc_SWx__
-PPxy13_NWx__:
-    sbc Dy
-    bcs PPxy13_NWxNE
-    adc rounded_Dx
-PPxy13_NWxSE:
     cpx to_x
     beq PPxy13_return
+    tya
+    inx
+    adc Dy
+    bcs PPxy13_adc_SWx__
+PPxy13_NWx__:
+    adc Dy
+    bcc PPxy13_NWxNE
+    sbc rounded_Dx
+PPxy13_NWxSE:
     tay
     lda #9
     ora nt_buffer+13*32, x
     sta nt_buffer+13*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy13_SWx__
-    adc rounded_Dx
-    jmp PPxy14_NWx__
-PPxy13_NWxNE:
     cpx to_x
     beq PPxy13_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy13_SWx__
+    sbc rounded_Dx
+    jmp PPxy14_NWx__
+PPxy13_NWxNE:
     tay
     lda #12
     ora nt_buffer+13*32, x
     sta nt_buffer+13*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy13_NWx__
-PPxy13_adc_SWx__:
-    adc rounded_Dx
-PPxy13_SWx__:
-    sbc Dy
-    bcc PPxy13_fill_SWx__
-PPxy13_SWxSE:
     cpx to_x
     beq PPxy13_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy13_NWx__
+PPxy13_adc_SWx__:
+    sbc rounded_Dx
+PPxy13_SWx__:
+    adc Dy
+    bcs PPxy13_fill_SWx__
+PPxy13_SWxSE:
     tay
     lda #3
 PPxy13_store___xSE:
     ora nt_buffer+13*32, x
     sta nt_buffer+13*32, x
+    cpx to_x
+    beq PPxy13_return
     tya
     inx
-    sbc Dy
-    bcs PPxy13_SWx__
-    adc rounded_Dx
+    adc Dy
+    bcc PPxy13_SWx__
+    sbc rounded_Dx
     jmp PPxy14_NWx__
 PPxy13_return:
     rts
@@ -1016,9 +1018,7 @@ PPxy13___xNE:
     tay
     jmp PPxy13_store___xNE
 PPxy13_fill_SWx__:
-    adc rounded_Dx
-    cpx to_x
-    beq PPxy13_return
+    sbc rounded_Dx
     tay
     lda #2
     ora nt_buffer+13*32, x
@@ -1028,56 +1028,58 @@ PPxy14_store___xNE:
     lda #4
     ora nt_buffer+14*32, x
     sta nt_buffer+14*32, x
-    tya
-    inx
-    sbc Dy
-    bcc PPxy14_adc_SWx__
-PPxy14_NWx__:
-    sbc Dy
-    bcs PPxy14_NWxNE
-    adc rounded_Dx
-PPxy14_NWxSE:
     cpx to_x
     beq PPxy14_return
+    tya
+    inx
+    adc Dy
+    bcs PPxy14_adc_SWx__
+PPxy14_NWx__:
+    adc Dy
+    bcc PPxy14_NWxNE
+    sbc rounded_Dx
+PPxy14_NWxSE:
     tay
     lda #9
     ora nt_buffer+14*32, x
     sta nt_buffer+14*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy14_SWx__
-    adc rounded_Dx
-    jmp PPxy15_NWx__
-PPxy14_NWxNE:
     cpx to_x
     beq PPxy14_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy14_SWx__
+    sbc rounded_Dx
+    jmp PPxy15_NWx__
+PPxy14_NWxNE:
     tay
     lda #12
     ora nt_buffer+14*32, x
     sta nt_buffer+14*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy14_NWx__
-PPxy14_adc_SWx__:
-    adc rounded_Dx
-PPxy14_SWx__:
-    sbc Dy
-    bcc PPxy14_fill_SWx__
-PPxy14_SWxSE:
     cpx to_x
     beq PPxy14_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy14_NWx__
+PPxy14_adc_SWx__:
+    sbc rounded_Dx
+PPxy14_SWx__:
+    adc Dy
+    bcs PPxy14_fill_SWx__
+PPxy14_SWxSE:
     tay
     lda #3
 PPxy14_store___xSE:
     ora nt_buffer+14*32, x
     sta nt_buffer+14*32, x
+    cpx to_x
+    beq PPxy14_return
     tya
     inx
-    sbc Dy
-    bcs PPxy14_SWx__
-    adc rounded_Dx
+    adc Dy
+    bcc PPxy14_SWx__
+    sbc rounded_Dx
     jmp PPxy15_NWx__
 PPxy14_return:
     rts
@@ -1089,9 +1091,7 @@ PPxy14___xNE:
     tay
     jmp PPxy14_store___xNE
 PPxy14_fill_SWx__:
-    adc rounded_Dx
-    cpx to_x
-    beq PPxy14_return
+    sbc rounded_Dx
     tay
     lda #2
     ora nt_buffer+14*32, x
@@ -1101,56 +1101,58 @@ PPxy15_store___xNE:
     lda #4
     ora nt_buffer+15*32, x
     sta nt_buffer+15*32, x
-    tya
-    inx
-    sbc Dy
-    bcc PPxy15_adc_SWx__
-PPxy15_NWx__:
-    sbc Dy
-    bcs PPxy15_NWxNE
-    adc rounded_Dx
-PPxy15_NWxSE:
     cpx to_x
     beq PPxy15_return
+    tya
+    inx
+    adc Dy
+    bcs PPxy15_adc_SWx__
+PPxy15_NWx__:
+    adc Dy
+    bcc PPxy15_NWxNE
+    sbc rounded_Dx
+PPxy15_NWxSE:
     tay
     lda #9
     ora nt_buffer+15*32, x
     sta nt_buffer+15*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy15_SWx__
-    adc rounded_Dx
-    jmp PPxy16_NWx__
-PPxy15_NWxNE:
     cpx to_x
     beq PPxy15_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy15_SWx__
+    sbc rounded_Dx
+    jmp PPxy16_NWx__
+PPxy15_NWxNE:
     tay
     lda #12
     ora nt_buffer+15*32, x
     sta nt_buffer+15*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy15_NWx__
-PPxy15_adc_SWx__:
-    adc rounded_Dx
-PPxy15_SWx__:
-    sbc Dy
-    bcc PPxy15_fill_SWx__
-PPxy15_SWxSE:
     cpx to_x
     beq PPxy15_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy15_NWx__
+PPxy15_adc_SWx__:
+    sbc rounded_Dx
+PPxy15_SWx__:
+    adc Dy
+    bcs PPxy15_fill_SWx__
+PPxy15_SWxSE:
     tay
     lda #3
 PPxy15_store___xSE:
     ora nt_buffer+15*32, x
     sta nt_buffer+15*32, x
+    cpx to_x
+    beq PPxy15_return
     tya
     inx
-    sbc Dy
-    bcs PPxy15_SWx__
-    adc rounded_Dx
+    adc Dy
+    bcc PPxy15_SWx__
+    sbc rounded_Dx
     jmp PPxy16_NWx__
 PPxy15_return:
     rts
@@ -1162,9 +1164,7 @@ PPxy15___xNE:
     tay
     jmp PPxy15_store___xNE
 PPxy15_fill_SWx__:
-    adc rounded_Dx
-    cpx to_x
-    beq PPxy15_return
+    sbc rounded_Dx
     tay
     lda #2
     ora nt_buffer+15*32, x
@@ -1174,56 +1174,58 @@ PPxy16_store___xNE:
     lda #4
     ora nt_buffer+16*32, x
     sta nt_buffer+16*32, x
-    tya
-    inx
-    sbc Dy
-    bcc PPxy16_adc_SWx__
-PPxy16_NWx__:
-    sbc Dy
-    bcs PPxy16_NWxNE
-    adc rounded_Dx
-PPxy16_NWxSE:
     cpx to_x
     beq PPxy16_return
+    tya
+    inx
+    adc Dy
+    bcs PPxy16_adc_SWx__
+PPxy16_NWx__:
+    adc Dy
+    bcc PPxy16_NWxNE
+    sbc rounded_Dx
+PPxy16_NWxSE:
     tay
     lda #9
     ora nt_buffer+16*32, x
     sta nt_buffer+16*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy16_SWx__
-    adc rounded_Dx
-    jmp PPxy17_NWx__
-PPxy16_NWxNE:
     cpx to_x
     beq PPxy16_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy16_SWx__
+    sbc rounded_Dx
+    jmp PPxy17_NWx__
+PPxy16_NWxNE:
     tay
     lda #12
     ora nt_buffer+16*32, x
     sta nt_buffer+16*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy16_NWx__
-PPxy16_adc_SWx__:
-    adc rounded_Dx
-PPxy16_SWx__:
-    sbc Dy
-    bcc PPxy16_fill_SWx__
-PPxy16_SWxSE:
     cpx to_x
     beq PPxy16_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy16_NWx__
+PPxy16_adc_SWx__:
+    sbc rounded_Dx
+PPxy16_SWx__:
+    adc Dy
+    bcs PPxy16_fill_SWx__
+PPxy16_SWxSE:
     tay
     lda #3
 PPxy16_store___xSE:
     ora nt_buffer+16*32, x
     sta nt_buffer+16*32, x
+    cpx to_x
+    beq PPxy16_return
     tya
     inx
-    sbc Dy
-    bcs PPxy16_SWx__
-    adc rounded_Dx
+    adc Dy
+    bcc PPxy16_SWx__
+    sbc rounded_Dx
     jmp PPxy17_NWx__
 PPxy16_return:
     rts
@@ -1235,9 +1237,7 @@ PPxy16___xNE:
     tay
     jmp PPxy16_store___xNE
 PPxy16_fill_SWx__:
-    adc rounded_Dx
-    cpx to_x
-    beq PPxy16_return
+    sbc rounded_Dx
     tay
     lda #2
     ora nt_buffer+16*32, x
@@ -1247,56 +1247,58 @@ PPxy17_store___xNE:
     lda #4
     ora nt_buffer+17*32, x
     sta nt_buffer+17*32, x
-    tya
-    inx
-    sbc Dy
-    bcc PPxy17_adc_SWx__
-PPxy17_NWx__:
-    sbc Dy
-    bcs PPxy17_NWxNE
-    adc rounded_Dx
-PPxy17_NWxSE:
     cpx to_x
     beq PPxy17_return
+    tya
+    inx
+    adc Dy
+    bcs PPxy17_adc_SWx__
+PPxy17_NWx__:
+    adc Dy
+    bcc PPxy17_NWxNE
+    sbc rounded_Dx
+PPxy17_NWxSE:
     tay
     lda #9
     ora nt_buffer+17*32, x
     sta nt_buffer+17*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy17_SWx__
-    adc rounded_Dx
-    jmp PPxy18_NWx__
-PPxy17_NWxNE:
     cpx to_x
     beq PPxy17_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy17_SWx__
+    sbc rounded_Dx
+    jmp PPxy18_NWx__
+PPxy17_NWxNE:
     tay
     lda #12
     ora nt_buffer+17*32, x
     sta nt_buffer+17*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy17_NWx__
-PPxy17_adc_SWx__:
-    adc rounded_Dx
-PPxy17_SWx__:
-    sbc Dy
-    bcc PPxy17_fill_SWx__
-PPxy17_SWxSE:
     cpx to_x
     beq PPxy17_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy17_NWx__
+PPxy17_adc_SWx__:
+    sbc rounded_Dx
+PPxy17_SWx__:
+    adc Dy
+    bcs PPxy17_fill_SWx__
+PPxy17_SWxSE:
     tay
     lda #3
 PPxy17_store___xSE:
     ora nt_buffer+17*32, x
     sta nt_buffer+17*32, x
+    cpx to_x
+    beq PPxy17_return
     tya
     inx
-    sbc Dy
-    bcs PPxy17_SWx__
-    adc rounded_Dx
+    adc Dy
+    bcc PPxy17_SWx__
+    sbc rounded_Dx
     jmp PPxy18_NWx__
 PPxy17_return:
     rts
@@ -1308,9 +1310,7 @@ PPxy17___xNE:
     tay
     jmp PPxy17_store___xNE
 PPxy17_fill_SWx__:
-    adc rounded_Dx
-    cpx to_x
-    beq PPxy17_return
+    sbc rounded_Dx
     tay
     lda #2
     ora nt_buffer+17*32, x
@@ -1320,56 +1320,58 @@ PPxy18_store___xNE:
     lda #4
     ora nt_buffer+18*32, x
     sta nt_buffer+18*32, x
-    tya
-    inx
-    sbc Dy
-    bcc PPxy18_adc_SWx__
-PPxy18_NWx__:
-    sbc Dy
-    bcs PPxy18_NWxNE
-    adc rounded_Dx
-PPxy18_NWxSE:
     cpx to_x
     beq PPxy18_return
+    tya
+    inx
+    adc Dy
+    bcs PPxy18_adc_SWx__
+PPxy18_NWx__:
+    adc Dy
+    bcc PPxy18_NWxNE
+    sbc rounded_Dx
+PPxy18_NWxSE:
     tay
     lda #9
     ora nt_buffer+18*32, x
     sta nt_buffer+18*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy18_SWx__
-    adc rounded_Dx
-    jmp PPxy19_NWx__
-PPxy18_NWxNE:
     cpx to_x
     beq PPxy18_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy18_SWx__
+    sbc rounded_Dx
+    jmp PPxy19_NWx__
+PPxy18_NWxNE:
     tay
     lda #12
     ora nt_buffer+18*32, x
     sta nt_buffer+18*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy18_NWx__
-PPxy18_adc_SWx__:
-    adc rounded_Dx
-PPxy18_SWx__:
-    sbc Dy
-    bcc PPxy18_fill_SWx__
-PPxy18_SWxSE:
     cpx to_x
     beq PPxy18_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy18_NWx__
+PPxy18_adc_SWx__:
+    sbc rounded_Dx
+PPxy18_SWx__:
+    adc Dy
+    bcs PPxy18_fill_SWx__
+PPxy18_SWxSE:
     tay
     lda #3
 PPxy18_store___xSE:
     ora nt_buffer+18*32, x
     sta nt_buffer+18*32, x
+    cpx to_x
+    beq PPxy18_return
     tya
     inx
-    sbc Dy
-    bcs PPxy18_SWx__
-    adc rounded_Dx
+    adc Dy
+    bcc PPxy18_SWx__
+    sbc rounded_Dx
     jmp PPxy19_NWx__
 PPxy18_return:
     rts
@@ -1381,9 +1383,7 @@ PPxy18___xNE:
     tay
     jmp PPxy18_store___xNE
 PPxy18_fill_SWx__:
-    adc rounded_Dx
-    cpx to_x
-    beq PPxy18_return
+    sbc rounded_Dx
     tay
     lda #2
     ora nt_buffer+18*32, x
@@ -1393,56 +1393,58 @@ PPxy19_store___xNE:
     lda #4
     ora nt_buffer+19*32, x
     sta nt_buffer+19*32, x
-    tya
-    inx
-    sbc Dy
-    bcc PPxy19_adc_SWx__
-PPxy19_NWx__:
-    sbc Dy
-    bcs PPxy19_NWxNE
-    adc rounded_Dx
-PPxy19_NWxSE:
     cpx to_x
     beq PPxy19_return
+    tya
+    inx
+    adc Dy
+    bcs PPxy19_adc_SWx__
+PPxy19_NWx__:
+    adc Dy
+    bcc PPxy19_NWxNE
+    sbc rounded_Dx
+PPxy19_NWxSE:
     tay
     lda #9
     ora nt_buffer+19*32, x
     sta nt_buffer+19*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy19_SWx__
-    adc rounded_Dx
-    jmp PPxy20_NWx__
-PPxy19_NWxNE:
     cpx to_x
     beq PPxy19_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy19_SWx__
+    sbc rounded_Dx
+    jmp PPxy20_NWx__
+PPxy19_NWxNE:
     tay
     lda #12
     ora nt_buffer+19*32, x
     sta nt_buffer+19*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy19_NWx__
-PPxy19_adc_SWx__:
-    adc rounded_Dx
-PPxy19_SWx__:
-    sbc Dy
-    bcc PPxy19_fill_SWx__
-PPxy19_SWxSE:
     cpx to_x
     beq PPxy19_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy19_NWx__
+PPxy19_adc_SWx__:
+    sbc rounded_Dx
+PPxy19_SWx__:
+    adc Dy
+    bcs PPxy19_fill_SWx__
+PPxy19_SWxSE:
     tay
     lda #3
 PPxy19_store___xSE:
     ora nt_buffer+19*32, x
     sta nt_buffer+19*32, x
+    cpx to_x
+    beq PPxy19_return
     tya
     inx
-    sbc Dy
-    bcs PPxy19_SWx__
-    adc rounded_Dx
+    adc Dy
+    bcc PPxy19_SWx__
+    sbc rounded_Dx
     jmp PPxy20_NWx__
 PPxy19_return:
     rts
@@ -1454,9 +1456,7 @@ PPxy19___xNE:
     tay
     jmp PPxy19_store___xNE
 PPxy19_fill_SWx__:
-    adc rounded_Dx
-    cpx to_x
-    beq PPxy19_return
+    sbc rounded_Dx
     tay
     lda #2
     ora nt_buffer+19*32, x
@@ -1466,56 +1466,58 @@ PPxy20_store___xNE:
     lda #4
     ora nt_buffer+20*32, x
     sta nt_buffer+20*32, x
-    tya
-    inx
-    sbc Dy
-    bcc PPxy20_adc_SWx__
-PPxy20_NWx__:
-    sbc Dy
-    bcs PPxy20_NWxNE
-    adc rounded_Dx
-PPxy20_NWxSE:
     cpx to_x
     beq PPxy20_return
+    tya
+    inx
+    adc Dy
+    bcs PPxy20_adc_SWx__
+PPxy20_NWx__:
+    adc Dy
+    bcc PPxy20_NWxNE
+    sbc rounded_Dx
+PPxy20_NWxSE:
     tay
     lda #9
     ora nt_buffer+20*32, x
     sta nt_buffer+20*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy20_SWx__
-    adc rounded_Dx
-    jmp PPxy21_NWx__
-PPxy20_NWxNE:
     cpx to_x
     beq PPxy20_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy20_SWx__
+    sbc rounded_Dx
+    jmp PPxy21_NWx__
+PPxy20_NWxNE:
     tay
     lda #12
     ora nt_buffer+20*32, x
     sta nt_buffer+20*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy20_NWx__
-PPxy20_adc_SWx__:
-    adc rounded_Dx
-PPxy20_SWx__:
-    sbc Dy
-    bcc PPxy20_fill_SWx__
-PPxy20_SWxSE:
     cpx to_x
     beq PPxy20_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy20_NWx__
+PPxy20_adc_SWx__:
+    sbc rounded_Dx
+PPxy20_SWx__:
+    adc Dy
+    bcs PPxy20_fill_SWx__
+PPxy20_SWxSE:
     tay
     lda #3
 PPxy20_store___xSE:
     ora nt_buffer+20*32, x
     sta nt_buffer+20*32, x
+    cpx to_x
+    beq PPxy20_return
     tya
     inx
-    sbc Dy
-    bcs PPxy20_SWx__
-    adc rounded_Dx
+    adc Dy
+    bcc PPxy20_SWx__
+    sbc rounded_Dx
     jmp PPxy21_NWx__
 PPxy20_return:
     rts
@@ -1527,9 +1529,7 @@ PPxy20___xNE:
     tay
     jmp PPxy20_store___xNE
 PPxy20_fill_SWx__:
-    adc rounded_Dx
-    cpx to_x
-    beq PPxy20_return
+    sbc rounded_Dx
     tay
     lda #2
     ora nt_buffer+20*32, x
@@ -1539,58 +1539,60 @@ PPxy21_store___xNE:
     lda #4
     ora nt_buffer+21*32, x
     sta nt_buffer+21*32, x
-    tya
-    inx
-    sbc Dy
-    bcc PPxy21_adc_SWx__
-PPxy21_NWx__:
-    sbc Dy
-    bcs PPxy21_NWxNE
-    adc rounded_Dx
-PPxy21_NWxSE:
     cpx to_x
     beq PPxy21_return
+    tya
+    inx
+    adc Dy
+    bcs PPxy21_adc_SWx__
+PPxy21_NWx__:
+    adc Dy
+    bcc PPxy21_NWxNE
+    sbc rounded_Dx
+PPxy21_NWxSE:
     tay
     lda #9
     ora nt_buffer+21*32, x
     sta nt_buffer+21*32, x
+    cpx to_x
+    beq PPxy21_return
     tya
     inx
-    sbc Dy
-    bcs PPxy21_SWx__
+    adc Dy
+    bcc PPxy21_SWx__
     rts
     nop
     nop
     nop
     nop
 PPxy21_NWxNE:
-    cpx to_x
-    beq PPxy21_return
     tay
     lda #12
     ora nt_buffer+21*32, x
     sta nt_buffer+21*32, x
-    tya
-    inx
-    sbc Dy
-    bcs PPxy21_NWx__
-PPxy21_adc_SWx__:
-    adc rounded_Dx
-PPxy21_SWx__:
-    sbc Dy
-    bcc PPxy21_fill_SWx__
-PPxy21_SWxSE:
     cpx to_x
     beq PPxy21_return
+    tya
+    inx
+    adc Dy
+    bcc PPxy21_NWx__
+PPxy21_adc_SWx__:
+    sbc rounded_Dx
+PPxy21_SWx__:
+    adc Dy
+    bcs PPxy21_fill_SWx__
+PPxy21_SWxSE:
     tay
     lda #3
 PPxy21_store___xSE:
     ora nt_buffer+21*32, x
     sta nt_buffer+21*32, x
+    cpx to_x
+    beq PPxy21_return
     tya
     inx
-    sbc Dy
-    bcs PPxy21_SWx__
+    adc Dy
+    bcc PPxy21_SWx__
     rts
     nop
     nop
@@ -1604,9 +1606,7 @@ PPxy21___xNE:
     tay
     jmp PPxy21_store___xNE
 PPxy21_fill_SWx__:
-    adc rounded_Dx
-    cpx to_x
-    beq PPxy21_return
+    sbc rounded_Dx
     tay
     lda #2
     ora nt_buffer+21*32, x
@@ -3668,7 +3668,7 @@ PPyx_offset:
 .assert .lobyte(PPyx21___xSW) <> $FF, error, "page overlap: PPyx21___xSW"
 .assert .lobyte(PPyx21_NEx__) <> $FF, error, "page overlap: PPyx21_NEx__"
 .assert .lobyte(PPyx21_NExSE) <> $FF, error, "page overlap: PPyx21_NExSE"
-.segment "UNROLLED"
+.segment "LINE_UNROLLED"
     nop
     nop
 NPxy0:
@@ -3676,6 +3676,8 @@ NPxy0_store___xNE:
     lda #8
     ora nt_buffer+0*32, x
     sta nt_buffer+0*32, x
+    cpx to_x
+    beq NPxy0_return
     tya
     dex
     sbc Dy
@@ -3685,12 +3687,12 @@ NPxy0_NWx__:
     bcs NPxy0_NWxNE
     adc rounded_Dx
 NPxy0_NWxSE:
-    cpx to_x
-    beq NPxy0_return
     tay
     lda #6
     ora nt_buffer+0*32, x
     sta nt_buffer+0*32, x
+    cpx to_x
+    beq NPxy0_return
     tya
     dex
     sbc Dy
@@ -3698,12 +3700,12 @@ NPxy0_NWxSE:
     adc rounded_Dx
     jmp NPxy1_NWx__
 NPxy0_NWxNE:
-    cpx to_x
-    beq NPxy0_return
     tay
     lda #12
     ora nt_buffer+0*32, x
     sta nt_buffer+0*32, x
+    cpx to_x
+    beq NPxy0_return
     tya
     dex
     sbc Dy
@@ -3714,13 +3716,13 @@ NPxy0_SWx__:
     sbc Dy
     bcc NPxy0_fill_SWx__
 NPxy0_SWxSE:
-    cpx to_x
-    beq NPxy0_return
     tay
     lda #3
 NPxy0_store___xSE:
     ora nt_buffer+0*32, x
     sta nt_buffer+0*32, x
+    cpx to_x
+    beq NPxy0_return
     tya
     dex
     sbc Dy
@@ -3738,8 +3740,6 @@ NPxy0___xNE:
     jmp NPxy0_store___xNE
 NPxy0_fill_SWx__:
     adc rounded_Dx
-    cpx to_x
-    beq NPxy0_return
     tay
     lda #1
     ora nt_buffer+0*32, x
@@ -3749,6 +3749,8 @@ NPxy1_store___xNE:
     lda #8
     ora nt_buffer+1*32, x
     sta nt_buffer+1*32, x
+    cpx to_x
+    beq NPxy1_return
     tya
     dex
     sbc Dy
@@ -3758,12 +3760,12 @@ NPxy1_NWx__:
     bcs NPxy1_NWxNE
     adc rounded_Dx
 NPxy1_NWxSE:
-    cpx to_x
-    beq NPxy1_return
     tay
     lda #6
     ora nt_buffer+1*32, x
     sta nt_buffer+1*32, x
+    cpx to_x
+    beq NPxy1_return
     tya
     dex
     sbc Dy
@@ -3771,12 +3773,12 @@ NPxy1_NWxSE:
     adc rounded_Dx
     jmp NPxy2_NWx__
 NPxy1_NWxNE:
-    cpx to_x
-    beq NPxy1_return
     tay
     lda #12
     ora nt_buffer+1*32, x
     sta nt_buffer+1*32, x
+    cpx to_x
+    beq NPxy1_return
     tya
     dex
     sbc Dy
@@ -3787,13 +3789,13 @@ NPxy1_SWx__:
     sbc Dy
     bcc NPxy1_fill_SWx__
 NPxy1_SWxSE:
-    cpx to_x
-    beq NPxy1_return
     tay
     lda #3
 NPxy1_store___xSE:
     ora nt_buffer+1*32, x
     sta nt_buffer+1*32, x
+    cpx to_x
+    beq NPxy1_return
     tya
     dex
     sbc Dy
@@ -3811,8 +3813,6 @@ NPxy1___xNE:
     jmp NPxy1_store___xNE
 NPxy1_fill_SWx__:
     adc rounded_Dx
-    cpx to_x
-    beq NPxy1_return
     tay
     lda #1
     ora nt_buffer+1*32, x
@@ -3822,6 +3822,8 @@ NPxy2_store___xNE:
     lda #8
     ora nt_buffer+2*32, x
     sta nt_buffer+2*32, x
+    cpx to_x
+    beq NPxy2_return
     tya
     dex
     sbc Dy
@@ -3831,12 +3833,12 @@ NPxy2_NWx__:
     bcs NPxy2_NWxNE
     adc rounded_Dx
 NPxy2_NWxSE:
-    cpx to_x
-    beq NPxy2_return
     tay
     lda #6
     ora nt_buffer+2*32, x
     sta nt_buffer+2*32, x
+    cpx to_x
+    beq NPxy2_return
     tya
     dex
     sbc Dy
@@ -3844,12 +3846,12 @@ NPxy2_NWxSE:
     adc rounded_Dx
     jmp NPxy3_NWx__
 NPxy2_NWxNE:
-    cpx to_x
-    beq NPxy2_return
     tay
     lda #12
     ora nt_buffer+2*32, x
     sta nt_buffer+2*32, x
+    cpx to_x
+    beq NPxy2_return
     tya
     dex
     sbc Dy
@@ -3860,13 +3862,13 @@ NPxy2_SWx__:
     sbc Dy
     bcc NPxy2_fill_SWx__
 NPxy2_SWxSE:
-    cpx to_x
-    beq NPxy2_return
     tay
     lda #3
 NPxy2_store___xSE:
     ora nt_buffer+2*32, x
     sta nt_buffer+2*32, x
+    cpx to_x
+    beq NPxy2_return
     tya
     dex
     sbc Dy
@@ -3884,8 +3886,6 @@ NPxy2___xNE:
     jmp NPxy2_store___xNE
 NPxy2_fill_SWx__:
     adc rounded_Dx
-    cpx to_x
-    beq NPxy2_return
     tay
     lda #1
     ora nt_buffer+2*32, x
@@ -3895,6 +3895,8 @@ NPxy3_store___xNE:
     lda #8
     ora nt_buffer+3*32, x
     sta nt_buffer+3*32, x
+    cpx to_x
+    beq NPxy3_return
     tya
     dex
     sbc Dy
@@ -3904,12 +3906,12 @@ NPxy3_NWx__:
     bcs NPxy3_NWxNE
     adc rounded_Dx
 NPxy3_NWxSE:
-    cpx to_x
-    beq NPxy3_return
     tay
     lda #6
     ora nt_buffer+3*32, x
     sta nt_buffer+3*32, x
+    cpx to_x
+    beq NPxy3_return
     tya
     dex
     sbc Dy
@@ -3917,12 +3919,12 @@ NPxy3_NWxSE:
     adc rounded_Dx
     jmp NPxy4_NWx__
 NPxy3_NWxNE:
-    cpx to_x
-    beq NPxy3_return
     tay
     lda #12
     ora nt_buffer+3*32, x
     sta nt_buffer+3*32, x
+    cpx to_x
+    beq NPxy3_return
     tya
     dex
     sbc Dy
@@ -3933,13 +3935,13 @@ NPxy3_SWx__:
     sbc Dy
     bcc NPxy3_fill_SWx__
 NPxy3_SWxSE:
-    cpx to_x
-    beq NPxy3_return
     tay
     lda #3
 NPxy3_store___xSE:
     ora nt_buffer+3*32, x
     sta nt_buffer+3*32, x
+    cpx to_x
+    beq NPxy3_return
     tya
     dex
     sbc Dy
@@ -3957,8 +3959,6 @@ NPxy3___xNE:
     jmp NPxy3_store___xNE
 NPxy3_fill_SWx__:
     adc rounded_Dx
-    cpx to_x
-    beq NPxy3_return
     tay
     lda #1
     ora nt_buffer+3*32, x
@@ -3968,6 +3968,8 @@ NPxy4_store___xNE:
     lda #8
     ora nt_buffer+4*32, x
     sta nt_buffer+4*32, x
+    cpx to_x
+    beq NPxy4_return
     tya
     dex
     sbc Dy
@@ -3977,12 +3979,12 @@ NPxy4_NWx__:
     bcs NPxy4_NWxNE
     adc rounded_Dx
 NPxy4_NWxSE:
-    cpx to_x
-    beq NPxy4_return
     tay
     lda #6
     ora nt_buffer+4*32, x
     sta nt_buffer+4*32, x
+    cpx to_x
+    beq NPxy4_return
     tya
     dex
     sbc Dy
@@ -3990,12 +3992,12 @@ NPxy4_NWxSE:
     adc rounded_Dx
     jmp NPxy5_NWx__
 NPxy4_NWxNE:
-    cpx to_x
-    beq NPxy4_return
     tay
     lda #12
     ora nt_buffer+4*32, x
     sta nt_buffer+4*32, x
+    cpx to_x
+    beq NPxy4_return
     tya
     dex
     sbc Dy
@@ -4006,13 +4008,13 @@ NPxy4_SWx__:
     sbc Dy
     bcc NPxy4_fill_SWx__
 NPxy4_SWxSE:
-    cpx to_x
-    beq NPxy4_return
     tay
     lda #3
 NPxy4_store___xSE:
     ora nt_buffer+4*32, x
     sta nt_buffer+4*32, x
+    cpx to_x
+    beq NPxy4_return
     tya
     dex
     sbc Dy
@@ -4030,8 +4032,6 @@ NPxy4___xNE:
     jmp NPxy4_store___xNE
 NPxy4_fill_SWx__:
     adc rounded_Dx
-    cpx to_x
-    beq NPxy4_return
     tay
     lda #1
     ora nt_buffer+4*32, x
@@ -4041,6 +4041,8 @@ NPxy5_store___xNE:
     lda #8
     ora nt_buffer+5*32, x
     sta nt_buffer+5*32, x
+    cpx to_x
+    beq NPxy5_return
     tya
     dex
     sbc Dy
@@ -4050,12 +4052,12 @@ NPxy5_NWx__:
     bcs NPxy5_NWxNE
     adc rounded_Dx
 NPxy5_NWxSE:
-    cpx to_x
-    beq NPxy5_return
     tay
     lda #6
     ora nt_buffer+5*32, x
     sta nt_buffer+5*32, x
+    cpx to_x
+    beq NPxy5_return
     tya
     dex
     sbc Dy
@@ -4063,12 +4065,12 @@ NPxy5_NWxSE:
     adc rounded_Dx
     jmp NPxy6_NWx__
 NPxy5_NWxNE:
-    cpx to_x
-    beq NPxy5_return
     tay
     lda #12
     ora nt_buffer+5*32, x
     sta nt_buffer+5*32, x
+    cpx to_x
+    beq NPxy5_return
     tya
     dex
     sbc Dy
@@ -4079,13 +4081,13 @@ NPxy5_SWx__:
     sbc Dy
     bcc NPxy5_fill_SWx__
 NPxy5_SWxSE:
-    cpx to_x
-    beq NPxy5_return
     tay
     lda #3
 NPxy5_store___xSE:
     ora nt_buffer+5*32, x
     sta nt_buffer+5*32, x
+    cpx to_x
+    beq NPxy5_return
     tya
     dex
     sbc Dy
@@ -4103,8 +4105,6 @@ NPxy5___xNE:
     jmp NPxy5_store___xNE
 NPxy5_fill_SWx__:
     adc rounded_Dx
-    cpx to_x
-    beq NPxy5_return
     tay
     lda #1
     ora nt_buffer+5*32, x
@@ -4114,6 +4114,8 @@ NPxy6_store___xNE:
     lda #8
     ora nt_buffer+6*32, x
     sta nt_buffer+6*32, x
+    cpx to_x
+    beq NPxy6_return
     tya
     dex
     sbc Dy
@@ -4123,12 +4125,12 @@ NPxy6_NWx__:
     bcs NPxy6_NWxNE
     adc rounded_Dx
 NPxy6_NWxSE:
-    cpx to_x
-    beq NPxy6_return
     tay
     lda #6
     ora nt_buffer+6*32, x
     sta nt_buffer+6*32, x
+    cpx to_x
+    beq NPxy6_return
     tya
     dex
     sbc Dy
@@ -4136,12 +4138,12 @@ NPxy6_NWxSE:
     adc rounded_Dx
     jmp NPxy7_NWx__
 NPxy6_NWxNE:
-    cpx to_x
-    beq NPxy6_return
     tay
     lda #12
     ora nt_buffer+6*32, x
     sta nt_buffer+6*32, x
+    cpx to_x
+    beq NPxy6_return
     tya
     dex
     sbc Dy
@@ -4152,13 +4154,13 @@ NPxy6_SWx__:
     sbc Dy
     bcc NPxy6_fill_SWx__
 NPxy6_SWxSE:
-    cpx to_x
-    beq NPxy6_return
     tay
     lda #3
 NPxy6_store___xSE:
     ora nt_buffer+6*32, x
     sta nt_buffer+6*32, x
+    cpx to_x
+    beq NPxy6_return
     tya
     dex
     sbc Dy
@@ -4176,8 +4178,6 @@ NPxy6___xNE:
     jmp NPxy6_store___xNE
 NPxy6_fill_SWx__:
     adc rounded_Dx
-    cpx to_x
-    beq NPxy6_return
     tay
     lda #1
     ora nt_buffer+6*32, x
@@ -4187,6 +4187,8 @@ NPxy7_store___xNE:
     lda #8
     ora nt_buffer+7*32, x
     sta nt_buffer+7*32, x
+    cpx to_x
+    beq NPxy7_return
     tya
     dex
     sbc Dy
@@ -4196,12 +4198,12 @@ NPxy7_NWx__:
     bcs NPxy7_NWxNE
     adc rounded_Dx
 NPxy7_NWxSE:
-    cpx to_x
-    beq NPxy7_return
     tay
     lda #6
     ora nt_buffer+7*32, x
     sta nt_buffer+7*32, x
+    cpx to_x
+    beq NPxy7_return
     tya
     dex
     sbc Dy
@@ -4209,12 +4211,12 @@ NPxy7_NWxSE:
     adc rounded_Dx
     jmp NPxy8_NWx__
 NPxy7_NWxNE:
-    cpx to_x
-    beq NPxy7_return
     tay
     lda #12
     ora nt_buffer+7*32, x
     sta nt_buffer+7*32, x
+    cpx to_x
+    beq NPxy7_return
     tya
     dex
     sbc Dy
@@ -4225,13 +4227,13 @@ NPxy7_SWx__:
     sbc Dy
     bcc NPxy7_fill_SWx__
 NPxy7_SWxSE:
-    cpx to_x
-    beq NPxy7_return
     tay
     lda #3
 NPxy7_store___xSE:
     ora nt_buffer+7*32, x
     sta nt_buffer+7*32, x
+    cpx to_x
+    beq NPxy7_return
     tya
     dex
     sbc Dy
@@ -4249,8 +4251,6 @@ NPxy7___xNE:
     jmp NPxy7_store___xNE
 NPxy7_fill_SWx__:
     adc rounded_Dx
-    cpx to_x
-    beq NPxy7_return
     tay
     lda #1
     ora nt_buffer+7*32, x
@@ -4260,6 +4260,8 @@ NPxy8_store___xNE:
     lda #8
     ora nt_buffer+8*32, x
     sta nt_buffer+8*32, x
+    cpx to_x
+    beq NPxy8_return
     tya
     dex
     sbc Dy
@@ -4269,12 +4271,12 @@ NPxy8_NWx__:
     bcs NPxy8_NWxNE
     adc rounded_Dx
 NPxy8_NWxSE:
-    cpx to_x
-    beq NPxy8_return
     tay
     lda #6
     ora nt_buffer+8*32, x
     sta nt_buffer+8*32, x
+    cpx to_x
+    beq NPxy8_return
     tya
     dex
     sbc Dy
@@ -4282,12 +4284,12 @@ NPxy8_NWxSE:
     adc rounded_Dx
     jmp NPxy9_NWx__
 NPxy8_NWxNE:
-    cpx to_x
-    beq NPxy8_return
     tay
     lda #12
     ora nt_buffer+8*32, x
     sta nt_buffer+8*32, x
+    cpx to_x
+    beq NPxy8_return
     tya
     dex
     sbc Dy
@@ -4298,13 +4300,13 @@ NPxy8_SWx__:
     sbc Dy
     bcc NPxy8_fill_SWx__
 NPxy8_SWxSE:
-    cpx to_x
-    beq NPxy8_return
     tay
     lda #3
 NPxy8_store___xSE:
     ora nt_buffer+8*32, x
     sta nt_buffer+8*32, x
+    cpx to_x
+    beq NPxy8_return
     tya
     dex
     sbc Dy
@@ -4322,8 +4324,6 @@ NPxy8___xNE:
     jmp NPxy8_store___xNE
 NPxy8_fill_SWx__:
     adc rounded_Dx
-    cpx to_x
-    beq NPxy8_return
     tay
     lda #1
     ora nt_buffer+8*32, x
@@ -4333,6 +4333,8 @@ NPxy9_store___xNE:
     lda #8
     ora nt_buffer+9*32, x
     sta nt_buffer+9*32, x
+    cpx to_x
+    beq NPxy9_return
     tya
     dex
     sbc Dy
@@ -4342,12 +4344,12 @@ NPxy9_NWx__:
     bcs NPxy9_NWxNE
     adc rounded_Dx
 NPxy9_NWxSE:
-    cpx to_x
-    beq NPxy9_return
     tay
     lda #6
     ora nt_buffer+9*32, x
     sta nt_buffer+9*32, x
+    cpx to_x
+    beq NPxy9_return
     tya
     dex
     sbc Dy
@@ -4355,12 +4357,12 @@ NPxy9_NWxSE:
     adc rounded_Dx
     jmp NPxy10_NWx__
 NPxy9_NWxNE:
-    cpx to_x
-    beq NPxy9_return
     tay
     lda #12
     ora nt_buffer+9*32, x
     sta nt_buffer+9*32, x
+    cpx to_x
+    beq NPxy9_return
     tya
     dex
     sbc Dy
@@ -4371,13 +4373,13 @@ NPxy9_SWx__:
     sbc Dy
     bcc NPxy9_fill_SWx__
 NPxy9_SWxSE:
-    cpx to_x
-    beq NPxy9_return
     tay
     lda #3
 NPxy9_store___xSE:
     ora nt_buffer+9*32, x
     sta nt_buffer+9*32, x
+    cpx to_x
+    beq NPxy9_return
     tya
     dex
     sbc Dy
@@ -4395,8 +4397,6 @@ NPxy9___xNE:
     jmp NPxy9_store___xNE
 NPxy9_fill_SWx__:
     adc rounded_Dx
-    cpx to_x
-    beq NPxy9_return
     tay
     lda #1
     ora nt_buffer+9*32, x
@@ -4406,6 +4406,8 @@ NPxy10_store___xNE:
     lda #8
     ora nt_buffer+10*32, x
     sta nt_buffer+10*32, x
+    cpx to_x
+    beq NPxy10_return
     tya
     dex
     sbc Dy
@@ -4415,12 +4417,12 @@ NPxy10_NWx__:
     bcs NPxy10_NWxNE
     adc rounded_Dx
 NPxy10_NWxSE:
-    cpx to_x
-    beq NPxy10_return
     tay
     lda #6
     ora nt_buffer+10*32, x
     sta nt_buffer+10*32, x
+    cpx to_x
+    beq NPxy10_return
     tya
     dex
     sbc Dy
@@ -4428,12 +4430,12 @@ NPxy10_NWxSE:
     adc rounded_Dx
     jmp NPxy11_NWx__
 NPxy10_NWxNE:
-    cpx to_x
-    beq NPxy10_return
     tay
     lda #12
     ora nt_buffer+10*32, x
     sta nt_buffer+10*32, x
+    cpx to_x
+    beq NPxy10_return
     tya
     dex
     sbc Dy
@@ -4444,13 +4446,13 @@ NPxy10_SWx__:
     sbc Dy
     bcc NPxy10_fill_SWx__
 NPxy10_SWxSE:
-    cpx to_x
-    beq NPxy10_return
     tay
     lda #3
 NPxy10_store___xSE:
     ora nt_buffer+10*32, x
     sta nt_buffer+10*32, x
+    cpx to_x
+    beq NPxy10_return
     tya
     dex
     sbc Dy
@@ -4468,8 +4470,6 @@ NPxy10___xNE:
     jmp NPxy10_store___xNE
 NPxy10_fill_SWx__:
     adc rounded_Dx
-    cpx to_x
-    beq NPxy10_return
     tay
     lda #1
     ora nt_buffer+10*32, x
@@ -4479,6 +4479,8 @@ NPxy11_store___xNE:
     lda #8
     ora nt_buffer+11*32, x
     sta nt_buffer+11*32, x
+    cpx to_x
+    beq NPxy11_return
     tya
     dex
     sbc Dy
@@ -4488,12 +4490,12 @@ NPxy11_NWx__:
     bcs NPxy11_NWxNE
     adc rounded_Dx
 NPxy11_NWxSE:
-    cpx to_x
-    beq NPxy11_return
     tay
     lda #6
     ora nt_buffer+11*32, x
     sta nt_buffer+11*32, x
+    cpx to_x
+    beq NPxy11_return
     tya
     dex
     sbc Dy
@@ -4501,12 +4503,12 @@ NPxy11_NWxSE:
     adc rounded_Dx
     jmp NPxy12_NWx__
 NPxy11_NWxNE:
-    cpx to_x
-    beq NPxy11_return
     tay
     lda #12
     ora nt_buffer+11*32, x
     sta nt_buffer+11*32, x
+    cpx to_x
+    beq NPxy11_return
     tya
     dex
     sbc Dy
@@ -4517,13 +4519,13 @@ NPxy11_SWx__:
     sbc Dy
     bcc NPxy11_fill_SWx__
 NPxy11_SWxSE:
-    cpx to_x
-    beq NPxy11_return
     tay
     lda #3
 NPxy11_store___xSE:
     ora nt_buffer+11*32, x
     sta nt_buffer+11*32, x
+    cpx to_x
+    beq NPxy11_return
     tya
     dex
     sbc Dy
@@ -4541,8 +4543,6 @@ NPxy11___xNE:
     jmp NPxy11_store___xNE
 NPxy11_fill_SWx__:
     adc rounded_Dx
-    cpx to_x
-    beq NPxy11_return
     tay
     lda #1
     ora nt_buffer+11*32, x
@@ -4552,6 +4552,8 @@ NPxy12_store___xNE:
     lda #8
     ora nt_buffer+12*32, x
     sta nt_buffer+12*32, x
+    cpx to_x
+    beq NPxy12_return
     tya
     dex
     sbc Dy
@@ -4561,12 +4563,12 @@ NPxy12_NWx__:
     bcs NPxy12_NWxNE
     adc rounded_Dx
 NPxy12_NWxSE:
-    cpx to_x
-    beq NPxy12_return
     tay
     lda #6
     ora nt_buffer+12*32, x
     sta nt_buffer+12*32, x
+    cpx to_x
+    beq NPxy12_return
     tya
     dex
     sbc Dy
@@ -4574,12 +4576,12 @@ NPxy12_NWxSE:
     adc rounded_Dx
     jmp NPxy13_NWx__
 NPxy12_NWxNE:
-    cpx to_x
-    beq NPxy12_return
     tay
     lda #12
     ora nt_buffer+12*32, x
     sta nt_buffer+12*32, x
+    cpx to_x
+    beq NPxy12_return
     tya
     dex
     sbc Dy
@@ -4590,13 +4592,13 @@ NPxy12_SWx__:
     sbc Dy
     bcc NPxy12_fill_SWx__
 NPxy12_SWxSE:
-    cpx to_x
-    beq NPxy12_return
     tay
     lda #3
 NPxy12_store___xSE:
     ora nt_buffer+12*32, x
     sta nt_buffer+12*32, x
+    cpx to_x
+    beq NPxy12_return
     tya
     dex
     sbc Dy
@@ -4614,8 +4616,6 @@ NPxy12___xNE:
     jmp NPxy12_store___xNE
 NPxy12_fill_SWx__:
     adc rounded_Dx
-    cpx to_x
-    beq NPxy12_return
     tay
     lda #1
     ora nt_buffer+12*32, x
@@ -4625,6 +4625,8 @@ NPxy13_store___xNE:
     lda #8
     ora nt_buffer+13*32, x
     sta nt_buffer+13*32, x
+    cpx to_x
+    beq NPxy13_return
     tya
     dex
     sbc Dy
@@ -4634,12 +4636,12 @@ NPxy13_NWx__:
     bcs NPxy13_NWxNE
     adc rounded_Dx
 NPxy13_NWxSE:
-    cpx to_x
-    beq NPxy13_return
     tay
     lda #6
     ora nt_buffer+13*32, x
     sta nt_buffer+13*32, x
+    cpx to_x
+    beq NPxy13_return
     tya
     dex
     sbc Dy
@@ -4647,12 +4649,12 @@ NPxy13_NWxSE:
     adc rounded_Dx
     jmp NPxy14_NWx__
 NPxy13_NWxNE:
-    cpx to_x
-    beq NPxy13_return
     tay
     lda #12
     ora nt_buffer+13*32, x
     sta nt_buffer+13*32, x
+    cpx to_x
+    beq NPxy13_return
     tya
     dex
     sbc Dy
@@ -4663,13 +4665,13 @@ NPxy13_SWx__:
     sbc Dy
     bcc NPxy13_fill_SWx__
 NPxy13_SWxSE:
-    cpx to_x
-    beq NPxy13_return
     tay
     lda #3
 NPxy13_store___xSE:
     ora nt_buffer+13*32, x
     sta nt_buffer+13*32, x
+    cpx to_x
+    beq NPxy13_return
     tya
     dex
     sbc Dy
@@ -4687,8 +4689,6 @@ NPxy13___xNE:
     jmp NPxy13_store___xNE
 NPxy13_fill_SWx__:
     adc rounded_Dx
-    cpx to_x
-    beq NPxy13_return
     tay
     lda #1
     ora nt_buffer+13*32, x
@@ -4698,6 +4698,8 @@ NPxy14_store___xNE:
     lda #8
     ora nt_buffer+14*32, x
     sta nt_buffer+14*32, x
+    cpx to_x
+    beq NPxy14_return
     tya
     dex
     sbc Dy
@@ -4707,12 +4709,12 @@ NPxy14_NWx__:
     bcs NPxy14_NWxNE
     adc rounded_Dx
 NPxy14_NWxSE:
-    cpx to_x
-    beq NPxy14_return
     tay
     lda #6
     ora nt_buffer+14*32, x
     sta nt_buffer+14*32, x
+    cpx to_x
+    beq NPxy14_return
     tya
     dex
     sbc Dy
@@ -4720,12 +4722,12 @@ NPxy14_NWxSE:
     adc rounded_Dx
     jmp NPxy15_NWx__
 NPxy14_NWxNE:
-    cpx to_x
-    beq NPxy14_return
     tay
     lda #12
     ora nt_buffer+14*32, x
     sta nt_buffer+14*32, x
+    cpx to_x
+    beq NPxy14_return
     tya
     dex
     sbc Dy
@@ -4736,13 +4738,13 @@ NPxy14_SWx__:
     sbc Dy
     bcc NPxy14_fill_SWx__
 NPxy14_SWxSE:
-    cpx to_x
-    beq NPxy14_return
     tay
     lda #3
 NPxy14_store___xSE:
     ora nt_buffer+14*32, x
     sta nt_buffer+14*32, x
+    cpx to_x
+    beq NPxy14_return
     tya
     dex
     sbc Dy
@@ -4760,8 +4762,6 @@ NPxy14___xNE:
     jmp NPxy14_store___xNE
 NPxy14_fill_SWx__:
     adc rounded_Dx
-    cpx to_x
-    beq NPxy14_return
     tay
     lda #1
     ora nt_buffer+14*32, x
@@ -4771,6 +4771,8 @@ NPxy15_store___xNE:
     lda #8
     ora nt_buffer+15*32, x
     sta nt_buffer+15*32, x
+    cpx to_x
+    beq NPxy15_return
     tya
     dex
     sbc Dy
@@ -4780,12 +4782,12 @@ NPxy15_NWx__:
     bcs NPxy15_NWxNE
     adc rounded_Dx
 NPxy15_NWxSE:
-    cpx to_x
-    beq NPxy15_return
     tay
     lda #6
     ora nt_buffer+15*32, x
     sta nt_buffer+15*32, x
+    cpx to_x
+    beq NPxy15_return
     tya
     dex
     sbc Dy
@@ -4793,12 +4795,12 @@ NPxy15_NWxSE:
     adc rounded_Dx
     jmp NPxy16_NWx__
 NPxy15_NWxNE:
-    cpx to_x
-    beq NPxy15_return
     tay
     lda #12
     ora nt_buffer+15*32, x
     sta nt_buffer+15*32, x
+    cpx to_x
+    beq NPxy15_return
     tya
     dex
     sbc Dy
@@ -4809,13 +4811,13 @@ NPxy15_SWx__:
     sbc Dy
     bcc NPxy15_fill_SWx__
 NPxy15_SWxSE:
-    cpx to_x
-    beq NPxy15_return
     tay
     lda #3
 NPxy15_store___xSE:
     ora nt_buffer+15*32, x
     sta nt_buffer+15*32, x
+    cpx to_x
+    beq NPxy15_return
     tya
     dex
     sbc Dy
@@ -4833,8 +4835,6 @@ NPxy15___xNE:
     jmp NPxy15_store___xNE
 NPxy15_fill_SWx__:
     adc rounded_Dx
-    cpx to_x
-    beq NPxy15_return
     tay
     lda #1
     ora nt_buffer+15*32, x
@@ -4844,6 +4844,8 @@ NPxy16_store___xNE:
     lda #8
     ora nt_buffer+16*32, x
     sta nt_buffer+16*32, x
+    cpx to_x
+    beq NPxy16_return
     tya
     dex
     sbc Dy
@@ -4853,12 +4855,12 @@ NPxy16_NWx__:
     bcs NPxy16_NWxNE
     adc rounded_Dx
 NPxy16_NWxSE:
-    cpx to_x
-    beq NPxy16_return
     tay
     lda #6
     ora nt_buffer+16*32, x
     sta nt_buffer+16*32, x
+    cpx to_x
+    beq NPxy16_return
     tya
     dex
     sbc Dy
@@ -4866,12 +4868,12 @@ NPxy16_NWxSE:
     adc rounded_Dx
     jmp NPxy17_NWx__
 NPxy16_NWxNE:
-    cpx to_x
-    beq NPxy16_return
     tay
     lda #12
     ora nt_buffer+16*32, x
     sta nt_buffer+16*32, x
+    cpx to_x
+    beq NPxy16_return
     tya
     dex
     sbc Dy
@@ -4882,13 +4884,13 @@ NPxy16_SWx__:
     sbc Dy
     bcc NPxy16_fill_SWx__
 NPxy16_SWxSE:
-    cpx to_x
-    beq NPxy16_return
     tay
     lda #3
 NPxy16_store___xSE:
     ora nt_buffer+16*32, x
     sta nt_buffer+16*32, x
+    cpx to_x
+    beq NPxy16_return
     tya
     dex
     sbc Dy
@@ -4906,8 +4908,6 @@ NPxy16___xNE:
     jmp NPxy16_store___xNE
 NPxy16_fill_SWx__:
     adc rounded_Dx
-    cpx to_x
-    beq NPxy16_return
     tay
     lda #1
     ora nt_buffer+16*32, x
@@ -4917,6 +4917,8 @@ NPxy17_store___xNE:
     lda #8
     ora nt_buffer+17*32, x
     sta nt_buffer+17*32, x
+    cpx to_x
+    beq NPxy17_return
     tya
     dex
     sbc Dy
@@ -4926,12 +4928,12 @@ NPxy17_NWx__:
     bcs NPxy17_NWxNE
     adc rounded_Dx
 NPxy17_NWxSE:
-    cpx to_x
-    beq NPxy17_return
     tay
     lda #6
     ora nt_buffer+17*32, x
     sta nt_buffer+17*32, x
+    cpx to_x
+    beq NPxy17_return
     tya
     dex
     sbc Dy
@@ -4939,12 +4941,12 @@ NPxy17_NWxSE:
     adc rounded_Dx
     jmp NPxy18_NWx__
 NPxy17_NWxNE:
-    cpx to_x
-    beq NPxy17_return
     tay
     lda #12
     ora nt_buffer+17*32, x
     sta nt_buffer+17*32, x
+    cpx to_x
+    beq NPxy17_return
     tya
     dex
     sbc Dy
@@ -4955,13 +4957,13 @@ NPxy17_SWx__:
     sbc Dy
     bcc NPxy17_fill_SWx__
 NPxy17_SWxSE:
-    cpx to_x
-    beq NPxy17_return
     tay
     lda #3
 NPxy17_store___xSE:
     ora nt_buffer+17*32, x
     sta nt_buffer+17*32, x
+    cpx to_x
+    beq NPxy17_return
     tya
     dex
     sbc Dy
@@ -4979,8 +4981,6 @@ NPxy17___xNE:
     jmp NPxy17_store___xNE
 NPxy17_fill_SWx__:
     adc rounded_Dx
-    cpx to_x
-    beq NPxy17_return
     tay
     lda #1
     ora nt_buffer+17*32, x
@@ -4990,6 +4990,8 @@ NPxy18_store___xNE:
     lda #8
     ora nt_buffer+18*32, x
     sta nt_buffer+18*32, x
+    cpx to_x
+    beq NPxy18_return
     tya
     dex
     sbc Dy
@@ -4999,12 +5001,12 @@ NPxy18_NWx__:
     bcs NPxy18_NWxNE
     adc rounded_Dx
 NPxy18_NWxSE:
-    cpx to_x
-    beq NPxy18_return
     tay
     lda #6
     ora nt_buffer+18*32, x
     sta nt_buffer+18*32, x
+    cpx to_x
+    beq NPxy18_return
     tya
     dex
     sbc Dy
@@ -5012,12 +5014,12 @@ NPxy18_NWxSE:
     adc rounded_Dx
     jmp NPxy19_NWx__
 NPxy18_NWxNE:
-    cpx to_x
-    beq NPxy18_return
     tay
     lda #12
     ora nt_buffer+18*32, x
     sta nt_buffer+18*32, x
+    cpx to_x
+    beq NPxy18_return
     tya
     dex
     sbc Dy
@@ -5028,13 +5030,13 @@ NPxy18_SWx__:
     sbc Dy
     bcc NPxy18_fill_SWx__
 NPxy18_SWxSE:
-    cpx to_x
-    beq NPxy18_return
     tay
     lda #3
 NPxy18_store___xSE:
     ora nt_buffer+18*32, x
     sta nt_buffer+18*32, x
+    cpx to_x
+    beq NPxy18_return
     tya
     dex
     sbc Dy
@@ -5052,8 +5054,6 @@ NPxy18___xNE:
     jmp NPxy18_store___xNE
 NPxy18_fill_SWx__:
     adc rounded_Dx
-    cpx to_x
-    beq NPxy18_return
     tay
     lda #1
     ora nt_buffer+18*32, x
@@ -5063,6 +5063,8 @@ NPxy19_store___xNE:
     lda #8
     ora nt_buffer+19*32, x
     sta nt_buffer+19*32, x
+    cpx to_x
+    beq NPxy19_return
     tya
     dex
     sbc Dy
@@ -5072,12 +5074,12 @@ NPxy19_NWx__:
     bcs NPxy19_NWxNE
     adc rounded_Dx
 NPxy19_NWxSE:
-    cpx to_x
-    beq NPxy19_return
     tay
     lda #6
     ora nt_buffer+19*32, x
     sta nt_buffer+19*32, x
+    cpx to_x
+    beq NPxy19_return
     tya
     dex
     sbc Dy
@@ -5085,12 +5087,12 @@ NPxy19_NWxSE:
     adc rounded_Dx
     jmp NPxy20_NWx__
 NPxy19_NWxNE:
-    cpx to_x
-    beq NPxy19_return
     tay
     lda #12
     ora nt_buffer+19*32, x
     sta nt_buffer+19*32, x
+    cpx to_x
+    beq NPxy19_return
     tya
     dex
     sbc Dy
@@ -5101,13 +5103,13 @@ NPxy19_SWx__:
     sbc Dy
     bcc NPxy19_fill_SWx__
 NPxy19_SWxSE:
-    cpx to_x
-    beq NPxy19_return
     tay
     lda #3
 NPxy19_store___xSE:
     ora nt_buffer+19*32, x
     sta nt_buffer+19*32, x
+    cpx to_x
+    beq NPxy19_return
     tya
     dex
     sbc Dy
@@ -5125,8 +5127,6 @@ NPxy19___xNE:
     jmp NPxy19_store___xNE
 NPxy19_fill_SWx__:
     adc rounded_Dx
-    cpx to_x
-    beq NPxy19_return
     tay
     lda #1
     ora nt_buffer+19*32, x
@@ -5136,6 +5136,8 @@ NPxy20_store___xNE:
     lda #8
     ora nt_buffer+20*32, x
     sta nt_buffer+20*32, x
+    cpx to_x
+    beq NPxy20_return
     tya
     dex
     sbc Dy
@@ -5145,12 +5147,12 @@ NPxy20_NWx__:
     bcs NPxy20_NWxNE
     adc rounded_Dx
 NPxy20_NWxSE:
-    cpx to_x
-    beq NPxy20_return
     tay
     lda #6
     ora nt_buffer+20*32, x
     sta nt_buffer+20*32, x
+    cpx to_x
+    beq NPxy20_return
     tya
     dex
     sbc Dy
@@ -5158,12 +5160,12 @@ NPxy20_NWxSE:
     adc rounded_Dx
     jmp NPxy21_NWx__
 NPxy20_NWxNE:
-    cpx to_x
-    beq NPxy20_return
     tay
     lda #12
     ora nt_buffer+20*32, x
     sta nt_buffer+20*32, x
+    cpx to_x
+    beq NPxy20_return
     tya
     dex
     sbc Dy
@@ -5174,13 +5176,13 @@ NPxy20_SWx__:
     sbc Dy
     bcc NPxy20_fill_SWx__
 NPxy20_SWxSE:
-    cpx to_x
-    beq NPxy20_return
     tay
     lda #3
 NPxy20_store___xSE:
     ora nt_buffer+20*32, x
     sta nt_buffer+20*32, x
+    cpx to_x
+    beq NPxy20_return
     tya
     dex
     sbc Dy
@@ -5198,8 +5200,6 @@ NPxy20___xNE:
     jmp NPxy20_store___xNE
 NPxy20_fill_SWx__:
     adc rounded_Dx
-    cpx to_x
-    beq NPxy20_return
     tay
     lda #1
     ora nt_buffer+20*32, x
@@ -5209,6 +5209,8 @@ NPxy21_store___xNE:
     lda #8
     ora nt_buffer+21*32, x
     sta nt_buffer+21*32, x
+    cpx to_x
+    beq NPxy21_return
     tya
     dex
     sbc Dy
@@ -5218,12 +5220,12 @@ NPxy21_NWx__:
     bcs NPxy21_NWxNE
     adc rounded_Dx
 NPxy21_NWxSE:
-    cpx to_x
-    beq NPxy21_return
     tay
     lda #6
     ora nt_buffer+21*32, x
     sta nt_buffer+21*32, x
+    cpx to_x
+    beq NPxy21_return
     tya
     dex
     sbc Dy
@@ -5234,12 +5236,12 @@ NPxy21_NWxSE:
     nop
     nop
 NPxy21_NWxNE:
-    cpx to_x
-    beq NPxy21_return
     tay
     lda #12
     ora nt_buffer+21*32, x
     sta nt_buffer+21*32, x
+    cpx to_x
+    beq NPxy21_return
     tya
     dex
     sbc Dy
@@ -5250,13 +5252,13 @@ NPxy21_SWx__:
     sbc Dy
     bcc NPxy21_fill_SWx__
 NPxy21_SWxSE:
-    cpx to_x
-    beq NPxy21_return
     tay
     lda #3
 NPxy21_store___xSE:
     ora nt_buffer+21*32, x
     sta nt_buffer+21*32, x
+    cpx to_x
+    beq NPxy21_return
     tya
     dex
     sbc Dy
@@ -5275,8 +5277,6 @@ NPxy21___xNE:
     jmp NPxy21_store___xNE
 NPxy21_fill_SWx__:
     adc rounded_Dx
-    cpx to_x
-    beq NPxy21_return
     tay
     lda #1
     ora nt_buffer+21*32, x

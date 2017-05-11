@@ -63,6 +63,20 @@ clearOAMLoop:
     ; Increment X by 4.
     txa
     axs #.lobyte(-4)
+
+    lda inter
+    clc
+    adc #35
+    sta CPU_OAM+0, x ; Set sprite's y-position.
+    lda #$08
+    sta CPU_OAM+1, x ; Set sprite's pattern.
+    lda #0
+    sta CPU_OAM+2, x ; Set sprite's attributes.
+    lda #0
+    sta CPU_OAM+3, x ; Set sprite's x-position.
+    ; Increment X by 4.
+    txa
+    axs #.lobyte(-4)
     rts
 .endproc
 

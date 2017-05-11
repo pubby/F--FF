@@ -104,18 +104,20 @@ readControllerLoop:
     jsr ppu_load_4x4_pixels_chr
 
 
-    lda #64
-    sta from_x
     sta px
     lda #32
     sta from_y
     sta py
 
+    lda #$0
+    sta fx+1
+    lda #64
+    sta fx+0
+
     lda #0
-    sta from_x+1
     sta from_y+1
-    sta px+1
     sta py+1
+    sta px+1
 
 
     lda #PPUCTRL_NMI_ON
@@ -217,23 +219,24 @@ loop:
     inc fy+1
 :
 
-.repeat 2, i
-    lda px+i
-    sta to_x+i
-    lda py+i
-    sta to_y+i
-
-    lda fx+i
-    sta from_x+i
-    lda fy+i
-    sta from_y+i
-.endrepeat
-
     lda #PPUMASK_BG_ON | PPUMASK_GRAYSCALE | PPUMASK_EMPHASIZE_B | PPUMASK_NO_BG_CLIP
     ora #PPUMASK_SPR_ON | PPUMASK_NO_SPR_CLIP
     sta PPUMASK
 
 .repeat 1
+    .repeat 2, i
+        lda px+i
+        sta to_x+i
+        lda py+i
+        sta to_y+i
+
+        lda fx+i
+        sta from_x+i
+        lda fy+i
+        sta from_y+i
+    .endrepeat
+
+    bankswitch 0
     jsr draw_line5
 .endrepeat
 
