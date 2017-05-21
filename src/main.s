@@ -1,8 +1,7 @@
 .include "globals.inc"
 
-.import random_byte
 .import ppu_set_palette
-.import draw_line3, draw_line5
+.import draw_line
 .import prepare_game_sprites
 
 .export main, nmi_handler, irq_handler
@@ -39,7 +38,7 @@ readControllerLoop:
     sta PPUADDR
     sta PPUMASK
 
-    .repeat 704, i
+    .repeat 32*22, i
         lda nt_buffer+i
         sta PPUDATA
     .endrepeat
@@ -80,11 +79,6 @@ readControllerLoop:
 
     bit PPUSTATUS
     jsr ppu_set_palette
-
-    lda #$82
-    sta rng_state+0
-    lda #$39
-    sta rng_state+1
 
     bit PPUSTATUS
 .repeat 2, i
@@ -129,12 +123,8 @@ loop:
     beq :-
 
     lda #0
-    .repeat 704, i
+    .repeat 32*22, i
         sta nt_buffer+i
-    .endrepeat
-
-    .repeat 1700
-        nop
     .endrepeat
 
     lda p1_buttons_held
@@ -237,7 +227,7 @@ loop:
     .endrepeat
 
     bankswitch 0
-    jsr draw_line5
+    jsr draw_line
 .endrepeat
 
     lda #PPUMASK_BG_ON | PPUMASK_GRAYSCALE | PPUMASK_EMPHASIZE_R | PPUMASK_NO_BG_CLIP

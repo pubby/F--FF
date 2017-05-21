@@ -1,7 +1,15 @@
 .include "globals.inc"
 .include "intercept.inc"
 
-.export draw_line3, draw_line5
+.export draw_line
+
+Dx_sub      = 0 ; 1 byte
+Dx          = 1 ; 2 bytes
+Dy_sub      = 3 ; 1 byte
+Dy          = 4 ; 2 bytes
+rounded_Dx  = 6 ; 1 byte
+rounded_Dy  = 7 ; 2 bytes
+to_out_code = 6 ; 1 byte, shared with rounded_Dx
 
 .segment "LINE_TABLES"
 subpixel_table:
@@ -34,7 +42,6 @@ subpixel_table:
     compute_out_code to_x, to_y
     sta to_out_code
     compute_out_code from_x, from_y
-    sta from_out_code
     tax                 ; Store from_out_code in X temporarily.
     bne :+              ; Flag set by TAX.
     jmp clipTo
@@ -147,25 +154,190 @@ doneClipTo:
     beq accept          ; Flag set by TAX.
     jmp clipToLoop
 accept:
-    sec
-    .if .xmatch(xop,add)
-        sub16into to_x, from_x, Dx
-    .else
-        sub16into from_x, to_x, Dx
-    .endif
-    sec
-    sub16into to_y, from_y, Dy
-
-    ;lda #0
-    ;sta from_x+1
-    ;sta to_x+1
-    ;sta from_y+1
-    ;sta to_y+1
     ; fall-through into invoking code.
 .endmacro
 
-.proc draw_line5
-    bankswitch 0
+.macro bressenham_set_ptr name
+    lda from_x
+    alr #%00000100
+    tax
+    lda from_y
+    lsr
+    lsr
+    lsr
+    tay
+    bcc :+
+    clc
+    inx
+:
+    lda .ident(.sprintf("%s_lo", .string(name))), y
+    adc .ident(.sprintf("%s_offset", .string(name))), x
+    sta ptr_temp+0
+    lda .ident(.sprintf("%s_hi", .string(name))), y
+    adc #0
+    sta ptr_temp+1 ; This won't set carry.
+.endmacro
+
+.macro bressenham op
+    lda from_y
+    cmp #22*8
+    bcc :+
+earlyReturn:
+    rts
+:
+    ldx #%11111100
+    sax subroutine_temp
+    lda to_y
+    sec
+    sbc subroutine_temp ; Carry will remain set.
+    sax rounded_Dy
+    lda to_y
+    sbc from_y          ; Carry will remain set.
+    sta Dy
+
+    .if .xmatch(op,add)
+        lda from_x
+        sax subroutine_temp
+        lda to_x
+        sbc subroutine_temp
+        and #%11111100
+        sta rounded_Dx
+        ora rounded_Dy
+        beq earlyReturn
+        lda to_x
+        sbc from_x
+        sta Dx
+        cmp rounded_Dy
+        bcc secondOctant
+    .else
+        lda to_x
+        sax subroutine_temp
+        lda from_x
+        sbc subroutine_temp
+        and #%11111100
+        sta rounded_Dx
+        ora rounded_Dy
+        beq earlyReturn
+        lda from_x
+        sbc to_x
+        sta Dx
+        cmp rounded_Dy
+        bcc fourthOctant
+    .endif
+
+    .if .xmatch(op,add)
+        bressenham_set_ptr PPxy
+
+        lda to_x
+        lsr
+        lsr
+        lsr
+        adc #$FF
+        sta to_x
+
+        lda from_x
+        lsr
+        lsr
+        alr #%11111110      ; Clears carry for iteration code.
+        tax
+
+        lda from_y
+        and #%00000011
+        ora rounded_Dx
+        tay
+        lda subpixel_table, y
+        eor #$FF
+        jmp (ptr_temp)
+    secondOctant:
+        lda from_x
+        and #%00000011
+        ora rounded_Dy
+        tay
+        lda subpixel_table, y
+        sta subroutine_temp
+
+        bressenham_set_ptr PPyx
+
+        lda from_y
+        and #%11111000
+        eor #$FF
+        sec
+        adc to_y
+        lsr
+        lsr
+        lsr
+        adc #0
+        tay
+
+        lda from_x
+        lsr
+        lsr
+        lsr
+        tax
+
+        sec
+        lda subroutine_temp
+        jmp (ptr_temp)
+    .else
+    thirdOctant:
+        bressenham_set_ptr NPxy
+
+        lda to_x
+        lsr
+        lsr
+        lsr
+        adc #0
+        sta to_x
+
+        lda from_x
+        lsr
+        lsr
+        lsr
+        tax
+
+        lda from_y
+        and #%00000011
+        ora rounded_Dx
+        tay
+        lda subpixel_table, y
+        sta subroutine_temp
+        sec
+        jmp (ptr_temp)
+    fourthOctant:
+        lda from_x
+        and #%00000011
+        eor #%00000011
+        ora rounded_Dy
+        tay
+        lda subpixel_table, y
+        sta subroutine_temp
+
+        bressenham_set_ptr NPyx
+
+        lda from_y
+        and #%11111000
+        eor #$FF
+        sec
+        adc to_y
+        lsr
+        lsr
+        lsr
+        adc #0
+        tay
+
+        lda from_x
+        lsr
+        lsr
+        lsr
+        tax
+
+        sec
+        lda subroutine_temp
+        jmp (ptr_temp)
+    .endif
+.endmacro
+
+.proc draw_line
     sec
     lax to_y+0
     sbc from_y+0
@@ -225,643 +397,12 @@ posDy:
     ; Neg Dx
     .scope clipNegX
         clip sub
+        bressenham sub
     .endscope
-    jmp doneClip
 posDx:
     .scope clipPosX
         clip add
+        bressenham add
     .endscope
-doneClip:
-
-rounded_from_x = 0
-rounded_from_y = 1
-rounded_to_x = 2
-
-    lda from_y
-    cmp #22*8
-    bcc :+
-    rts
-:
-
-
-    ldx #%11111100
-    lda from_y
-dontSwapY:
-    sax rounded_from_y
-    lda to_y
-    sec
-    sbc rounded_from_y  ; Carry will remain set.
-    sax rounded_Dy
-    lda to_y
-    sbc from_y          ; Carry will remain set.
-    sta Dy
-doneSettingY:
-
-
-    lda from_x
-    sax rounded_from_x 
-    lax to_x
-    sbc from_x
-    sta Dx
-    txa                 ; Reload to_x.
-    and #%11111100
-    sta rounded_to_x
-    sbc rounded_from_x
-    bcc reverseX
-    sta rounded_Dx
-    cmp Dy
-    bcc secondOctant
-
-    jsr calcStartingPointXY
-    lda PPxy_lo, y
-    adc PPxy_offset, x
-    sta ptr_temp+0
-    lda PPxy_hi, y
-    adc #0
-    sta ptr_temp+1 ; This won't set carry.
-
-    lda to_x
-    lsr
-    lsr
-    lsr
-    adc #255
-    sta to_x
-
-    lda from_x
-    lsr
-    lsr
-    alr #%11111110      ; Clears carry for iteration code.
-    tax
-
-    lda from_y
-    and #%00000011
-    ora rounded_Dx
-    tay
-    lda subpixel_table, y
-    eor #$FF
-    jmp (ptr_temp)
-secondOctant:
-    lda from_x
-    and #%00000011
-    ora rounded_Dy
-    tay
-    lda subpixel_table, y
-    sta subroutine_temp
-
-    jsr calcStartingPointXY
-    lda PPyx_lo, y
-    adc PPyx_offset, x
-    sta ptr_temp+0
-    lda PPyx_hi, y
-    adc #0
-    sta ptr_temp+1
-
-    jmp lsrFromYCallTemp
-reverseX:
-    sec
-    lda rounded_from_x
-    sbc rounded_to_x    ; Carry remains set.
-    sta rounded_Dx
-
-    sec ; TODO
-    lda #0
-    sbc Dx
-    sta Dx
-
-    ;lda from_x
-    ;sbc to_x
-    ;sta Dx
-    lda rounded_Dx
-    cmp Dy
-    bcc fourthOctant
-
-    ;lda rounded_Dx
-    ;sta Dx
-
-    jsr calcStartingPointXY
-    lda NPxy_lo, y
-    adc NPxy_offset, x
-    sta ptr_temp+0
-    lda NPxy_hi, y
-    adc #0              ; Carry set from calcStartingPoint. Remains clear.
-    sta ptr_temp+1 
-
-    lda to_x
-    lsr
-    lsr
-    lsr
-    sbc #255
-    sta to_x
-
-    lda from_x
-    lsr
-    lsr
-    lsr
-    tax
-
-    lda from_y
-    and #%00000011
-    ora rounded_Dx
-    tay
-    lda subpixel_table, y
-    sta subroutine_temp
-    sec
-    jmp (ptr_temp)
-fourthOctant:
-    lda from_x
-    and #%00000011
-    eor #%00000011
-    ora rounded_Dy
-    tay
-    lda subpixel_table, y
-    sta subroutine_temp
-
-    jsr calcStartingPointXY
-    lda NPyx_lo, y
-    adc NPyx_offset, x
-    sta ptr_temp+0
-    lda NPyx_hi, y
-    adc #0
-    sta ptr_temp+1
-
-lsrFromYCallTemp:
-    lda from_y
-    lsr
-    lsr
-    lsr
-    ;sbc #0
-    sta from_y
-    lda to_y
-    lsr
-    lsr
-    lsr
-    adc #0
-    sec
-    sbc from_y
-    tay
-
-    ;adc #0
-    ;beq return
-    ;tay
-    ;bcc :+
-    ;iny
-;:
-
-lsrFromXCallTemp:
-    lda from_x
-    lsr
-    lsr
-    lsr
-    tax
-
-    ;clc ; TODO
-    sec
-    lda subroutine_temp
-    jmp (ptr_temp)
-
-; Returns with carry clear.
-calcStartingPointXY:
-    lda from_x
-    alr #%00000100
-    tax
-    lda from_y
-    lsr
-    lsr
-    lsr
-    tay
-    bcc :+
-    clc
-    inx
-:
-return:
-    rts
 .endproc
 
-;jmp .ident(.concat("row_", row+1, "_i_", i)):
-;.ident(.concat("row_", row, "_i_", i)):
-
-.if 0
-.proc clip_line
-    lda from_x+1
-    beq from_x_clipped
-    bmi clipL
-    bpl clipR
-
-    lda from_y+1
-    beq from_y_clipped
-
-from_x_clipped:
-    lda from_y+1
-    beq from_clipped
-    
-    if(!clipped(from))
-    {
-        clip(from)
-    }
-
-clipL:
-
-.endproc
-.endif
-
-.proc draw_line3
-.if 0
-    lda #0
-    sta inter
-    lda to_x+1
-    beq :+
-    jsr clip_to_x_left
-    lda to_y
-    sta inter
-:
-
-    ldx #%11111000
-    sec 
-    lda to_y
-    sbc from_y
-    sta Dy
-    lda to_x
-    sbc from_x
-    bcc reverseX
-    cmp Dy
-    bcc secondOctant
-    sax Dx
-    lda from_y
-    and #%00000111
-    ora Dx
-    tax
-    lda subpixel_table, x
-    sta subroutine_temp
-
-    lax from_y
-    ldy lsr3_table, x
-    lda PPxy_lo, y
-    sta ptr_temp+0
-    lda PPxy_hi, y
-    sta ptr_temp+1
-
-    lax Dx
-    ldy lsr3_table, x
-
-    lax from_x
-    lda lsr3_table, x
-    tax
-
-    lda subroutine_temp
-    ; carry set from bcc
-    jmp (ptr_temp)
-secondOctant:
-    sta Dx
-    lda Dy
-    sax Dy
-    lda from_x
-    and #%00000111
-    ora Dy
-    tax
-    lda subpixel_table, x
-    sta subroutine_temp
-
-    lax from_y
-    ldy lsr3_table, x
-    lda PPyx_lo, y
-    sta ptr_temp+0
-    lda PPyx_hi, y
-    sta ptr_temp+1
-
-    lax Dy
-    ldy lsr3_table, x
-
-    lax from_x
-    lda lsr3_table, x
-    tax
-
-    lda subroutine_temp
-    sec
-    jmp (ptr_temp)
-reverseX:
-    eor #$FF
-    adc #1 ; carry cleared from bcc
-    cmp Dy
-    bcc fourthOctant
-
-    sax Dx
-    lda from_y
-    and #%00000111
-    ora Dx
-    tax
-    lda subpixel_table, x
-    sta subroutine_temp
-
-    lax from_y
-    ldy lsr3_table, x
-    lda NPxy_lo, y
-    sta ptr_temp+0
-    lda NPxy_hi, y
-    sta ptr_temp+1
-
-    lax Dx
-    ldy lsr3_table, x
-
-    lax from_x
-    lda lsr3_table, x
-    tax
-
-    lda subroutine_temp
-    ; carry set from bcc
-    jmp (ptr_temp)
-fourthOctant:
-    sta Dx
-    lda Dy
-    sax Dy
-    lda from_x
-    and #%00000111
-    ora Dy
-    tax
-    lda subpixel_table, x
-    sta subroutine_temp
-
-    lax from_y
-    ldy lsr3_table, x
-    lda NPyx_lo, y
-    sta ptr_temp+0
-    lda NPyx_hi, y
-    sta ptr_temp+1
-
-    lax Dy
-    ldy lsr3_table, x
-
-    lax from_x
-    lda lsr3_table, x
-    tax
-
-    lda subroutine_temp
-    sec
-    jmp (ptr_temp)
-.endif
-.endproc
-
-.if 0
-.proc draw_line3
-half_Dx = 0
-half_Dy = 1
-    lsr from_x
-    lsr from_y
-    lsr to_x
-    lsr to_y
-
-    ; Setup variables
-    sec
-    lda to_x
-    sbc from_x
-    bcc negativeDx
-    sta Dx
-    lda to_y
-    sbc from_y ; carry set (bcc)
-    sta Dy
-
-    cmp Dx
-    bcs @bigDx
-
-    lda Dx
-    clc
-    adc #4
-    lsr
-    ;lsr
-    ;lsr
-    eor #$FF
-    ;sec
-    ;adc #3
-    ;lda #$FF
-    tax
-    inx
-
-    lda from_y
-    lsr
-    lsr
-    tay
-    lda PPxy_lo, y
-    sta ptr_temp+0
-    lda PPxy_hi, y
-    sta ptr_temp+1
-    txa
-    lsr from_x
-    lsr from_x
-    lsr to_x
-    lsr to_x
-    ldx from_x
-    jmp (ptr_temp)
-@bigDx:
-    lsr
-    eor #$FF
-    tax
-    inx
-
-    lsr from_x
-    lsr from_x
-    lsr from_x
-    lsr from_y
-    lsr from_y
-    lsr from_y
-
-    ldy from_y
-    lda PPyx_lo, y
-    sta ptr_temp+0
-    lda PPyx_hi, y
-    sta ptr_temp+1
-    lda Dy
-    lsr
-    lsr
-    lsr
-    tay
-    txa
-    ldx from_x
-    clc
-    jmp (ptr_temp)
-negativeDx:
-    eor #$FF
-    sta Dx
-    lda to_y
-    sbc from_y ; carry set
-    sta Dy
-
-    cmp Dx
-    bcs @bigDx
-
-    lda Dx
-    lsr
-    eor #$FF
-    tax
-    inx
-
-    lsr from_x
-    lsr from_x
-    lsr from_x
-    lsr from_y
-    lsr from_y
-    lsr from_y
-
-    ldy from_y
-    lda NPxy_lo, y
-    sta ptr_temp+0
-    lda NPxy_hi, y
-    sta ptr_temp+1
-    txa
-    ldx from_x
-    jmp (ptr_temp)
-@bigDx:
-    lsr
-    eor #$FF
-    tax
-    inx
-
-    lsr from_x
-    lsr from_x
-    lsr from_x
-    lsr from_y
-    lsr from_y
-    lsr from_y
-
-    ldy from_y
-    lda NPyx_lo, y
-    sta ptr_temp+0
-    lda NPyx_hi, y
-    sta ptr_temp+1
-    lda Dy
-    lsr
-    lsr
-    lsr
-    tay
-    txa
-    ldx from_x
-    clc
-    jmp (ptr_temp)
-.endproc
-
-.proc draw_line2
-dx = 0
-dy = 1
-D = 2
-D_sub = 3
-D_add = 4
-pattern = 5
-pattern_mask = 6
-to = 7
-    lda to_x
-    lsr
-    lsr
-    sta to
-
-    ; Setup variables
-    sec
-    lda to_x
-    sbc from_x
-    sta D_sub
-    sec
-    lda to_y
-    sbc from_y
-    sta D_add
-    sec
-    sbc D_sub
-    sta D
-
-    ldy from_x
-    ldx from_y
-    lda nt_buffer_ptr_lo, x
-    sta ptr_temp+0
-    lda nt_buffer_ptr_hi, x
-    sta ptr_temp+1
-    lda #11
-    sta pattern
-    lda #%00001111
-    sta pattern_mask
-loop:
-.repeat 4, i
-    lda #%00010001 << i
-    and pattern_mask
-    ora (ptr_temp), y
-    sta (ptr_temp), y
-
-    lda D
-    bmi :++
-    lda #$FF
-    eor pattern_mask
-    sta pattern_mask
-    bmi :+
-    inx
-    lda nt_buffer_ptr_lo, x
-    sta ptr_temp+0
-    lda nt_buffer_ptr_hi, x
-    sta ptr_temp+1
-:
-    lda D
-    sec
-    sbc D_sub
-:
-    clc
-    adc D_add
-    sta D
-.endrepeat
-
-    iny
-    cpy to
-    bcs return
-    jmp loop
-return:
-    rts
-.endproc
-
-.proc draw_line
-dx = 0
-dy = 1
-D = 2
-D_sub = 3
-D_add = 4
-    ; Setup variables
-    sec
-    lda to_x
-    sbc from_x
-    sta dx
-    asl
-    sta D_sub
-    sec
-    lda to_y
-    sbc from_y
-    sta dy
-    asl
-    sta D_add
-    sec
-    sbc dx
-    sta D
-
-    ldy from_x
-    ldx from_y
-    lda nt_buffer_ptr_lo, x
-    sta ptr_temp+0
-    lda nt_buffer_ptr_hi, x
-    sta ptr_temp+1
-loop:
-    lda #$20
-    sta (ptr_temp), y
-
-    lda D
-    bmi doneYChange
-    inx
-    lda nt_buffer_ptr_lo, x
-    sta ptr_temp+0
-    lda nt_buffer_ptr_hi, x
-    sta ptr_temp+1
-    lda D
-    sec
-    sbc D_sub
-doneYChange:
-    clc
-    adc D_add
-    sta D
-
-    iny
-    cpy to_x
-    bcc loop
-    rts
-.endproc
-
-.endif

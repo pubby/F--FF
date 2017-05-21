@@ -66,14 +66,17 @@ int main(int argc, char** argv)
 
     std::fprintf(fp, ".include \"globals.inc\"\n");
 
-    /*
-    std::fprintf(fp, "%syx_lo:\n", pp);
-    for(unsigned i = 0; i != 22; ++i)
-        std::fprintf(fp, ".byt .lobyte(%syx%i)\n", pp, i);
-    std::fprintf(fp, "%syx_hi:\n", pp);
-    for(unsigned i = 0; i != 22; ++i)
-        std::fprintf(fp, ".byt .hibyte(%syx%i)\n", pp, i);
-        */
+    std::fprintf(fp, ".macro or_buffer i\n");
+    std::fprintf(fp, "        ora nt_buffer+i*32, x\n");
+    std::fprintf(fp, "        sta nt_buffer+i*32, x\n");
+    //std::fprintf(fp, "    .if i < 6\n");
+    //std::fprintf(fp, "        ora zp_nt_buffer+i*32, x\n");
+    ////std::fprintf(fp, "        sta zp_nt_buffer+i*32, x\n");
+    //std::fprintf(fp, "    .else\n");
+    //std::fprintf(fp, "        ora nt_buffer+(i-6)*32, x\n");
+    //std::fprintf(fp, "        sta nt_buffer+(i-6)*32, x\n");
+    //std::fprintf(fp, "    .endif\n");
+    std::fprintf(fp, ".endmacro\n");
 
     for(int p = 0; p != 2; ++p)
     {
@@ -88,8 +91,7 @@ int main(int argc, char** argv)
             std::fprintf(fp, "%sxy%i:\n", pp, i);
             std::fprintf(fp, "%sxy%i_store___xNE:\n", pp, i);
             std::fprintf(fp, "    lda #%u\n", flip(p, 0b0100));
-            std::fprintf(fp, "    ora nt_buffer+%i*32, x\n", i);
-            std::fprintf(fp, "    sta nt_buffer+%i*32, x\n", i);
+            std::fprintf(fp, "    or_buffer %i\n", i);
             std::fprintf(fp, "    cpx to_x\n");
             std::fprintf(fp, "    beq %sxy%i_return\n", pp, i);
             std::fprintf(fp, "    tya\n");
@@ -107,8 +109,7 @@ int main(int argc, char** argv)
             std::fprintf(fp, "%sxy%i_NWxSE:\n", pp, i);
             std::fprintf(fp, "    tay\n");
             std::fprintf(fp, "    lda #%u\n", flip(p, 0b1001));
-            std::fprintf(fp, "    ora nt_buffer+%i*32, x\n", i);
-            std::fprintf(fp, "    sta nt_buffer+%i*32, x\n", i);
+            std::fprintf(fp, "    or_buffer %i\n", i);
             std::fprintf(fp, "    cpx to_x\n");
             std::fprintf(fp, "    beq %sxy%i_return\n", pp, i);
             std::fprintf(fp, "    tya\n");
@@ -126,8 +127,7 @@ int main(int argc, char** argv)
             std::fprintf(fp, "%sxy%i_NWxNE:\n", pp, i);
             std::fprintf(fp, "    tay\n");
             std::fprintf(fp, "    lda #%u\n", flip(p, 0b1100));
-            std::fprintf(fp, "    ora nt_buffer+%i*32, x\n", i);
-            std::fprintf(fp, "    sta nt_buffer+%i*32, x\n", i);
+            std::fprintf(fp, "    or_buffer %i\n", i);
             std::fprintf(fp, "    cpx to_x\n");
             std::fprintf(fp, "    beq %sxy%i_return\n", pp, i);
             std::fprintf(fp, "    tya\n");
@@ -147,8 +147,7 @@ int main(int argc, char** argv)
             std::fprintf(fp, "    tay\n");
             std::fprintf(fp, "    lda #%u\n", flip(p, 0b0011));
             std::fprintf(fp, "%sxy%i_store___xSE:\n", pp, i);
-            std::fprintf(fp, "    ora nt_buffer+%i*32, x\n", i);
-            std::fprintf(fp, "    sta nt_buffer+%i*32, x\n", i);
+            std::fprintf(fp, "    or_buffer %i\n", i);
             std::fprintf(fp, "    cpx to_x\n");
             std::fprintf(fp, "    beq %sxy%i_return\n", pp, i);
             std::fprintf(fp, "    tya\n");
@@ -182,8 +181,7 @@ int main(int argc, char** argv)
             std::fprintf(fp, "    %s rounded_Dx\n", adc(p));
             std::fprintf(fp, "    tay\n");
             std::fprintf(fp, "    lda #%u\n", flip(p, 0b0010));
-            std::fprintf(fp, "    ora nt_buffer+%i*32, x\n", i);
-            std::fprintf(fp, "    sta nt_buffer+%i*32, x\n", i);
+            std::fprintf(fp, "    or_buffer %i\n", i);
             if(last_i)
             {
                 std::fprintf(fp, "%sxy%i_return:\n", pp, i);
@@ -213,8 +211,7 @@ int main(int argc, char** argv)
             std::fprintf(fp, "%syx%i_NWxSE:\n", pp, i);
             std::fprintf(fp, "    sta subroutine_temp\n");
             std::fprintf(fp, "    lda #%u\n", flip(p, 0b1001));
-            std::fprintf(fp, "    ora nt_buffer+%i*32, x\n", i);
-            std::fprintf(fp, "    sta nt_buffer+%i*32, x\n", i);
+            std::fprintf(fp, "    or_buffer %i\n", i);
             if(last_i)
                 for(int i = 0; i != 15; ++i)
                     std::fprintf(fp, "    rts\n");
@@ -231,8 +228,7 @@ int main(int argc, char** argv)
             std::fprintf(fp, "%syx%i_NWxSW:\n", pp, i);
             std::fprintf(fp, "    sta subroutine_temp\n");
             std::fprintf(fp, "    lda #%u\n", flip(p, 0b1010));
-            std::fprintf(fp, "    ora nt_buffer+%i*32, x\n", i);
-            std::fprintf(fp, "    sta nt_buffer+%i*32, x\n", i);
+            std::fprintf(fp, "    or_buffer %i\n", i);
             if(last_i)
                 for(int i = 0; i != 14; ++i)
                     std::fprintf(fp, "    rts\n");
@@ -258,8 +254,7 @@ int main(int argc, char** argv)
             std::fprintf(fp, "    sta subroutine_temp\n");
             std::fprintf(fp, "    lda #%u\n", flip(p, 0b0101));
             std::fprintf(fp, "%syx%i_store___xSE:\n", pp, i);
-            std::fprintf(fp, "    ora nt_buffer+%i*32, x\n", i);
-            std::fprintf(fp, "    sta nt_buffer+%i*32, x\n", i);
+            std::fprintf(fp, "    or_buffer %i\n", i);
             if(last_i)
                 for(int i = 0; i != 15; ++i)
                     std::fprintf(fp, "    rts\n");
@@ -290,14 +285,12 @@ int main(int argc, char** argv)
             std::fprintf(fp, "    adc rounded_Dy\n");
             std::fprintf(fp, "    sta subroutine_temp\n");
             std::fprintf(fp, "    lda #%u\n", flip(p, 0b0100));
-            std::fprintf(fp, "    ora nt_buffer+%i*32, x\n", i);
-            std::fprintf(fp, "    sta nt_buffer+%i*32, x\n", i);
+            std::fprintf(fp, "    or_buffer %i\n", i);
             std::fprintf(fp, "    %s\n", p ? "dex" : "inx");
 
             std::fprintf(fp, "%syx%i___xSW:\n", pp, i);
             std::fprintf(fp, "    lda #%u\n", flip(p, 0b0010));
-            std::fprintf(fp, "    ora nt_buffer+%i*32, x\n", i);
-            std::fprintf(fp, "    sta nt_buffer+%i*32, x\n", i);
+            std::fprintf(fp, "    or_buffer %i\n", i);
             if(last_i)
                     std::fprintf(fp, "    rts\n");
             else
@@ -398,121 +391,6 @@ int main(int argc, char** argv)
         }
 
     }
-
-
-    /*
-    for(int p = 0; p != 2; ++p)
-    {
-        char const* pp = p ? "NP" : "PP";
-        std::fprintf(fp, ".segment \"RODATA\"\n");
-        std::fprintf(fp, "%sxy_lo:\n", pp);
-        for(unsigned i = 0; i != 22; ++i)
-            std::fprintf(fp, ".byt .lobyte(%sxy%i)\n", pp, i);
-        std::fprintf(fp, "%sxy_hi:\n", pp);
-        for(unsigned i = 0; i != 22; ++i)
-            std::fprintf(fp, ".byt .hibyte(%sxy%i)\n", pp, i);
-        std::fprintf(fp, "%syx_lo:\n", pp);
-        for(unsigned i = 0; i != 22; ++i)
-            std::fprintf(fp, ".byt .lobyte(%syx%i)\n", pp, i);
-        std::fprintf(fp, "%syx_hi:\n", pp);
-        for(unsigned i = 0; i != 22; ++i)
-            std::fprintf(fp, ".byt .hibyte(%syx%i)\n", pp, i);
-
-        std::fprintf(fp, ".segment \"CODE\"\n");
-        std::fprintf(fp, ":\n");
-        std::fprintf(fp, "    rts\n");
-
-        for(unsigned i = 0; i != 22; ++i)
-        {
-            std::fprintf(fp, "%sxy%i:\n", pp, i);
-            std::fprintf(fp, "    dec nt_buffer+%i*32, x\n", i);
-            std::fprintf(fp, "    %s\n", p ? "dex" : "inx");
-            std::fprintf(fp, "    dey\n");
-            if(i == 7)
-                std::fprintf(fp, "midReturn%sxy:\n", pp);
-            if(i < 8)
-                std::fprintf(fp, "    bmi :-\n");
-            else if(i < 22 - 8)
-                std::fprintf(fp, "    bmi midReturn%sxy\n", pp);
-            else
-                std::fprintf(fp, "    bmi :+\n");
-            std::fprintf(fp, "    sbc Dy\n");
-            std::fprintf(fp, "    bcs %sxy%i\n", pp, i);
-            std::fprintf(fp, "    adc Dx\n");
-        }
-
-        std::fprintf(fp, ":\n");
-        std::fprintf(fp, "    rts\n");
-
-        for(unsigned i = 0; i != 22; ++i)
-        {
-            std::fprintf(fp, "%syx%i:\n", pp, i);
-            std::fprintf(fp, "    dec nt_buffer+%i*32, x\n", i);
-            if(i < 22 - 1)
-            {
-                std::fprintf(fp, "    dey\n");
-                if(i == 7)
-                    std::fprintf(fp, "midReturn%syx:\n", pp);
-                if(i < 8)
-                    std::fprintf(fp, "    bmi :-\n");
-                else if(i < 22 - 8)
-                    std::fprintf(fp, "    bmi midReturn%syx\n", pp);
-                else
-                    std::fprintf(fp, "    bmi :+\n");
-                std::fprintf(fp, "    sbc Dx\n");
-                std::fprintf(fp, "    bcs %syx%i\n", pp, i+1);
-                std::fprintf(fp, "    adc Dy\n");
-                std::fprintf(fp, "    %s\n", p ? "dex" : "inx");
-            }
-        }
-
-        std::fprintf(fp, ":\n");
-        std::fprintf(fp, "    rts\n");
-    }
-
-    /*
-    std::fprintf(fp, ".include \"globals.inc\"\n");
-    std::fprintf(fp, ".segment \"RODATA\"\n");
-    std::fprintf(fp, "loop_lo:\n");
-    for(unsigned i = 0; i != 44; ++i)
-        std::fprintf(fp, ".byt .lobyte(LY%i)\n", i);
-    std::fprintf(fp, "loop_hi:\n");
-    for(unsigned i = 0; i != 44; ++i)
-        std::fprintf(fp, ".byt .hibyte(LY%i)\n", i);
-
-    std::fprintf(fp, ".segment \"CODE\"\n");
-    for(unsigned i = 0; i != 44; ++i)
-    {
-        std::fprintf(fp, "LY%i:\n", i);
-        std::fprintf(fp, "    iny\n");
-        std::fprintf(fp, "    cpy to_x\n");
-        std::fprintf(fp, "jumpPoint%i:\n", i);
-        if(i % 9 == 4)
-        {
-            std::fprintf(fp, "    bcc :+\n");
-            std::fprintf(fp, "return%i:\n", i / 9);
-            std::fprintf(fp, "    rts\n");
-            std::fprintf(fp, ":\n");
-        }
-        std::fprintf(fp, "    bcs return%i\n", i / 9);
-        std::fprintf(fp, "    sta subroutine_temp\n");
-        std::fprintf(fp, "    lax xdiv, y\n");
-        if(i % 2 == 0)
-            std::fprintf(fp, "    lda upper_pattern, y\n");
-        else
-            std::fprintf(fp, "    lda lower_pattern, y\n");
-        //std::fprintf(fp, "    and subroutine_temp, x\n", i / 2);
-        std::fprintf(fp, "    ora nt_buffer+%i*32, x\n", i / 2);
-        std::fprintf(fp, "    sta nt_buffer+%i*32, x\n", i / 2);
-        std::fprintf(fp, "    lda subroutine_temp\n");
-        std::fprintf(fp, "    adc D_add\n");
-        std::fprintf(fp, "    bmi LY%i\n", i);
-        if(i < 44 - 1)
-            std::fprintf(fp, "    sbc D_sub\n");
-    }
-    std::fprintf(fp, "bottomReturn:\n");
-    std::fprintf(fp, "    rts\n");
-    */
 
     std::fclose(fp);
 }

@@ -2,6 +2,7 @@
 .define GLOBAL_INC
 
 .include "nes.inc"
+.include "macros.inc"
 
 CPU_OAM = $0200
 rom_bank = $3FFF
@@ -18,13 +19,9 @@ draw_line_octant1 = $0300
     sta banktable+.lobyte(.bank(label))
 .endmacro
 
+.globalzp debug
 .globalzp subroutine_temp
 .globalzp ptr_temp
-
-.globalzp p1_buttons_held
-.globalzp p1_buttons_pressed
-.globalzp p2_buttons_held
-.globalzp p2_buttons_pressed
 
 .globalzp nmi_counter
 .globalzp frame_number
@@ -41,6 +38,9 @@ draw_line_octant1 = $0300
 .globalzp to_y_sub
 .globalzp to_y
 
+.globalzp from_out_code
+.globalzp to_out_code
+
 .globalzp Dx_sub
 .globalzp Dx
 .globalzp Dy_sub
@@ -53,8 +53,26 @@ draw_line_octant1 = $0300
 .globalzp fx
 .globalzp fy
 
-.globalzp inter
+; Game
+.globalzp p1
+.globalzp p1_buttons_held
+.globalzp p1_buttons_pressed
+.globalzp p1_x_sub
+.globalzp p1_x
+.globalzp p1_y_sub
+.globalzp p1_y
+.globalzp p1_dir
 
+.globalzp p2
+.globalzp p2_buttons_held
+.globalzp p2_buttons_pressed
+.globalzp p2_x_sub
+.globalzp p2_x
+.globalzp p2_y_sub
+.globalzp p2_y
+.globalzp p2_dir
+
+; Buffers
 .global nt_buffer
 
 ; tables

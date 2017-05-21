@@ -17,7 +17,7 @@ version := 0.01
 # Space-separated list of assembly language files that make up the
 # PRG ROM.  If it gets too long for one line, you can add a backslash
 # (the \ character) at the end of the line and continue on the next.
-objlist := nrom init main globals palette rng line line_unrolled sprites
+objlist := nrom init main globals palette line line_unrolled sprites
 
 
 AS65 := ca65
@@ -35,7 +35,7 @@ NSF2DATA := wine tools/nsf2data.exe
 
 .PHONY: all run clean
 
-all: $(title).nes 
+all: $(title).nes editor 3d
 
 run: $(title).nes
 	$(EMU) $<
@@ -53,7 +53,7 @@ objlistntsc := $(foreach o,$(objlist),$(objdir)/$(o).o)
 map.txt $(title).nes: uxrom.cfg $(objlistntsc)
 	$(LD65) -o $(title).nes -m map.txt -C $^
 
-$(objdir)/%.o: $(srcdir)/%.s $(srcdir)/nes.inc $(srcdir)/globals.inc
+$(objdir)/%.o: $(srcdir)/%.s $(srcdir)/nes.inc $(srcdir)/globals.inc $(srcdir)/clip.inc
 	$(AS65) $(CFLAGS65) $< -o $@
 
 $(objdir)/%.o: $(objdir)/%.s
@@ -80,8 +80,20 @@ chrc: chrc.cpp
 line: line.cpp
 	 $(CXX) -std=c++14 $< -o $@
 
+clip: clip.cpp
+	 $(CXX) -std=c++14 $< -o $@
+
+editor: editor.cpp
+	 $(CXX) -std=c++14 $< -o $@ -lsfml-system -lsfml-graphics -lsfml-window
+
+3d: 3d.cpp
+	 $(CXX) -std=c++14 $< -o $@ -lsfml-system -lsfml-graphics -lsfml-window
+
 $(srcdir)/line.chr: chrc
 	./chrc $@
 
 $(srcdir)/line_unrolled.s: line
 	./line $@
+
+$(srcdir)/clip.inc: clip
+	./clip $@

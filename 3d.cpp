@@ -5,6 +5,8 @@
 
 #include <SFML/Graphics.hpp>
 
+#include "foo.level.hpp"
+
 using u8 = std::uint8_t;
 using u16 = std::uint32_t;
 using s8 = std::int8_t;
@@ -54,7 +56,15 @@ struct coord
     u16 y;
 };
 
-using line = std::array<coord, 2>;
+struct line
+{
+    coord c1;
+    coord c2;
+    sf::Color color;
+
+    coord& operator[](unsigned i) { return i == 0 ? c1 : c2; }
+    coord const& operator[](unsigned i) const { return i == 0 ? c1 : c2; }
+};
 
 coord transform(coord player, u8 dir, coord c)
 {
@@ -74,7 +84,7 @@ coord transform(coord player, u8 dir, coord c)
 
 line transform(coord player, u8 dir, line l)
 {
-    return { transform(player, dir, l[0]), transform(player, dir, l[1]) };
+    return { transform(player, dir, l[0]), transform(player, dir, l[1]), l.color };
 }
 
 coord perspective(coord c)
@@ -85,18 +95,18 @@ coord perspective(coord c)
 
 line perspective(line l)
 {
-    return { perspective(l[0]), perspective(l[1]) };
+    return { perspective(l[0]), perspective(l[1]), l.color };
 }
 
-void draw_line(sf::RenderTarget& rt, line l, sf::Color color)
+void draw_line(sf::RenderTarget& rt, line l)
 {
     int d = 16;
     int s = 8;
     sf::VertexArray line(sf::LinesStrip, 2);
     line[0].position = sf::Vector2f(to_signed(l[0].x)/s+d, to_signed(l[0].y)/s-32);
     line[1].position = sf::Vector2f(to_signed(l[1].x)/s+d, to_signed(l[1].y)/s-32);
-    line[0].color = color;
-    line[1].color = color;
+    line[0].color = l.color;
+    line[1].color = l.color;
     rt.draw(line);
 }
 
@@ -132,34 +142,47 @@ void do_draw(sf::RenderTarget& rt, coord player, u8 dir, line l)
 
     line dl1 = l;
     line dl2 = l;
+    line dl3 = l;
+    line dl4 = l;
 
     dl1[0] = { to_signed(l[0].x) * d1, (to_signed(l[0].y) + 32) * d1 };
     dl1[1] = { to_signed(l[1].x) * d2, (to_signed(l[1].y) + 32) * d2 };
+    dl1.color = l.color;
 
     dl2[0] = { to_signed(l[0].x) * d1, (to_signed(l[0].y) + 16) * d1 };
     dl2[1] = { to_signed(l[1].x) * d2, (to_signed(l[1].y) + 16) * d2 };
+    dl2.color = l.color;
 
-    draw_line(rt, dl1, sf::Color::Magenta);
-    draw_line(rt, dl2, sf::Color::Red);
+    dl3[0] = dl1[0];
+    dl3[1] = dl2[0];
+    dl3.color = l.color;
+
+    dl4[0] = dl1[1];
+    dl4[1] = dl2[1];
+    dl4.color = l.color;
+
+    draw_line(rt, dl1);
+    if(l.color != sf::Color::Yellow)
+    {
+        draw_line(rt, dl2);
+        //draw_line(rt, dl3);
+        //draw_line(rt, dl4);
+    }
 }
 
 int main()
 {
-    std::vector<coord> points;
     std::vector<line> lines;
-    for(int x = -1; x <= 1; x += 2)
-        points.push_back({ 128*x, 128 });
-    for(int x = -1; x <= 1; x += 2)
-        points.push_back({ -128*x, (u16)-128 });
-
-    for(unsigned i = 0; i != points.size(); ++i)
+    for(unsigned i = 0; i != track_size; ++i)
     {
-        lines.push_back({{points[i], points[(i+1) % points.size()]}});
+        unsigned j = (i + 1) % track_size;
+        lines.push_back({{ ltx[i]/3, lty[i]/3 }, { ltx[j]/3, lty[j]/3 }, sf::Color::Red});
+        lines.push_back({{ rtx[i]/3, rty[i]/3 }, { rtx[j]/3, rty[j]/3 }, sf::Color::Red});
+        lines.push_back({{ ltx[i]/3, lty[i]/3 }, { rtx[i]/3, rty[i]/3 }, sf::Color::Yellow});
     }
+    std::cout << lines.size() << std::endl;
 
-
-
-    sf::RenderWindow window(sf::VideoMode(32, 22), "SFML window");
+    sf::RenderWindow window(sf::VideoMode(64, 44), "SFML window");
     window.setFramerateLimit(30);
     unsigned char d = 0;
     coord pl = {0,0};
@@ -182,13 +205,13 @@ int main()
 
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
         {
-            pl.x += cos_multiply(d, 64);
-            pl.y += sin_multiply(d, 64);
+            pl.x += cos_multiply(d, 16);
+            pl.y += sin_multiply(d, 16);
         }
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
         {
-            pl.x -= cos_multiply(d, 64);
-            pl.y -= sin_multiply(d, 64);
+            pl.x -= cos_multiply(d, 16);
+            pl.y -= sin_multiply(d, 16);
         }
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
             d += 4;
