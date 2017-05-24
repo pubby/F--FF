@@ -57,20 +57,28 @@ draw_line_octant1 = $0300
 .globalzp p1
 .globalzp p1_buttons_held
 .globalzp p1_buttons_pressed
-.globalzp p1_x_sub
 .globalzp p1_x
-.globalzp p1_y_sub
 .globalzp p1_y
 .globalzp p1_dir
+.globalzp p1_speed
 
 .globalzp p2
 .globalzp p2_buttons_held
 .globalzp p2_buttons_pressed
-.globalzp p2_x_sub
 .globalzp p2_x
-.globalzp p2_y_sub
 .globalzp p2_y
 .globalzp p2_dir
+.globalzp p2_speed
+
+; Multiplication
+.globalzp multiplicand
+.globalzp multiplier
+.globalzp product
+
+.globalzp trig_ptr1
+.globalzp trig_ptr2
+.globalzp trig_ptr3
+.globalzp trig_ptr4
 
 ; Buffers
 .global nt_buffer

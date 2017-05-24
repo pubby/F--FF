@@ -17,7 +17,8 @@ version := 0.01
 # Space-separated list of assembly language files that make up the
 # PRG ROM.  If it gets too long for one line, you can add a backslash
 # (the \ character) at the end of the line and continue on the next.
-objlist := nrom init main globals palette line line_unrolled sprites
+objlist := nrom init main globals palette line line_unrolled sprites player \
+           multiply
 
 
 AS65 := ca65
@@ -53,7 +54,8 @@ objlistntsc := $(foreach o,$(objlist),$(objdir)/$(o).o)
 map.txt $(title).nes: uxrom.cfg $(objlistntsc)
 	$(LD65) -o $(title).nes -m map.txt -C $^
 
-$(objdir)/%.o: $(srcdir)/%.s $(srcdir)/nes.inc $(srcdir)/globals.inc $(srcdir)/clip.inc
+$(objdir)/%.o: $(srcdir)/%.s $(srcdir)/nes.inc $(srcdir)/globals.inc \
+               $(srcdir)/clip.inc $(srcdir)/sin.inc
 	$(AS65) $(CFLAGS65) $< -o $@
 
 $(objdir)/%.o: $(objdir)/%.s
@@ -89,8 +91,14 @@ editor: editor.cpp
 3d: 3d.cpp
 	 $(CXX) -std=c++14 $< -o $@ -lsfml-system -lsfml-graphics -lsfml-window
 
+sin: sin.cpp
+	 $(CXX) -std=c++14 $< -o $@
+
 $(srcdir)/line.chr: chrc
 	./chrc $@
+
+$(srcdir)/sin.inc: sin
+	./sin $@
 
 $(srcdir)/line_unrolled.s: line
 	./line $@

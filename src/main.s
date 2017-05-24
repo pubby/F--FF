@@ -3,6 +3,9 @@
 .import ppu_set_palette
 .import draw_line
 .import prepare_game_sprites
+.import setup_cos, setup_sin
+.import multiply_trig
+.import p1_move, p2_move
 
 .export main, nmi_handler, irq_handler
 
@@ -127,6 +130,7 @@ loop:
         sta nt_buffer+i
     .endrepeat
 
+.if 0
     lda p1_buttons_held
     and #BUTTON_LEFT
     beq :+
@@ -208,6 +212,36 @@ loop:
     bcc :+
     inc fy+1
 :
+.else
+    jsr p1_move
+
+    lda #0
+    lda #$FF
+    sta p1_speed+1
+
+    lda p1_dir
+    jsr setup_cos
+    store16into p1_speed, multiplier
+    jsr multiply_trig
+    clc
+    add16into product, #128, px
+
+    ;lda p1_dir
+    ;jsr setup_sin
+    ;store16into p1_speed, multiplier
+    ;jsr multiply_trig
+    ;clc
+    ;add16into product, #128, py
+    store16into #128, py
+
+    store16into #128, fx
+    store16into #128, fy
+
+    ;lda #0
+    ;sta px+1
+    ;sta py+1
+
+.endif
 
     lda #PPUMASK_BG_ON | PPUMASK_GRAYSCALE | PPUMASK_EMPHASIZE_B | PPUMASK_NO_BG_CLIP
     ora #PPUMASK_SPR_ON | PPUMASK_NO_SPR_CLIP

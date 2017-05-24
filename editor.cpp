@@ -102,6 +102,20 @@ void save_cpp(char const* filename, editor const& e)
         std::fprintf(fp, "    %i%s\n", to_short(e.r_nodes[i].y), i == e.r_nodes.size() - 1 ? "" : ",");
     std::fprintf(fp, "};\n");
 
+
+    /*
+    std::fprintf(fp, "constexpr short segments[] =\n{\n");
+    for(unsigned i = 0; i != e.l_nodes.size(); ++i)
+    {
+        std::fprintf(fp, "    {{ %i, %i }, { %i, %i }},\n", 
+                     to_short(e.l_nodes[i].x),
+                     to_short(e.l_nodes[i].y),
+                     to_short(e.r_nodes[i].x),
+                     to_short(e.r_nodes[i].y));
+    }
+    std::fprintf(fp, "};\n");
+    */
+
     std::fclose(fp);
 }
 
