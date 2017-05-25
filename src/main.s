@@ -4,7 +4,8 @@
 .import draw_line
 .import prepare_game_sprites
 .import setup_cos, setup_sin
-.import multiply_trig
+.importzp multiply_trig, trig_store
+.import copy_trig_code
 .import p1_move, p2_move
 
 .export main, nmi_handler, irq_handler
@@ -96,6 +97,8 @@ readControllerLoop:
     dex
     bne :-
 .endrepeat
+
+    jsr copy_trig_code
 
     bankswitch_to ppu_load_4x4_pixels_chr
     jsr ppu_load_4x4_pixels_chr
@@ -216,23 +219,33 @@ loop:
     jsr p1_move
 
     lda #0
-    lda #$FF
+    ;lda #$FF
     sta p1_speed+1
 
     lda p1_dir
     jsr setup_cos
-    store16into p1_speed, multiplier
+    lda p1_speed+0
+    sta trig_store
+    ;lda p1_speed+1
+    lda #$FF
     jsr multiply_trig
+    sta product+0
+    stx product+1
     clc
     add16into product, #128, px
 
-    ;lda p1_dir
-    ;jsr setup_sin
-    ;store16into p1_speed, multiplier
-    ;jsr multiply_trig
-    ;clc
-    ;add16into product, #128, py
-    store16into #128, py
+    lda p1_dir
+    jsr setup_sin
+    lda p1_speed+0
+    sta trig_store
+    ;lda p1_speed+1
+    lda #$FF
+    jsr multiply_trig
+    sta product+0
+    stx product+1
+    clc
+    add16into product, #128, py
+    ;store16into #128, py
 
     store16into #128, fx
     store16into #128, fy

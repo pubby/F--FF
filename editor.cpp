@@ -119,6 +119,46 @@ void save_cpp(char const* filename, editor const& e)
     std::fclose(fp);
 }
 
+void save_asm(char const* filename, editor const& e)
+{
+    FILE* fp = std::fopen(filename, "w");
+    if(!fp)
+        throw std::runtime_error("can't open file");
+
+    std::fprintf(fp, "track_size:\n");
+        std::fprintf(fp, "    .byt %i\n", e.l_nodes.size());
+
+    std::fprintf(fp, "ltx_lo:\n");
+    for(unsigned i = 0; i != e.l_nodes.size(); ++i)
+        std::fprintf(fp, "    .byt .lobyte(%i)\n", to_short(e.l_nodes[i].x));
+    std::fprintf(fp, "ltx_hi:\n");
+    for(unsigned i = 0; i != e.l_nodes.size(); ++i)
+        std::fprintf(fp, "    .byt .hibyte(%i)\n", to_short(e.l_nodes[i].x));
+
+    std::fprintf(fp, "lty_lo:\n");
+    for(unsigned i = 0; i != e.l_nodes.size(); ++i)
+        std::fprintf(fp, "    .byt .lobyte(%i)\n", to_short(e.l_nodes[i].y));
+    std::fprintf(fp, "lty_hi:\n");
+    for(unsigned i = 0; i != e.l_nodes.size(); ++i)
+        std::fprintf(fp, "    .byt .hibyte(%i)\n", to_short(e.l_nodes[i].y));
+
+    std::fprintf(fp, "rtx_lo:\n");
+    for(unsigned i = 0; i != e.l_nodes.size(); ++i)
+        std::fprintf(fp, "    .byt .lobyte(%i)\n", to_short(e.r_nodes[i].x));
+    std::fprintf(fp, "rtx_hi:\n");
+    for(unsigned i = 0; i != e.l_nodes.size(); ++i)
+        std::fprintf(fp, "    .byt .hibyte(%i)\n", to_short(e.r_nodes[i].x));
+
+    std::fprintf(fp, "rty_lo:\n");
+    for(unsigned i = 0; i != e.l_nodes.size(); ++i)
+        std::fprintf(fp, "    .byt .lobyte(%i)\n", to_short(e.r_nodes[i].y));
+    std::fprintf(fp, "rty_hi:\n");
+    for(unsigned i = 0; i != e.l_nodes.size(); ++i)
+        std::fprintf(fp, "    .byt .hibyte(%i)\n", to_short(e.r_nodes[i].y));
+
+    std::fclose(fp);
+}
+
 editor load(char const* filename)
 {
     editor e;
@@ -245,6 +285,7 @@ int main(int argc, char** argv)
                     break;
                 case sf::Keyboard::F6:
                     save_cpp((std::string(argv[1]) + ".hpp").c_str(), e);
+                    save_asm((std::string(argv[1]) + ".inc").c_str(), e);
                     break;
                 case sf::Keyboard::F7:
                     e = load(argv[1]);

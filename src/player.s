@@ -14,13 +14,13 @@
     and #BUTTON_LEFT
     beq notPressingLeft
     txa
-    axs #.lobyte(-4)
+    axs #.lobyte(-1)
 notPressingLeft:
     tya
     and #BUTTON_RIGHT
     beq notPressingRight
     txa
-    axs #4
+    axs #1
 notPressingRight:
     stx P i, dir
 
