@@ -7,6 +7,7 @@
 .importzp multiply_trig, trig_store
 .import copy_trig_code
 .import p1_move, p2_move
+.import render
 
 .export main, nmi_handler, irq_handler
 
@@ -217,35 +218,36 @@ loop:
 :
 .else
     jsr p1_move
+    jsr render
 
-    lda #0
-    ;lda #$FF
-    sta p1_speed+1
-
+.if 1
     lda p1_dir
     jsr setup_cos
     lda p1_speed+0
     sta trig_store
-    ;lda p1_speed+1
-    lda #$FF
+    lda p1_speed+1
     jsr multiply_trig
-    sta product+0
-    stx product+1
     clc
-    add16into product, #128, px
+    adc #128
+    sta px+0
+    txa
+    adc #0
+    sta px+1
 
     lda p1_dir
     jsr setup_sin
     lda p1_speed+0
     sta trig_store
-    ;lda p1_speed+1
-    lda #$FF
+    lda p1_speed+1
     jsr multiply_trig
-    sta product+0
-    stx product+1
     clc
-    add16into product, #128, py
+    adc #128
+    sta py+0
+    txa
+    adc #0
+    sta py+1
     ;store16into #128, py
+.endif
 
     store16into #128, fx
     store16into #128, fy
@@ -260,7 +262,7 @@ loop:
     ora #PPUMASK_SPR_ON | PPUMASK_NO_SPR_CLIP
     sta PPUMASK
 
-.repeat 1
+.repeat 0
     .repeat 2, i
         lda px+i
         sta to_x+i
@@ -274,7 +276,7 @@ loop:
     .endrepeat
 
     bankswitch 0
-    jsr draw_line
+    ;jsr draw_line
 .endrepeat
 
     lda #PPUMASK_BG_ON | PPUMASK_GRAYSCALE | PPUMASK_EMPHASIZE_R | PPUMASK_NO_BG_CLIP

@@ -115,10 +115,18 @@ void draw_line(sf::RenderTarget& rt, line l, sf::Color color)
 void do_draw(sf::RenderTarget& rt, coord player, u8 dir, line l, sf::Color color)
 {
     l = transform(player, dir, l);
+    /*
+    //l[0].x += 128;
+    l[0].y += 256;
+    //l[1].x += 128;
+    l[1].y += 256;
+    draw_line(rt, l, color);
+    return;
+    */
     double const scale = 256.0;
-    int const near = 4;
+    int const near = 0;
 
-    double d1 = (scale / (to_signed(l[0].y)));
+    double d1 = (scale / std::max(1, to_signed(l[0].y)));
     if(to_signed(l[0].y) < near)
     {
         if(to_signed(l[1].y) < near)
@@ -128,10 +136,10 @@ void do_draw(sf::RenderTarget& rt, coord player, u8 dir, line l, sf::Color color
         t /= (double)(to_signed(l[0].y - l[1].y));
         l[0].x = to_signed(l[1].x) * t + to_signed(l[0].x) * (1.0 - t);
         l[0].y = near;
-        d1 = scale / near;
+        d1 = scale / std::max(4, near);
     }
 
-    double d2 = (scale / (to_signed(l[1].y)));
+    double d2 = (scale / std::max(1, to_signed(l[1].y)));
     if(to_signed(l[1].y) < near)
     {
         // find the intersection
@@ -139,7 +147,7 @@ void do_draw(sf::RenderTarget& rt, coord player, u8 dir, line l, sf::Color color
         t /= (double)(to_signed(l[1].y - l[0].y));
         l[1].x = to_signed(l[0].x) * t + to_signed(l[1].x) * (1.0 - t);
         l[1].y = near;
-        d2 = scale / near;
+        d2 = scale / std::max(4, near);
     }
 
     line dl1 = l;

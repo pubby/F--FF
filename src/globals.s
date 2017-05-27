@@ -40,15 +40,26 @@ p2_y:     .res 2
 p2_dir:   .res 1
 p2_speed: .res 2
 
-; Multiplication
-multiplicand: .res 2
-multiplier:   .res 2
-product:      .res 2
+; Rendering
+render_temp: .res 1
 
-trig_ptr1: .res 2
-trig_ptr2: .res 2
-trig_ptr3: .res 2
-trig_ptr4: .res 2
+lx_lo_ptr: .res 2
+lx_hi_ptr: .res 2
+ly_lo_ptr: .res 2
+ly_hi_ptr: .res 2
+rx_lo_ptr: .res 2
+rx_hi_ptr: .res 2
+ry_lo_ptr: .res 2
+ry_hi_ptr: .res 2
+
+scratchpad_lx_lo: .res 12
+scratchpad_lx_hi: .res 12
+scratchpad_ly_lo: .res 12
+scratchpad_ly_hi: .res 12
+scratchpad_rx_lo: .res 12
+scratchpad_rx_hi: .res 12
+scratchpad_ry_lo: .res 12
+scratchpad_ry_hi: .res 12
 
 .segment "BSS" ; RAM
 nt_buffer: .res 32*22

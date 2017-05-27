@@ -8,7 +8,7 @@ Dx          = 1 ; 2 bytes
 Dy_sub      = 3 ; 1 byte
 Dy          = 4 ; 2 bytes
 rounded_Dx  = 6 ; 1 byte
-rounded_Dy  = 7 ; 2 bytes
+rounded_Dy  = 7 ; 1 byte
 to_out_code = 6 ; 1 byte, shared with rounded_Dx
 
 .segment "LINE_TABLES"

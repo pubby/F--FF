@@ -3,6 +3,7 @@
 .export setup_cos, setup_sin
 .exportzp multiply_trig, trig_store
 .export copy_trig_code
+.export setup_depth_scale
 
 .segment "MULT_TABLES"
     .byt .lobyte(16384)
@@ -23,6 +24,12 @@ square1_hi:
     .repeat 512, i
         .byt .hibyte((i*i)/4)  
     .endrepeat
+reciprical_table:
+    .byt 0
+    .byt 0
+    .repeat 254, i
+        .byt (256 / (i + 2))
+    .endrepeat
 sin_table:
     .include "sin.inc"
 
@@ -32,115 +39,6 @@ sin_table:
 .assert .lobyte(square2_hi) = 1, error, "misaligned table"
 
 .segment "CODE"
-
-.if 0
-setup_cos:
-    clc
-    adc #64
-.proc setup_sin
-    ldy #$FF
-    cmp #128
-    bcc :+
-    sbc #128 
-    iny
-:
-    sty multiplicand+1
-    cmp #64
-    bcc :+
-    eor #$FF
-    adc #128
-:
-    cmp #62
-    bcs @one
-    tay                         ; Store A in Y for later.
-    lda #.hibyte(square1_lo)
-    sta trig_ptr1+1
-    lda #.hibyte(square2_lo)
-    sta trig_ptr2+1
-    lda #.hibyte(square1_hi)
-    sta trig_ptr3+1
-    lda #.hibyte(square2_hi)
-    sta trig_ptr4+1
-    lda sin_table, y            ; Use stored Y.
-    sta multiplicand+0
-    sta trig_ptr1+0
-    sta trig_ptr3+0
-    eor #$FF
-    adc #1
-    sta trig_ptr2+0
-    sta trig_ptr4+0
-    bcc :+
-    inc trig_ptr2+1
-    inc trig_ptr4+1
-:
-    rts
-@one:
-    lda #0
-    sta trig_ptr1+0
-    sta trig_ptr3+0
-    sta trig_ptr2+0
-    sta trig_ptr4+0
-    sta multiplicand+0
-    lda #.hibyte(square1_lo + 256)
-    sta trig_ptr1+1
-    lda #.hibyte(square2_lo - 1)
-    sta trig_ptr2+1
-    lda #.hibyte(square1_hi + 256)
-    sta trig_ptr3+1
-    lda #.hibyte(square2_hi - 1)
-    sta trig_ptr4+1
-    rts
-.endproc
-
-.proc multiply_trig
-    ldy multiplier+1
-    sec
-    lda (trig_ptr1), y
-    sbc (trig_ptr2), y
-    sta product+0
-    lda (trig_ptr3), y
-    sbc (trig_ptr4), y
-    sta product+1
-
-    ldy multiplier+0
-    lda (trig_ptr1), y
-    cmp (trig_ptr2), y
-    lda (trig_ptr3), y
-    sbc (trig_ptr4), y
-    clc
-    adc product+0
-    tay
-    lda product+1
-    adc #0
-
-    bit multiplier+1
-    bpl :+
-    sec
-    sbc multiplicand+0
-:
-    ;eor #$FF
-    ;sta product+1
-    ;dey
-    ;tya
-    ;eor #$FF
-    ;sta product+0
-
-    sty product+0
-    sta product+1
-    lda multiplicand+1
-    bne return
-    sec
-    sbc product+0
-    sta product+0
-    lda #0
-    sbc product+1
-    sta product+1
-return:
-    rts
-.endproc
-.endif
-
-
 
 multiply_trig = $C0
 
@@ -158,16 +56,18 @@ p4: sbc 4444, x
     sec
 s:  sbc #0
 :
-    sta .lobyte(multiply_trig + (r1 - multiply_trig_code) + 1)
+    sta .lobyte(multiply_trig + (r2 - multiply_trig_code) + 1)
 
 m:  ldx #0
 q1: lda 1111, x
 q2: cmp 2222, x
 q3: lda 3333, x
 q4: sbc 4444, x
+    sta .lobyte(multiply_trig + (r1 - multiply_trig_code) + 1)
     clc
-r0: adc #0
-r1: ldx #0
+r0: lda #0
+r1: adc #0
+r2: ldx #0
 d:  bcc :+
     inx
 :
@@ -192,19 +92,48 @@ loop:
     rts
 .endproc
 
+setup_depth_scale:
+    cpx #2
+    bcc positive_one
+    lda #$38          ; sec
+    sta trig_label s, -1
+    lda #$E8          ; inx
+    sta trig_label d, 2
+    lda #$E9          ; inx
+    sta trig_label s, 0
+    lda #$90          ; bcc
+    sta trig_label d, 0
+    lda #$18          ; clc
+    sta trig_label r0, -1
+    lda #$69          ; adc
+    sta trig_label r1, 0
+    lda #.hibyte(square1_lo)
+    sta trig_label p1, 2
+    sta trig_label q1, 2
+    lda #.hibyte(square2_lo)
+    sta trig_label p2, 2
+    sta trig_label q2, 2
+    lda #.hibyte(square1_hi)
+    sta trig_label p3, 2
+    sta trig_label q3, 2
+    lda #.hibyte(square2_hi)
+    sta trig_label p4, 2
+    sta trig_label q4, 2
+    lda recriprocal_table, x
+    jmp storePositive
 positive_one:
     lda #.hibyte(square1_lo + 256)
-    sta multiply_trig + (multiply_trig_code::p1 - multiply_trig_code) + 2
-    sta multiply_trig + (multiply_trig_code::q1 - multiply_trig_code) + 2
+    sta trig_label p1, 2
+    sta trig_label q1, 2
     lda #.hibyte(square2_lo - 1)
-    sta multiply_trig + (multiply_trig_code::p2 - multiply_trig_code) + 2
-    sta multiply_trig + (multiply_trig_code::q2 - multiply_trig_code) + 2
+    sta trig_label p2, 2
+    sta trig_label q2, 2
     lda #.hibyte(square1_hi + 256)
-    sta multiply_trig + (multiply_trig_code::p3 - multiply_trig_code) + 2
-    sta multiply_trig + (multiply_trig_code::q3 - multiply_trig_code) + 2
+    sta trig_label p3, 2
+    sta trig_label q3, 2
     lda #.hibyte(square2_hi - 1)
-    sta multiply_trig + (multiply_trig_code::p4 - multiply_trig_code) + 2
-    sta multiply_trig + (multiply_trig_code::q4 - multiply_trig_code) + 2
+    sta trig_label p4, 2
+    sta trig_label q4, 2
     jmp zero_lo
 setup_cos:
     clc
@@ -215,13 +144,17 @@ setup_sin:
     bcs negative
 positive:
     ldx #$38          ; sec
-    stx multiply_trig + (multiply_trig_code::s - multiply_trig_code) - 1
+    stx trig_label s, -1
     ldx #$E8          ; inx
-    stx multiply_trig + (multiply_trig_code::d - multiply_trig_code) + 2
+    stx trig_label d, 2
     inx               ; sbc
-    stx multiply_trig + (multiply_trig_code::s - multiply_trig_code)
+    stx trig_label s, 0
     ldx #$90          ; bcc
-    stx multiply_trig + (multiply_trig_code::d - multiply_trig_code)
+    stx trig_label d, 0
+    ldx #$18          ; clc
+    stx trig_label r0, -1
+    ldx #$69          ; adc
+    stx trig_label r1, 0
     cmp #64
     bcc :+
     eor #$FF
@@ -231,47 +164,52 @@ positive:
     bcs positive_one
     tax                         ; Store A in X for later.
     lda #.hibyte(square1_lo)
-    sta multiply_trig + (multiply_trig_code::p1 - multiply_trig_code) + 2
-    sta multiply_trig + (multiply_trig_code::q1 - multiply_trig_code) + 2
+    sta trig_label p1, 2
+    sta trig_label q1, 2
     lda #.hibyte(square2_lo)
-    sta multiply_trig + (multiply_trig_code::p2 - multiply_trig_code) + 2
-    sta multiply_trig + (multiply_trig_code::q2 - multiply_trig_code) + 2
+    sta trig_label p2, 2
+    sta trig_label q2, 2
     lda #.hibyte(square1_hi)
-    sta multiply_trig + (multiply_trig_code::p3 - multiply_trig_code) + 2
-    sta multiply_trig + (multiply_trig_code::q3 - multiply_trig_code) + 2
+    sta trig_label p3, 2
+    sta trig_label q3, 2
     lda #.hibyte(square2_hi)
-    sta multiply_trig + (multiply_trig_code::p4 - multiply_trig_code) + 2
-    sta multiply_trig + (multiply_trig_code::q4 - multiply_trig_code) + 2
+    sta trig_label p4, 2
+    sta trig_label q4, 2
     lda sin_table, x            ; Use stored X.
-    sta multiply_trig + (multiply_trig_code::s - multiply_trig_code) + 1
-    sta multiply_trig + (multiply_trig_code::p1 - multiply_trig_code) + 1
-    sta multiply_trig + (multiply_trig_code::q1 - multiply_trig_code) + 1
-    sta multiply_trig + (multiply_trig_code::p3 - multiply_trig_code) + 1
-    sta multiply_trig + (multiply_trig_code::q3 - multiply_trig_code) + 1
+storePositive:
+    sta trig_label s, 1
+    sta trig_label p1, 1
+    sta trig_label q1, 1
+    sta trig_label p3, 1
+    sta trig_label q3, 1
     eor #$FF
     adc #1                      ; Carry clear from bcs.
-    sta multiply_trig + (multiply_trig_code::p2 - multiply_trig_code) + 1
-    sta multiply_trig + (multiply_trig_code::q2 - multiply_trig_code) + 1
-    sta multiply_trig + (multiply_trig_code::p4 - multiply_trig_code) + 1
-    sta multiply_trig + (multiply_trig_code::q4 - multiply_trig_code) + 1
+    sta trig_label p2, 1
+    sta trig_label q2, 1
+    sta trig_label p4, 1
+    sta trig_label q4, 1
     bcc :+
-    inc multiply_trig + (multiply_trig_code::p2 - multiply_trig_code) + 2
-    inc multiply_trig + (multiply_trig_code::q2 - multiply_trig_code) + 2
-    inc multiply_trig + (multiply_trig_code::p4 - multiply_trig_code) + 2
-    inc multiply_trig + (multiply_trig_code::q4 - multiply_trig_code) + 2
+    inc trig_label p2, 2
+    inc trig_label q2, 2
+    inc trig_label p4, 2
+    inc trig_label q4, 2
 :
     rts
 negative:
     sbc #128 
     beq positive
     ldx #$18          ; clc
-    stx multiply_trig + (multiply_trig_code::s - multiply_trig_code) - 1
+    stx trig_label s, -1
     ldx #$CA          ; dex
-    stx multiply_trig + (multiply_trig_code::d - multiply_trig_code) + 2
+    stx trig_label d, 2
     ldx #$69          ; adc
-    stx multiply_trig + (multiply_trig_code::s - multiply_trig_code)
+    stx trig_label s, 0
     ldx #$B0          ; bcs
-    stx multiply_trig + (multiply_trig_code::d - multiply_trig_code)
+    stx trig_label d, 0
+    ldx #$38          ; sec
+    stx trig_label r0, -1
+    ldx #$E9          ; sbc
+    stx trig_label r1, 0
     cmp #64
     bcc :+
     eor #$FF
@@ -281,59 +219,85 @@ negative:
     bcs negative_one
     tax                         ; Store A in X for later.
     lda #.hibyte(square1_lo)
-    sta multiply_trig + (multiply_trig_code::p2 - multiply_trig_code) + 2
-    sta multiply_trig + (multiply_trig_code::q2 - multiply_trig_code) + 2
+    sta trig_label p2, 2
+    sta trig_label q1, 2
     lda #.hibyte(square2_lo)
-    sta multiply_trig + (multiply_trig_code::p1 - multiply_trig_code) + 2
-    sta multiply_trig + (multiply_trig_code::q1 - multiply_trig_code) + 2
+    sta trig_label p1, 2
+    sta trig_label q2, 2
     lda #.hibyte(square1_hi)
-    sta multiply_trig + (multiply_trig_code::p4 - multiply_trig_code) + 2
-    sta multiply_trig + (multiply_trig_code::q4 - multiply_trig_code) + 2
+    sta trig_label p4, 2
+    sta trig_label q3, 2
     lda #.hibyte(square2_hi)
-    sta multiply_trig + (multiply_trig_code::p3 - multiply_trig_code) + 2
-    sta multiply_trig + (multiply_trig_code::q3 - multiply_trig_code) + 2
+    sta trig_label p3, 2
+    sta trig_label q4, 2
     lda sin_table, x            ; Use stored X.
-    sta multiply_trig + (multiply_trig_code::s - multiply_trig_code) + 1
-    sta multiply_trig + (multiply_trig_code::p2 - multiply_trig_code) + 1
-    sta multiply_trig + (multiply_trig_code::q2 - multiply_trig_code) + 1
-    sta multiply_trig + (multiply_trig_code::p4 - multiply_trig_code) + 1
-    sta multiply_trig + (multiply_trig_code::q4 - multiply_trig_code) + 1
+    sta trig_label s, 1
+    sta trig_label p2, 1
+    sta trig_label q1, 1
+    sta trig_label p4, 1
+    sta trig_label q3, 1
     eor #$FF
     adc #1                      ; Carry clear from bcs.
-    sta multiply_trig + (multiply_trig_code::p1 - multiply_trig_code) + 1
-    sta multiply_trig + (multiply_trig_code::q1 - multiply_trig_code) + 1
-    sta multiply_trig + (multiply_trig_code::p3 - multiply_trig_code) + 1
-    sta multiply_trig + (multiply_trig_code::q3 - multiply_trig_code) + 1
+    sta trig_label p1, 1
+    sta trig_label q2, 1
+    sta trig_label p3, 1
+    sta trig_label q4, 1
     bcc :+
-    inc multiply_trig + (multiply_trig_code::p1 - multiply_trig_code) + 2
-    inc multiply_trig + (multiply_trig_code::q1 - multiply_trig_code) + 2
-    inc multiply_trig + (multiply_trig_code::p3 - multiply_trig_code) + 2
-    inc multiply_trig + (multiply_trig_code::q3 - multiply_trig_code) + 2
+    inc trig_label p1, 2
+    inc trig_label q2, 2
+    inc trig_label p3, 2
+    inc trig_label q4, 2
 :
     rts
 negative_one:
     lda #.hibyte(square1_lo + 256)
-    sta multiply_trig + (multiply_trig_code::p2 - multiply_trig_code) + 2
-    sta multiply_trig + (multiply_trig_code::q2 - multiply_trig_code) + 2
+    sta trig_label p2, 2
+    sta trig_label q1, 2
     lda #.hibyte(square2_lo - 1)
-    sta multiply_trig + (multiply_trig_code::p1 - multiply_trig_code) + 2
-    sta multiply_trig + (multiply_trig_code::q1 - multiply_trig_code) + 2
+    sta trig_label p1, 2
+    sta trig_label q2, 2
     lda #.hibyte(square1_hi + 256)
-    sta multiply_trig + (multiply_trig_code::p4 - multiply_trig_code) + 2
-    sta multiply_trig + (multiply_trig_code::q4 - multiply_trig_code) + 2
+    sta trig_label p4, 2
+    sta trig_label q3, 2
     lda #.hibyte(square2_hi - 1)
-    sta multiply_trig + (multiply_trig_code::p3 - multiply_trig_code) + 2
-    sta multiply_trig + (multiply_trig_code::q3 - multiply_trig_code) + 2
+    sta trig_label p3, 2
+    sta trig_label q4, 2
 zero_lo:
     lda #0
-    sta multiply_trig + (multiply_trig_code::s - multiply_trig_code) + 1
-    sta multiply_trig + (multiply_trig_code::p1 - multiply_trig_code) + 1
-    sta multiply_trig + (multiply_trig_code::q1 - multiply_trig_code) + 1
-    sta multiply_trig + (multiply_trig_code::p2 - multiply_trig_code) + 1
-    sta multiply_trig + (multiply_trig_code::q2 - multiply_trig_code) + 1
-    sta multiply_trig + (multiply_trig_code::p3 - multiply_trig_code) + 1
-    sta multiply_trig + (multiply_trig_code::q3 - multiply_trig_code) + 1
-    sta multiply_trig + (multiply_trig_code::p4 - multiply_trig_code) + 1
-    sta multiply_trig + (multiply_trig_code::q4 - multiply_trig_code) + 1
+    sta trig_label s, 1
+    sta trig_label p1, 1
+    sta trig_label q1, 1
+    sta trig_label p2, 1
+    sta trig_label q2, 1
+    sta trig_label p3, 1
+    sta trig_label q3, 1
+    sta trig_label p4, 1
+    sta trig_label q4, 1
     rts
 
+.proc calc_recip
+    ldx foo+1
+    lda ptr_table, x
+    ; hibyte ready!
+    lda foo+0
+    and and_table, x
+    ora or_table, x
+    ; lobyte ready!
+
+    tax
+
+
+    lda foo+1
+    bne :+
+:
+    lsr
+    bne :+
+    lda foo+0
+    ror
+    tax
+    lda reciprocal_table, x
+:
+    ror foo+0
+.endproc
+
+.endproc

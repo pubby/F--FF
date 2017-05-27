@@ -80,6 +80,28 @@ draw_line_octant1 = $0300
 .globalzp trig_ptr3
 .globalzp trig_ptr4
 
+; Rendering
+.globalzp render_temp
+
+.globalzp lx_lo_ptr
+.globalzp lx_hi_ptr
+.globalzp ly_lo_ptr
+.globalzp ly_hi_ptr
+.globalzp rx_lo_ptr
+.globalzp rx_hi_ptr
+.globalzp ry_lo_ptr
+.globalzp ry_hi_ptr
+
+.globalzp scratchpad_lx_lo
+.globalzp scratchpad_lx_hi
+.globalzp scratchpad_ly_lo
+.globalzp scratchpad_ly_hi
+.globalzp scratchpad_rx_lo
+.globalzp scratchpad_rx_hi
+.globalzp scratchpad_ry_lo
+.globalzp scratchpad_ry_hi
+
+
 ; Buffers
 .global nt_buffer
 
