@@ -104,6 +104,8 @@ readControllerLoop:
     bankswitch_to ppu_load_4x4_pixels_chr
     jsr ppu_load_4x4_pixels_chr
 
+    lda #128
+    sta p1_dir
 
     sta px
     lda #32

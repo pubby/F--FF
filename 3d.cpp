@@ -129,6 +129,7 @@ void do_draw(sf::RenderTarget& rt, coord player, u8 dir, line l, sf::Color color
     double d1 = (scale / std::max(1, to_signed(l[0].y)));
     if(to_signed(l[0].y) < near)
     {
+        return;
         if(to_signed(l[1].y) < near)
             return;
         // find the intersection
@@ -142,6 +143,7 @@ void do_draw(sf::RenderTarget& rt, coord player, u8 dir, line l, sf::Color color
     double d2 = (scale / std::max(1, to_signed(l[1].y)));
     if(to_signed(l[1].y) < near)
     {
+        return;
         // find the intersection
         double t = to_signed(l[1].y) - near;
         t /= (double)(to_signed(l[1].y - l[0].y));

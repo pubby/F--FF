@@ -6,17 +6,7 @@ subroutine_temp: .res 1
 ptr_temp: .res 2
 
 nmi_counter:    .res 1
-frame_number:    .res 1
-
-; Line Drawing
-from_x_sub: .res 1
-from_x:     .res 2
-from_y_sub: .res 1
-from_y:     .res 2
-to_x_sub:   .res 1
-to_x:       .res 2
-to_y_sub:   .res 1
-to_y:       .res 2
+frame_number:   .res 1
 
 px: .res 2
 py: .res 2
@@ -40,8 +30,18 @@ p2_y:     .res 2
 p2_dir:   .res 1
 p2_speed: .res 2
 
+; Line Drawing
+from_x_sub:  .res 1
+from_x:      .res 2
+from_y_sub:  .res 1
+from_y:      .res 2
+to_x_sub:    .res 1
+to_x:        .res 2
+to_y_sub:    .res 1
+to_y:        .res 2
+
 ; Rendering
-render_temp: .res 1
+y_temp: .res 1
 
 lx_lo_ptr: .res 2
 lx_hi_ptr: .res 2

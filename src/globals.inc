@@ -9,6 +9,14 @@ rom_bank = $3FFF
 
 draw_line_octant1 = $0300
 
+Dx_sub      = 0 ; 1 byte
+Dx          = 1 ; 2 bytes
+Dy_sub      = 3 ; 1 byte
+Dy          = 4 ; 2 bytes
+rounded_Dx  = 6 ; 1 byte
+rounded_Dy  = 7 ; 1 byte
+to_out_code = 6 ; 1 byte, shared with rounded_Dx
+
 .macro bankswitch bank
     lda banktable+bank
     sta banktable+bank
@@ -19,7 +27,6 @@ draw_line_octant1 = $0300
     sta banktable+.lobyte(.bank(label))
 .endmacro
 
-.globalzp debug
 .globalzp subroutine_temp
 .globalzp ptr_temp
 
@@ -27,26 +34,6 @@ draw_line_octant1 = $0300
 .globalzp frame_number
 
 .globalzp rng_state
-
-; Line drawing
-.globalzp from_x_sub
-.globalzp from_x
-.globalzp from_y_sub
-.globalzp from_y
-.globalzp to_x_sub
-.globalzp to_x
-.globalzp to_y_sub
-.globalzp to_y
-
-.globalzp from_out_code
-.globalzp to_out_code
-
-.globalzp Dx_sub
-.globalzp Dx
-.globalzp Dy_sub
-.globalzp Dy
-.globalzp rounded_Dx
-.globalzp rounded_Dy
 
 .globalzp px
 .globalzp py
@@ -70,18 +57,18 @@ draw_line_octant1 = $0300
 .globalzp p2_dir
 .globalzp p2_speed
 
-; Multiplication
-.globalzp multiplicand
-.globalzp multiplier
-.globalzp product
-
-.globalzp trig_ptr1
-.globalzp trig_ptr2
-.globalzp trig_ptr3
-.globalzp trig_ptr4
+; Line drawing
+.globalzp from_x_sub
+.globalzp from_x
+.globalzp from_y_sub
+.globalzp from_y
+.globalzp to_x_sub
+.globalzp to_x
+.globalzp to_y_sub
+.globalzp to_y
 
 ; Rendering
-.globalzp render_temp
+.globalzp y_temp
 
 .globalzp lx_lo_ptr
 .globalzp lx_hi_ptr
@@ -123,5 +110,9 @@ draw_line_octant1 = $0300
 .global NPyx_lo
 .global NPyx_hi
 .global NPyx_offset
+
+.global recip_and_table
+.global recip_or_table
+.global recip_index_table
 
 .endif

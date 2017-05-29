@@ -64,19 +64,35 @@ notPressingRight:
 notPressingUp:
 
     ; Up/Down: Move forwards/backwards
-    lda P i, _buttons_held
-    and #BUTTON_UP
-    beq :+
-    clc
-    add16into p1_speed, #1, p1_speed
-:
-
-    ; Up/Down: Move forwards/backwards
-    lda P i, _buttons_held
+    lda p1_buttons_held
     and #BUTTON_DOWN
     beq notPressingDown
-    sec
-    sub16into p1_speed, #1, p1_speed
+
+    lda P i, _dir
+    jsr setup_cos
+    lda #8
+    sta trig_store
+    lda #0
+    jsr multiply_trig
+    clc
+    adc P i, _x
+    sta P i, _x
+    txa
+    adc 1 + P i, _x
+    sta 1 + P i, _x
+
+    lda P i, _dir
+    jsr setup_sin
+    lda #8
+    sta trig_store
+    lda #0
+    jsr multiply_trig
+    clc
+    adc P i, _y
+    sta P i, _y
+    txa
+    adc 1 + P i, _y
+    sta 1 + P i, _y
 notPressingDown:
 
     rts
