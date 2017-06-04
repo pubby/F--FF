@@ -2,16 +2,17 @@
 
 .segment "ZEROPAGE"
 
+debug: .res 2
 subroutine_temp: .res 1
 ptr_temp: .res 2
 
+nmi_x: .res 1
+nmi_y: .res 1
+
 nmi_counter:    .res 1
 frame_number:   .res 1
-
-px: .res 2
-py: .res 2
-fx: .res 2
-fy: .res 2
+frame_ready:    .res 1
+subframes_left: .res 1
 
 ; Game
 p1:
@@ -42,6 +43,7 @@ to_y:        .res 2
 
 ; Rendering
 y_temp: .res 1
+recip_ptr: .res 2
 
 lx_lo_ptr: .res 2
 lx_hi_ptr: .res 2
@@ -52,6 +54,7 @@ rx_hi_ptr: .res 2
 ry_lo_ptr: .res 2
 ry_hi_ptr: .res 2
 
+.segment "BSS" ; RAM
 scratchpad_lx_lo: .res 12
 scratchpad_lx_hi: .res 12
 scratchpad_ly_lo: .res 12
@@ -61,7 +64,6 @@ scratchpad_rx_hi: .res 12
 scratchpad_ry_lo: .res 12
 scratchpad_ry_hi: .res 12
 
-.segment "BSS" ; RAM
 nt_buffer: .res 32*22
 
 .segment "SMALL_TABLES"

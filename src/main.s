@@ -1,11 +1,10 @@
 .include "globals.inc"
 
 .import ppu_set_palette
-.import draw_line
 .import prepare_game_sprites
 .import setup_cos, setup_sin
-.importzp multiply_trig, trig_store
-.import copy_trig_code
+.importzp multiply_store
+.import copy_multiply_code
 .import p1_move, p2_move
 .import render
 
@@ -15,47 +14,73 @@
 
 .proc nmi_handler
     pha
+    stx nmi_x
+    sty nmi_y
 
-    ; Do OAM DMA.
+    lsr subframes_left
+    bne :+ 
+    lsr frame_ready
+    bcs renderFrame
+:
+
+    ; Do OAM DMA and then read the controllers.
     lda #.hibyte(CPU_OAM)
     sta OAMDMA
-    ldx #1             ; even odd          <- strobe code must take an odd number of cycles total
+    ldx #1
     stx p1_buttons_held    ; even odd even
     stx $4016          ; odd even odd even
     dex                ; odd even
     stx $4016          ; odd even odd even
 readControllerLoop:
     lda $4017          ; odd even odd EVEN <- loop code must take an even number of cycles total
-    and #3             ; odd even
-    cmp #1             ; odd even
-    rol p2_buttons_held, x ; odd even odd even odd even (X = 0; waste 1 cycle and 0 bytes for alignment)
+    lsr
+    rol p2_buttons_held, x
     lda $4016          ; odd even odd EVEN
-    and #3             ; odd even
-    cmp #1             ; odd even
-    rol p1_buttons_held    ; odd even odd even odd
+    lsr
+    rol p1_buttons_held
     bcc readControllerLoop ; even odd [even]
+
+    ldx #$00
+    stx PPUMASK
+.repeat 2, i
+:
+    lda $00
+    dex
+    bne :-
+.endrepeat
+    ldx #$A8
+:
+    lda $00
+    dex
+    bne :-
+    
+    jmp return
+
+renderFrame:
+    ; Do OAM DMA (without reading controllers)
+    lda #.hibyte(CPU_OAM) ; A = $03
+    sta OAMDMA
+    sta subframes_left
 
     bit PPUSTATUS
 
     lda #$20
     sta PPUADDR
-    lda #$00
-    sta PPUADDR
-    sta PPUMASK
+    ldx #$00
+    stx PPUADDR
+    stx PPUMASK
 
     .repeat 32*22, i
         lda nt_buffer+i
         sta PPUDATA
     .endrepeat
 
-    lda #0
-    sta PPUSCROLL
-    sta PPUSCROLL
-    sta PPUADDR
-    sta PPUADDR
+return:
+    stx PPUSCROLL
+    stx PPUSCROLL
+    stx PPUADDR
+    stx PPUADDR
 
-    ;lda #PPUMASK_BG_ON | PPUMASK_GRAYSCALE | PPUMASK_EMPHASIZE_G | PPUMASK_NO_BG_CLIP
-    ;ora #PPUMASK_SPR_ON | PPUMASK_NO_SPR_CLIP
     lda #PPUMASK_BG_ON | PPUMASK_NO_BG_CLIP| PPUMASK_SPR_ON | PPUMASK_NO_SPR_CLIP
     sta PPUMASK
     lda #PPUCTRL_NMI_ON
@@ -63,6 +88,8 @@ readControllerLoop:
 
     ; Restore registers and return.
     inc nmi_counter
+    ldx nmi_x
+    ldy nmi_y
     pla
     rti
 .endproc
@@ -81,6 +108,8 @@ readControllerLoop:
     sta PPUCTRL
     sta PPUMASK
     sta frame_number
+    sta frame_ready
+    sta subframes_left
 
     bit PPUSTATUS
     jsr ppu_set_palette
@@ -99,29 +128,26 @@ readControllerLoop:
     bne :-
 .endrepeat
 
-    jsr copy_trig_code
+    jsr copy_multiply_code
+
+    ; TODO
+    lda #63;+128
+    jsr setup_sin
+    lda #.lobyte(-$2020)
+    sta multiply_store
+    lda #.hibyte(-$2020)
+    jsr multiply
+    sta debug+0
+    stx debug+1
+;:
+    ;jmp :-
+
 
     bankswitch_to ppu_load_4x4_pixels_chr
     jsr ppu_load_4x4_pixels_chr
 
     lda #128
     sta p1_dir
-
-    sta px
-    lda #32
-    sta from_y
-    sta py
-
-    lda #$0
-    sta fx+1
-    lda #64
-    sta fx+0
-
-    lda #0
-    sta from_y+1
-    sta py+1
-    sta px+1
-
 
     lda #PPUCTRL_NMI_ON
     sta PPUCTRL
@@ -131,162 +157,24 @@ loop:
     cmp nmi_counter
     beq :-
 
-    lda #0
-    .repeat 32*22, i
-        sta nt_buffer+i
-    .endrepeat
-
-.if 0
-    lda p1_buttons_held
-    and #BUTTON_LEFT
-    beq :+
-    sec
-    lda px+0
-    sbc #1
-    sta px+0
-    bcs :+
-    dec px+1
-:
-    lda p1_buttons_held
-    and #BUTTON_RIGHT
-    beq :+
-    clc
-    lda px+0
-    adc #1
-    sta px+0
-    bcc :+
-    inc px+1
-:
-    lda p1_buttons_held
-    and #BUTTON_UP
-    beq :+
-    sec
-    lda py+0
-    sbc #1
-    sta py+0
-    bcs :+
-    dec py+1
-:
-    lda p1_buttons_held
-    and #BUTTON_DOWN
-    beq :+
-    clc
-    lda py+0
-    adc #1
-    sta py+0
-    bcc :+
-    inc py+1
-:
-
-    lda p2_buttons_held
-    and #BUTTON_LEFT
-    beq :+
-    sec
-    lda fx+0
-    sbc #1
-    sta fx+0
-    bcs :+
-    dec fx+1
-:
-    lda p2_buttons_held
-    and #BUTTON_RIGHT
-    beq :+
-    clc
-    lda fx+0
-    adc #1
-    sta fx+0
-    bcc :+
-    inc fx+1
-:
-    lda p2_buttons_held
-    and #BUTTON_UP
-    beq :+
-    sec
-    lda fy+0
-    sbc #1
-    sta fy+0
-    bcs :+
-    dec fy+1
-:
-    lda p2_buttons_held
-    and #BUTTON_DOWN
-    beq :+
-    clc
-    lda fy+0
-    adc #1
-    sta fy+0
-    bcc :+
-    inc fy+1
-:
-.else
-    jsr p1_move
-    jsr render
-
-.if 1
-    lda p1_dir
-    jsr setup_cos
-    lda p1_speed+0
-    sta trig_store
-    lda p1_speed+1
-    jsr multiply_trig
-    clc
-    adc #128
-    sta px+0
-    txa
-    adc #0
-    sta px+1
-
-    lda p1_dir
-    jsr setup_sin
-    lda p1_speed+0
-    sta trig_store
-    lda p1_speed+1
-    jsr multiply_trig
-    clc
-    adc #128
-    sta py+0
-    txa
-    adc #0
-    sta py+1
-    ;store16into #128, py
-.endif
-
-    store16into #128, fx
-    store16into #128, fy
-
-    ;lda #0
-    ;sta px+1
-    ;sta py+1
-
-.endif
+    bankswitch_to clear_nt_buffer
+    jsr clear_nt_buffer
 
     lda #PPUMASK_BG_ON | PPUMASK_GRAYSCALE | PPUMASK_EMPHASIZE_B | PPUMASK_NO_BG_CLIP
     ora #PPUMASK_SPR_ON | PPUMASK_NO_SPR_CLIP
-    sta PPUMASK
+    ;sta PPUMASK
 
-.repeat 0
-    .repeat 2, i
-        lda px+i
-        sta to_x+i
-        lda py+i
-        sta to_y+i
-
-        lda fx+i
-        sta from_x+i
-        lda fy+i
-        sta from_y+i
-    .endrepeat
-
-    bankswitch 0
-    ;jsr draw_line
-.endrepeat
+    jsr p1_move
+    jsr render
 
     lda #PPUMASK_BG_ON | PPUMASK_GRAYSCALE | PPUMASK_EMPHASIZE_R | PPUMASK_NO_BG_CLIP
     ora #PPUMASK_SPR_ON | PPUMASK_NO_SPR_CLIP
-    sta PPUMASK
+    ;sta PPUMASK
 
     jsr prepare_game_sprites
 
+    lda #1 
+    sta frame_ready
     inc frame_number
     jmp loop
 
@@ -317,6 +205,15 @@ bottom_pixel_pattern_table:
         .byt %00000000
     .endif
 .endrepeat
+
+.segment "B2_CODE"
+.proc clear_nt_buffer
+    lda #0
+    .repeat 32*22, i
+        sta nt_buffer+i
+    .endrepeat
+    rts
+.endproc
 
 .segment "CHR"
 .proc ppu_load_4x4_pixels_chr

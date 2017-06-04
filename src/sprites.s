@@ -36,6 +36,7 @@ clearOAMLoop:
 .endproc
 
 .proc prepare_player_sprites
+.if 0
     lda py
     clc
     adc #35
@@ -63,6 +64,7 @@ clearOAMLoop:
     ; Increment X by 4.
     txa
     axs #.lobyte(-4)
+.endif
 
     rts
 .endproc

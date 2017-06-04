@@ -83,8 +83,10 @@ int main(int argc, char** argv)
         char const* pp = p ? "NP" : "PP";
         std::fprintf(fp, ".segment \"LINE_UNROLLED\"\n");
         std::fprintf(fp, "    nop\n");
-        if(p == 1)
-            std::fprintf(fp, "    nop\n");
+        if(p == 0)
+            for(int i = 0; i != 0; ++i) std::fprintf(fp, "    nop\n");
+        else
+            for(int i = 0; i != 1; ++i) std::fprintf(fp, "    nop\n");
         for(unsigned i = 0; i != 22; ++i)
         {
             bool const last_i = i == 21;
@@ -162,11 +164,8 @@ int main(int argc, char** argv)
                 std::fprintf(fp, "    jmp %sxy%i_NWx__\n", pp, i+1);
             }
 
-            if(!last_i)
-            {
-                std::fprintf(fp, "%sxy%i_return:\n", pp, i);
-                std::fprintf(fp, "    rts\n");
-            }
+            std::fprintf(fp, "%sxy%i_return:\n", pp, i);
+            std::fprintf(fp, "    rts\n");
 
             std::fprintf(fp, "%sxy%i___xSE:\n", pp, i);
             std::fprintf(fp, "    tay\n");
@@ -183,13 +182,11 @@ int main(int argc, char** argv)
             std::fprintf(fp, "    lda #%u\n", flip(p, 0b0010));
             std::fprintf(fp, "    or_buffer %i\n", i);
             if(last_i)
-            {
-                std::fprintf(fp, "%sxy%i_return:\n", pp, i);
                 std::fprintf(fp, "    rts\n");
-            }
             // fall-through to next i
         }
 
+        std::fprintf(fp, "    nop\n");
         std::fprintf(fp, "    nop\n");
         if(p == 1)
             std::fprintf(fp, "    nop\n");
@@ -213,7 +210,7 @@ int main(int argc, char** argv)
             std::fprintf(fp, "    lda #%u\n", flip(p, 0b1001));
             std::fprintf(fp, "    or_buffer %i\n", i);
             if(last_i)
-                for(int i = 0; i != 15; ++i)
+                for(int i = 0; i != 12; ++i)
                     std::fprintf(fp, "    rts\n");
             else
             {
@@ -270,11 +267,8 @@ int main(int argc, char** argv)
                 std::fprintf(fp, "    jmp %syx%i_NWx__\n", pp, i+1);
             }
 
-            if(!last_i)
-            {
-                std::fprintf(fp, "%syx%i_return:\n", pp, i);
-                std::fprintf(fp, "    rts\n");
-            }
+            std::fprintf(fp, "%syx%i_return:\n", pp, i);
+            std::fprintf(fp, "    rts\n");
 
             std::fprintf(fp, "%syx%i___xSE:\n", pp, i);
             std::fprintf(fp, "    sta subroutine_temp\n");
@@ -388,6 +382,38 @@ int main(int argc, char** argv)
                          "\"page overlap: %syx%i_NEx__\"\n", pp, i, pp, i);
             std::fprintf(fp, ".assert .lobyte(%syx%i_NExSE) <> $FF, error, "
                          "\"page overlap: %syx%i_NExSE\"\n", pp, i, pp, i);
+        }
+
+        for(unsigned i = 0; i != 22; ++i)
+        {
+            std::fprintf(fp, ".assert %syx%i + %syx0_NWx__ - %syx0 = %syx%i_NWx__, "
+                             "error, \"ptr: %syx%i_NWx__\"\n", 
+                             pp, i, pp, pp, pp, i, pp, i);
+            std::fprintf(fp, ".assert %syx%i + %syx0_NEx__ - %syx0 = %syx%i_NEx__, "
+                             "error, \"ptr: %syx%i_NEx__\"\n", 
+                             pp, i, pp, pp, pp, i, pp, i);
+            std::fprintf(fp, ".assert %syx%i + %syx0___xSE - %syx0 = %syx%i___xSE, "
+                             "error, \"ptr: %syx%i___xSE\"\n", 
+                             pp, i, pp, pp, pp, i, pp, i);
+            std::fprintf(fp, ".assert %syx%i + %syx0___xSW - %syx0 = %syx%i___xSW, "
+                             "error, \"ptr: %syx%i___xSW\"\n", 
+                             pp, i, pp, pp, pp, i, pp, i);
+        }
+
+        for(unsigned i = 0; i != 22; ++i)
+        {
+            std::fprintf(fp, ".assert %sxy%i + %sxy0_NWx__ - %sxy0 = %sxy%i_NWx__, "
+                             "error, \"ptr: %sxy%i_NWx__\"\n", 
+                             pp, i, pp, pp, pp, i, pp, i);
+            std::fprintf(fp, ".assert %sxy%i + %sxy0_SWx__ - %sxy0 = %sxy%i_SWx__, "
+                             "error, \"ptr: %sxy%i_SWx__\"\n", 
+                             pp, i, pp, pp, pp, i, pp, i);
+            std::fprintf(fp, ".assert %sxy%i + %sxy0___xNE - %sxy0 = %sxy%i___xNE, "
+                             "error, \"ptr: %sxy%i___xNE\"\n", 
+                             pp, i, pp, pp, pp, i, pp, i);
+            std::fprintf(fp, ".assert %sxy%i + %sxy0___xSE - %sxy0 = %sxy%i___xSE, "
+                             "error, \"ptr: %sxy%i___xSE\"\n", 
+                             pp, i, pp, pp, pp, i, pp, i);
         }
 
     }

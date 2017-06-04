@@ -380,10 +380,10 @@ posDy:
     jmp posDx
 :
     sec
-    lax #0
+    lda #0
     sbc Dx+0
     sta Dx+0
-    txa
+    lda #0
     sbc Dx+1
     sta Dx+1
     ; Neg Dx

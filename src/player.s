@@ -1,7 +1,7 @@
 .include "globals.inc"
 
 .import setup_cos, setup_sin
-.importzp multiply_trig, trig_store
+.importzp multiply_store
 
 .export p1_move, p2_move
 
@@ -32,14 +32,12 @@ notPressingRight:
     and #BUTTON_UP
     beq notPressingUp
 
-    clc
-    lda #128
-    adc P i, _dir
+    lda P i, _dir
     jsr setup_cos
-    lda #8
-    sta trig_store
+    lda #32
+    sta multiply_store
     lda #0
-    jsr multiply_trig
+    jsr multiply
     clc
     adc P i, _x
     sta P i, _x
@@ -47,14 +45,12 @@ notPressingRight:
     adc 1 + P i, _x
     sta 1 + P i, _x
 
-    clc
-    lda #128
-    adc P i, _dir
+    lda P i, _dir
     jsr setup_sin
-    lda #8
-    sta trig_store
+    lda #32
+    sta multiply_store
     lda #0
-    jsr multiply_trig
+    jsr multiply
     clc
     adc P i, _y
     sta P i, _y
@@ -69,11 +65,13 @@ notPressingUp:
     beq notPressingDown
 
     lda P i, _dir
+    clc
+    adc #128
     jsr setup_cos
-    lda #8
-    sta trig_store
+    lda #32
+    sta multiply_store
     lda #0
-    jsr multiply_trig
+    jsr multiply
     clc
     adc P i, _x
     sta P i, _x
@@ -82,11 +80,13 @@ notPressingUp:
     sta 1 + P i, _x
 
     lda P i, _dir
+    clc
+    adc #128
     jsr setup_sin
-    lda #8
-    sta trig_store
+    lda #32
+    sta multiply_store
     lda #0
-    jsr multiply_trig
+    jsr multiply
     clc
     adc P i, _y
     sta P i, _y
