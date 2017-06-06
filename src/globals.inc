@@ -79,6 +79,9 @@ multiply = $78
 .globalzp to_y_sub
 .globalzp to_y
 
+; Multiplication
+.globalzp multiply_sub
+
 ; Rendering
 .globalzp y_temp
 .globalzp recip_ptr
@@ -101,6 +104,14 @@ multiply = $78
 .global scratchpad_ry_lo
 .global scratchpad_ry_hi
 
+.global depthpad_lx_lo
+.global depthpad_lx_hi
+.global depthpad_ly_lo
+.global depthpad_ly_hi
+.global depthpad_rx_lo
+.global depthpad_rx_hi
+.global depthpad_ry_lo
+.global depthpad_ry_hi
 
 ; Buffers
 .global nt_buffer

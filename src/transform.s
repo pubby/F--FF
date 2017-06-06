@@ -1,19 +1,188 @@
 .include "globals.inc"
+.include "intercept.inc"
 
 .import draw_line
 .import setup_cos, setup_sin
 .importzp multiply_store
 .import setup_depth
 .import asl_code
+.import clip_from_y_top_sub
+.import clip_from_y_top_add
+.import clip_to_y_top_sub
+.import clip_to_y_top_add
 
 .export render
 
-draw_distance = 4
+draw_distance = 6
 
 .segment "RODATA"
 .include "foo.level.inc"
 
 .segment "CODE"
+
+.macro side_line offset
+from:
+    lda scratchpad_lx_lo+offset, y
+    sta from_x+0
+    lda scratchpad_lx_hi+offset, y
+    sta from_x+1 
+    ldx scratchpad_ly_lo+offset, y     ; Keep in X for later.
+    stx from_y+0
+    lda scratchpad_ly_hi+offset, y
+    sta from_y+1
+    bne :+
+    jmp @zeroHi
+:
+    bmi @negative
+    jmp @positive
+@negative:
+    ldx scratchpad_ly_hi+1+offset, y   ; Check if entire line is behind camera.
+    bpl :+
+    jmp cull                           ; Cull line.
+:
+    ; Clip line so Y=0.
+    ; Find Dy
+    sec
+    lda scratchpad_ly_lo+1+offset, y
+    sbc from_y+0
+    sta Dy+0
+    txa                 ; X = ly_hi+1
+    sbc from_y+1
+    sta Dy+1
+
+    ldx #0              ; Keep 0 in X for later.
+    stx from_x_sub
+    stx from_y_sub
+    stx Dx_sub
+    stx Dy_sub
+
+    ; Find Dx
+    sec
+    lda scratchpad_lx_lo+1+offset, y
+    sbc from_x+0
+    sta Dx+0
+    lda scratchpad_lx_hi+1+offset, y
+    sbc from_x+1
+    sta Dx+1
+    bvc :+
+    eor #$80
+:
+    bmi :+
+    jmp @posDx
+:
+    sec
+    txa                 ; X = 0
+    sbc Dx+0
+    sta Dx+0
+    txa                 ; X = 0
+    sbc Dx+1
+    sta Dx+1
+    ; Neg Dx
+    jsr clip_from_y_top_sub
+    jmp @doneCalcIntercept
+@posDx:
+    jsr clip_from_y_top_add
+@doneCalcIntercept:
+    ldy y_temp
+    ldx #0
+    stx from_y+1
+    stx from_y+0
+@zeroHi:
+    ; ly_lo (from_y+0) in X.
+    lda recip_asl_table, x
+    sta multiply_label jump_pos, 1
+    clc
+    adc #.lobyte(negative_asl - positive_asl)
+    sta multiply_label jump_neg, 1
+    lda #$80            ; SKB
+    .byt $0C            ; IGN to skip next LDA.
+@positive:
+    lda #$60            ; RTS
+@storeR2:
+    sta multiply_label r2, 0
+
+    jsr multiply_from
+
+to:
+    lda scratchpad_lx_lo+1+offset, y
+    sta to_x+0
+    lda scratchpad_lx_hi+1+offset, y
+    sta to_x+1 
+    ldx scratchpad_ly_lo+1+offset, y   ; Keep in X for later.
+    stx to_y+0
+    lda scratchpad_ly_hi+1+offset, y
+    sta to_y+1
+    bne :+
+    jmp @zeroHi
+:
+    bmi @negative
+    jmp @positive
+@negative:
+    ; Clip line so Y=0.
+    ; Find Dy
+    sec
+    lda scratchpad_ly_lo+offset, y
+    sbc to_y+0
+    sta Dy+0
+    lda scratchpad_ly_hi+offset, y
+    sbc to_y+1
+    sta Dy+1
+
+    ldx #0              ; Keep 0 in X for later.
+    stx to_x_sub
+    stx to_y_sub
+    stx Dx_sub
+    stx Dy_sub
+
+    ; Find Dx
+    sec
+    lda scratchpad_lx_lo+offset, y
+    sbc to_x+0
+    sta Dx+0
+    lda scratchpad_lx_hi+offset, y
+    sbc to_x+1
+    sta Dx+1
+    bvc :+
+    eor #$80
+:
+    bmi :+
+    jmp @posDx
+:
+    sec
+    txa                 ; X = 0
+    sbc Dx+0
+    sta Dx+0
+    txa                 ; X = 0
+    sbc Dx+1
+    sta Dx+1
+    ; Neg Dx
+    jsr clip_to_y_top_sub
+    jmp @doneCalcIntercept
+@posDx:
+    jsr clip_to_y_top_add
+@doneCalcIntercept:
+    ldy y_temp
+    ldx #0
+    stx to_y+1
+    stx to_y+0
+@zeroHi:
+    ; ly_lo (to_y+0) in X.
+    lda recip_asl_table, x
+    sta multiply_label jump_pos, 1
+    clc
+    adc #.lobyte(negative_asl - positive_asl)
+    sta multiply_label jump_neg, 1
+    lda #$80            ; SKB
+    .byt $0C            ; IGN to skip next LDA.
+@positive:
+    lda #$60            ; RTS
+@storeR2:
+    sta multiply_label r2, 0
+
+    jsr multiply_to_and_render_line
+    ldy y_temp
+cull:
+.endmacro
 
 .proc render
     ; setup pointers (TODO)
@@ -146,7 +315,14 @@ cosLoop:
     cpy #draw_distance
     bne cosLoop
 
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;
     ; Draw the lines and shit
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+    ; Gonna use line routines in bank 0.
+    bankswitch 0
+
+    ; Setup self-modifying multiplication code.
     ldy #0
     sty ptr_temp+0
     ldx #$A5            ; LDA (zero page)
@@ -171,211 +347,13 @@ cosLoop:
     stx multiply_label jump_pos, 0
 renderLoop:
     sty y_temp
-
-fromL:
-    lda scratchpad_ly_hi, y
-    beq @zeroHi
-    bpl @positive
-    ;bit scratchpad_ly_hi+1, y   ; Check if entire line is behind camera.
-    ;bmi cull
-    jmp skipL
-@zeroHi:
-    ldx scratchpad_ly_lo, y
-    lda recip_asl_table, x
-    sta multiply_label jump_pos, 1
-    clc
-    adc #.lobyte(negative_asl - positive_asl)
-    sta multiply_label jump_neg, 1
-    lda #$80            ; SKB
-    .byt $0C            ; IGN to skip next LDA.
-@positive:
-    lda #$60            ; RTS
-    sta multiply_label r2, 0
-
-    ; FROM
-    ldx scratchpad_ly_hi, y ; TODO: tax?
-    lda recip_index_table, x
-    sta recip_ptr+1
-    lda scratchpad_ly_lo, y
-    jsr setup_depth
-    lda scratchpad_ly_lo, y
-    clc
-    adc #128
-    sta multiply_store
-    bcc :+
-    inx
-:
-    jsr multiply+1      ; +1 to skip TAX.
-    sta from_y+0
-    dex
-    stx from_y+1
-    lda scratchpad_lx_lo, y
-    sta multiply_store
-    ldx scratchpad_lx_hi, y
-    jsr multiply+1      ; +1 to skip TAX.
-    clc
-    adc #128
-    sta from_x+0
-    bcc :+
-    inx
-:
-    stx from_x+1
-
-toL:
-    lda scratchpad_ly_hi+1, y
-    beq @zeroHi
-    bpl @positive
-    ;bit scratchpad_ly_hi+1, y   ; Check if entire line is behind camera.
-    ;bmi cull
-    jmp skipL
-@zeroHi:
-    ldx scratchpad_ly_lo+1, y
-    lda recip_asl_table, x
-    sta multiply_label jump_pos, 1
-    clc
-    adc #.lobyte(negative_asl - positive_asl)
-    sta multiply_label jump_neg, 1
-    lda #$80            ; SKB
-    .byt $0C            ; IGN to skip next LDA.
-@positive:
-    lda #$60            ; RTS
-    sta multiply_label r2, 0
-
-    ; TO
-    ldx scratchpad_ly_hi+1, y ; TODO: tax?
-    lda recip_index_table, x
-    sta recip_ptr+1
-    lda scratchpad_ly_lo+1, y
-    jsr setup_depth
-    lda scratchpad_ly_lo+1, y
-    clc
-    adc #128
-    sta multiply_store
-    bcc :+
-    inx
-:
-    jsr multiply+1      ; +1 to skip TAX.
-    sta to_y+0
-    dex
-    stx to_y+1
-    lda scratchpad_lx_lo+1, y
-    sta multiply_store
-    ldx scratchpad_lx_hi+1, y
-    jsr multiply+1         ; +1 to skip TAX.
-    clc
-    adc #128
-    sta to_x+0
-    bcc :+
-    inx
-:
-    stx to_x+1
-
-
-    bankswitch 0
-    jsr draw_line
-    ldy y_temp
-
-skipL:
-fromR:
-    lda scratchpad_ry_hi, y
-    beq @zeroHi
-    bpl @positive
-    ;bit scratchpad_ly_hi+1, y   ; Check if entire line is behind camera.
-    ;bmi cull
-    jmp skipR
-@zeroHi:
-    ldx scratchpad_ry_lo, y
-    lda recip_asl_table, x
-    sta multiply_label jump_pos, 1
-    clc
-    adc #.lobyte(negative_asl - positive_asl)
-    sta multiply_label jump_neg, 1
-    lda #$80            ; SKB
-    .byt $0C            ; IGN to skip next LDA.
-@positive:
-    lda #$60            ; RTS
-    sta multiply_label r2, 0
-
-    ; FROM
-    ldx scratchpad_ry_hi, y ; TODO: tax?
-    lda recip_index_table, x
-    sta recip_ptr+1
-    lda scratchpad_ry_lo, y
-    jsr setup_depth
-    lda scratchpad_ry_lo, y
-    clc
-    adc #128
-    sta multiply_store
-    bcc :+
-    inx
-:
-    jsr multiply+1      ; +1 to skip TAX.
-    sta from_y+0
-    dex
-    stx from_y+1
-    lda scratchpad_rx_lo, y
-    sta multiply_store
-    ldx scratchpad_rx_hi, y
-    jsr multiply+1      ; +1 to skip TAX.
-    clc
-    adc #128
-    sta from_x+0
-    bcc :+
-    inx
-:
-    stx from_x+1
-
-toR:
-    lda scratchpad_ry_hi+1, y
-    beq @zeroHi
-    bpl @positive
-    ;bit scratchpad_ly_hi+1, y   ; Check if entire line is behind camera.
-    ;bmi cull
-    jmp skipR
-@zeroHi:
-    ldx scratchpad_ry_lo+1, y
-    lda recip_asl_table, x
-    sta multiply_label jump_pos, 1
-    clc
-    adc #.lobyte(negative_asl - positive_asl)
-    sta multiply_label jump_neg, 1
-    lda #$80            ; SKB
-    .byt $0C            ; IGN to skip next LDA.
-@positive:
-    lda #$60            ; RTS
-    sta multiply_label r2, 0
-
-    ; TO
-    ldx scratchpad_ry_hi+1, y ; TODO: tax?
-    lda recip_index_table, x
-    sta recip_ptr+1
-    lda scratchpad_ry_lo+1, y
-    jsr setup_depth
-    lda scratchpad_ry_lo+1, y
-    clc
-    adc #128
-    sta multiply_store
-    bcc :+
-    inx
-:
-    jsr multiply+1      ; +1 to skip TAX.
-    sta to_y+0
-    dex
-    stx to_y+1
-    lda scratchpad_rx_lo+1, y
-    sta multiply_store
-    ldx scratchpad_rx_hi+1, y
-    jsr multiply+1         ; +1 to skip TAX.
-    clc
-    adc #128
-    sta to_x+0
-    bcc :+
-    inx
-:
-    stx to_x+1
-
-    bankswitch 0
-    jsr draw_line
+    
+    .scope left
+        side_line 0
+    .endscope
+    .scope right
+        side_line (scratchpad_rx_lo - scratchpad_lx_lo)
+    .endscope
 
 nextIteration:
     ldy y_temp
@@ -394,120 +372,65 @@ return:
     rts
 .endproc
 
-; TODO code!
-.if 0
-    ldx scratchpad_ly_hi, y ; TODO: tax?
+.proc multiply_from
+    ldx from_y+1
     lda recip_index_table, x
-    sta ptr_temp+1
-    lda scratchpad_ly_lo, y
-    and recip_and_table, x
-    ora recip_or_table, x
-
-nonzeroHi:
-    lda #0
-    sta ptr_temp+0
-    ldx scratchpad_ly_hi, y ; TODO: tax?
-    lda recip_index_table, x
-    sta ptr_temp+1
-    lda scratchpad_ly_lo, y
-    pha
-    and recip_and_table, x
-    ora recip_or_table, x
-    tay
-    jsr setup_depth     ; Preserves X.
-
-
-    ; Clip from.
-    sta from_y+1
-    lda scratchpad_ly_lo, y
-    sta from_y+0
-
-    lda scratchpad_lx_lo, y
-    sta from_x+0
-    lda scratchpad_lx_hi, y
-    sta from_x+1
-
-    ; Find Dy
-    sec
-    lda scratchpad_ly_lo+1, y
-    sta to_y+0
-    sbc scratchpad_ly_lo, y
-    sta Dy+0
-    lda scratchpad_ly_hi+1, y
-    sta to_y+1
-    sbc scratchpad_ly_hi, y
-    sta Dy+1
-
-
-    ; Now find Dx
-    sec
-    lda scratchpad_lx_lo+1, y
-    sta to_x+0
-    sbc scratchpad_lx_lo, y
-    sta Dx+0
-    lda scratchpad_lx_hi+1, y
-    sta to_x+1
-    sbc scratchpad_lx_hi, y
-    sta Dx+1
-    bvc :+
-    eor #$80
+    sta recip_ptr+1
+    lda from_y+0
+    jsr setup_depth
+    lda from_y+0
+    clc
+    adc #128
+    sta multiply_store
+    bcc :+
+    inx
 :
-    bmi :+
-    jmp @posDx
-:
-    sec
-    lda #0
-    sbc Dx+0
-    sta Dx+0
-    lda #0
-    sbc Dx+commentssharesavehidereport1
-    sta Dx+1
-    ; Neg Dx
-    .scope clipNegX
-        clip sub
-        bressenham sub
-    .endscope
-@posDx:
-    .scope clipPosX
-        clip add
-        bressenham add
-    .endscope
-
-
-    ; calc Dx and Dy
-
-    ; No clipping needed!
-    lda scratchpad_ly_hi, y
-    beq zeroFrom
-    lda scratchpad_ly_lo, y
-    jsr setup_depth_scale
-    jsr multiply
-    sec
-    sbc #256-32
+    jsr multiply+1      ; +1 to skip TAX.
     sta from_y+0
-    bcs :+
     dex
-:
     stx from_y+1
+    lda from_x+0
+    sta multiply_store
+    ldx from_x+1
+    jsr multiply+1      ; +1 to skip TAX.
+    clc
+    adc #128
+    sta from_x+0
+    bcc :+
+    inx
+:
+    stx from_x+1
+    rts
+.endproc
 
-
-nonzeroHi:    ; Use 8x16 multiplication.
-    ldx scratchpad_ly_hi, y ; TODO: tax?
+.proc multiply_to_and_render_line
+    ldx to_y+1
     lda recip_index_table, x
-    sta ptr_temp+1
-    lda scratchpad_ly_lo, y
-    and recip_and_table, x
-    ora recip_or_table, x
-    sta ptr_temp+0
-    jsr setup_8x16_depth_scale
+    sta recip_ptr+1
+    lda to_y+0
+    jsr setup_depth
+    lda to_y+0
+    clc
+    adc #128
+    sta multiply_store
+    bcc :+
+    inx
+:
+    jsr multiply+1      ; +1 to skip TAX.
+    sta to_y+0
+    dex
+    stx to_y+1
+    lda to_x+0
+    sta multiply_store
+    ldx to_x+1
+    jsr multiply+1      ; +1 to skip TAX.
+    clc
+    adc #128
+    sta to_x+0
+    bcc :+
+    inx
+:
+    stx to_x+1
+    jmp draw_line
+.endproc
 
-
-zeroHi:       ; Use 16x16 multiplication.
-    sta multiplicand+1
-    ldx scratchpad_ly_lo, y
-    stx multiplicand+0
-    lda recip_table_0_lo, x
-    ldy recip_table_0_hi, x
-    jsr prepare_16x16_depth
-
-.endif

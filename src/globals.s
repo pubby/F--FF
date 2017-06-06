@@ -41,6 +41,8 @@ to_x:        .res 2
 to_y_sub:    .res 1
 to_y:        .res 2
 
+multiply_sub: .res 1
+
 ; Rendering
 y_temp: .res 1
 recip_ptr: .res 2
@@ -55,14 +57,25 @@ ry_lo_ptr: .res 2
 ry_hi_ptr: .res 2
 
 .segment "BSS" ; RAM
-scratchpad_lx_lo: .res 12
-scratchpad_lx_hi: .res 12
-scratchpad_ly_lo: .res 12
-scratchpad_ly_hi: .res 12
-scratchpad_rx_lo: .res 12
-scratchpad_rx_hi: .res 12
-scratchpad_ry_lo: .res 12
-scratchpad_ry_hi: .res 12
+pad_size = 6
+
+scratchpad_lx_lo: .res pad_size
+scratchpad_lx_hi: .res pad_size
+scratchpad_ly_lo: .res pad_size
+scratchpad_ly_hi: .res pad_size
+scratchpad_rx_lo: .res pad_size
+scratchpad_rx_hi: .res pad_size
+scratchpad_ry_lo: .res pad_size
+scratchpad_ry_hi: .res pad_size
+
+depthpad_lx_lo: .res pad_size
+depthpad_lx_hi: .res pad_size
+depthpad_ly_lo: .res pad_size
+depthpad_ly_hi: .res pad_size
+depthpad_rx_lo: .res pad_size
+depthpad_rx_hi: .res pad_size
+depthpad_ry_lo: .res pad_size
+depthpad_ry_hi: .res pad_size
 
 nt_buffer: .res 32*22
 

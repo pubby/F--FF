@@ -2,6 +2,10 @@
 .include "intercept.inc"
 
 .export draw_line
+.export clip_from_y_top_sub
+.export clip_from_y_top_add
+.export clip_to_y_top_sub
+.export clip_to_y_top_add
 
 .segment "LINE_TABLES"
 subpixel_table:
@@ -68,7 +72,11 @@ clipFromLoop:
 @notXLeft:
     lsr
     bcc @notYTop
-        calc_intercept_low xop, from_x_sub, Dx_sub, from_y_sub, Dy_sub
+        .if .xmatch(xop,add)
+            jsr clip_from_y_top_add
+        .else
+            jsr clip_from_y_top_sub
+        .endif
         lda #0
         sta from_y+0
         sta from_y+1
@@ -328,6 +336,26 @@ earlyReturn:
         jmp (ptr_temp)
     .endif
 .endmacro
+
+.proc clip_from_y_top_sub
+    calc_intercept_low sub, from_x_sub, Dx_sub, from_y_sub, Dy_sub
+    rts
+.endproc
+
+.proc clip_from_y_top_add
+    calc_intercept_low add, from_x_sub, Dx_sub, from_y_sub, Dy_sub
+    rts
+.endproc
+
+.proc clip_to_y_top_sub
+    calc_intercept_low sub, to_x_sub, Dx_sub, to_y_sub, Dy_sub
+    rts
+.endproc
+
+.proc clip_to_y_top_add
+    calc_intercept_low add, to_x_sub, Dx_sub, to_y_sub, Dy_sub
+    rts
+.endproc
 
 .proc draw_line
     sec

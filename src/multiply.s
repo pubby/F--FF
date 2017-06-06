@@ -26,8 +26,9 @@ square2_hi:
 .include "recip.inc"
 
 .proc positive_asl
-    .repeat 8
-        asl
+    .repeat 6
+        asl multiply_sub
+        rol
         rol subroutine_temp
         bmi max
     .endrepeat
@@ -40,8 +41,9 @@ max:
 .endproc
 
 .proc negative_asl
-    .repeat 8
-        asl
+    .repeat 6
+        asl multiply_sub
+        rol
         rol subroutine_temp
         bpl min
     .endrepeat
@@ -153,6 +155,7 @@ mvar_lh1:
     lda #0
 mvar_ll1:
     adc #0
+    sta multiply_sub
     bcc :+
     inc multiply_label r2, 1
     bne :+

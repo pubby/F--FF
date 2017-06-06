@@ -75,6 +75,7 @@ renderFrame:
         sta PPUDATA
     .endrepeat
 
+    inc nmi_counter
 return:
     stx PPUSCROLL
     stx PPUSCROLL
@@ -87,7 +88,6 @@ return:
     sta PPUCTRL
 
     ; Restore registers and return.
-    inc nmi_counter
     ldx nmi_x
     ldy nmi_y
     pla
@@ -108,8 +108,9 @@ return:
     sta PPUCTRL
     sta PPUMASK
     sta frame_number
-    sta frame_ready
     sta subframes_left
+    lda #1
+    sta frame_ready
 
     bit PPUSTATUS
     jsr ppu_set_palette

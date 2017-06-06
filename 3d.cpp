@@ -160,8 +160,8 @@ void do_draw(sf::RenderTarget& rt, coord player, u8 dir, line l, sf::Color color
     dl1[0] = { to_signed(l[0].x) * -d1, (to_signed(l[0].y) + 64) * d1 };
     dl1[1] = { to_signed(l[1].x) * -d2, (to_signed(l[1].y) + 64) * d2 };
 
-    dl2[0] = { to_signed(l[0].x) * -d1, (to_signed(l[0].y) + 32) * d1 };
-    dl2[1] = { to_signed(l[1].x) * -d2, (to_signed(l[1].y) + 32) * d2 };
+    dl2[0] = { to_signed(l[0].x) * -d1, (to_signed(l[0].y) + 64) * d1 };
+    dl2[1] = { to_signed(l[1].x) * -d2, (to_signed(l[1].y) + 64) * d2 };
 
     dl3[0] = dl1[0];
     dl3[1] = dl2[0];
@@ -169,13 +169,15 @@ void do_draw(sf::RenderTarget& rt, coord player, u8 dir, line l, sf::Color color
     dl4[0] = dl1[1];
     dl4[1] = dl2[1];
 
-    draw_line(rt, dl1, color);
     if(color == sf::Color::Red)
     {
+        //draw_line(rt, dl1, color);
         draw_line(rt, dl2, color);
         draw_line(rt, dl3, color);
         draw_line(rt, dl4, color);
     }
+    else
+        draw_line(rt, dl1, color);
 }
 
 int main()
