@@ -34,7 +34,7 @@ notPressingRight:
 
     lda P i, _dir
     jsr setup_cos
-    lda #32
+    lda #64
     sta multiply_store
     lda #0
     jsr multiply
@@ -47,7 +47,7 @@ notPressingRight:
 
     lda P i, _dir
     jsr setup_sin
-    lda #32
+    lda #64
     sta multiply_store
     lda #0
     jsr multiply
@@ -68,7 +68,7 @@ notPressingUp:
     clc
     adc #128
     jsr setup_cos
-    lda #32
+    lda #64
     sta multiply_store
     lda #0
     jsr multiply
@@ -83,7 +83,7 @@ notPressingUp:
     clc
     adc #128
     jsr setup_sin
-    lda #32
+    lda #64
     sta multiply_store
     lda #0
     jsr multiply

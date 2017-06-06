@@ -7,6 +7,7 @@
 .import copy_multiply_code
 .import p1_move, p2_move
 .import render
+.import draw_line
 
 .export main, nmi_handler, irq_handler
 
@@ -138,8 +139,6 @@ return:
     sta multiply_store
     lda #.hibyte(-$2020)
     jsr multiply
-    sta debug+0
-    stx debug+1
 ;:
     ;jmp :-
 
@@ -167,6 +166,22 @@ loop:
 
     jsr p1_move
     jsr render
+
+.if 0
+    bankswitch 0
+    lda #129
+    sta from_x+0
+    sta from_y+0
+    sta to_x+0
+    lda #128
+    sta to_y+0
+    lda #0
+    sta from_x+1
+    sta from_y+1
+    sta to_x+1
+    sta to_y+1
+    jsr draw_line
+.endif
 
     lda #PPUMASK_BG_ON | PPUMASK_GRAYSCALE | PPUMASK_EMPHASIZE_R | PPUMASK_NO_BG_CLIP
     ora #PPUMASK_SPR_ON | PPUMASK_NO_SPR_CLIP

@@ -35,8 +35,8 @@ square2_hi:
     ldx subroutine_temp
     rts
 max:
-    lda #.lobyte((1 << 15) - 512)
-    ldx #.hibyte((1 << 15) - 512)
+    lda #.lobyte((1 << 15) - 1)
+    ldx #.hibyte((1 << 15) - 1)
     rts
 .endproc
 
@@ -50,8 +50,8 @@ max:
     ldx subroutine_temp
     rts
 min:
-    lda #.lobyte(-(1 << 15) + 512)
-    ldx #.hibyte(-(1 << 15) + 512)
+    lda #.lobyte(-(1 << 15))
+    ldx #.hibyte(-(1 << 15))
     rts
 .endproc
 
