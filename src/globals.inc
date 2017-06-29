@@ -79,6 +79,17 @@ multiply = $78
 .globalzp to_y_sub
 .globalzp to_y
 
+.globalzp l1100
+.globalzp l1010
+.globalzp l0110
+.globalzp l1001
+.globalzp l0101
+.globalzp l0011
+.globalzp l0001
+.globalzp l0010
+.globalzp l0100
+.globalzp l1000
+
 ; Multiplication
 .globalzp multiply_sub
 
@@ -95,6 +106,7 @@ multiply = $78
 .globalzp ry_lo_ptr
 .globalzp ry_hi_ptr
 
+.global scratchpad
 .global scratchpad_lx_lo
 .global scratchpad_lx_hi
 .global scratchpad_ly_lo

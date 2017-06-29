@@ -41,6 +41,18 @@ to_x:        .res 2
 to_y_sub:    .res 1
 to_y:        .res 2
 
+l1100: .res 1
+l1010: .res 1
+l0110: .res 1
+l1001: .res 1
+l0101: .res 1
+l0011: .res 1
+l0001: .res 1
+l0010: .res 1
+l0100: .res 1
+l1000: .res 1
+
+; Multiplication
 multiply_sub: .res 1
 
 ; Rendering
@@ -59,6 +71,7 @@ ry_hi_ptr: .res 2
 .segment "BSS" ; RAM
 pad_size = 6
 
+scratchpad:
 scratchpad_lx_lo: .res pad_size
 scratchpad_lx_hi: .res pad_size
 scratchpad_ly_lo: .res pad_size

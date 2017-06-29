@@ -92,7 +92,7 @@ int main(int argc, char** argv)
             bool const last_i = i == 21;
             std::fprintf(fp, "%sxy%i:\n", pp, i);
             std::fprintf(fp, "%sxy%i_store___xNE:\n", pp, i);
-            std::fprintf(fp, "    lda #%u\n", flip(p, 0b0100));
+            std::fprintf(fp, "    lda %s\n", !p ? "l0100" : "l1000");
             std::fprintf(fp, "    or_buffer %i\n", i);
             std::fprintf(fp, "    cpx to_x\n");
             std::fprintf(fp, "    beq %sxy%i_return\n", pp, i);
@@ -110,7 +110,7 @@ int main(int argc, char** argv)
 
             std::fprintf(fp, "%sxy%i_NWxSE:\n", pp, i);
             std::fprintf(fp, "    tay\n");
-            std::fprintf(fp, "    lda #%u\n", flip(p, 0b1001));
+            std::fprintf(fp, "    lda %s\n", !p ? "l1001" : "l0110");
             std::fprintf(fp, "    or_buffer %i\n", i);
             std::fprintf(fp, "    cpx to_x\n");
             std::fprintf(fp, "    beq %sxy%i_return\n", pp, i);
@@ -128,7 +128,7 @@ int main(int argc, char** argv)
 
             std::fprintf(fp, "%sxy%i_NWxNE:\n", pp, i);
             std::fprintf(fp, "    tay\n");
-            std::fprintf(fp, "    lda #%u\n", flip(p, 0b1100));
+            std::fprintf(fp, "    lda %s\n", !p ? "l1100" : "l1100");
             std::fprintf(fp, "    or_buffer %i\n", i);
             std::fprintf(fp, "    cpx to_x\n");
             std::fprintf(fp, "    beq %sxy%i_return\n", pp, i);
@@ -147,7 +147,7 @@ int main(int argc, char** argv)
 
             std::fprintf(fp, "%sxy%i_SWxSE:\n", pp, i);
             std::fprintf(fp, "    tay\n");
-            std::fprintf(fp, "    lda #%u\n", flip(p, 0b0011));
+            std::fprintf(fp, "    lda %s\n", !p ? "l0011" : "l0011");
             std::fprintf(fp, "%sxy%i_store___xSE:\n", pp, i);
             std::fprintf(fp, "    or_buffer %i\n", i);
             std::fprintf(fp, "    cpx to_x\n");
@@ -169,7 +169,7 @@ int main(int argc, char** argv)
 
             std::fprintf(fp, "%sxy%i___xSE:\n", pp, i);
             std::fprintf(fp, "    tay\n");
-            std::fprintf(fp, "    lda #%u\n", flip(p, 0b0001));
+            std::fprintf(fp, "    lda %s\n", !p ? "l0001" : "l0010");
             std::fprintf(fp, "    jmp %sxy%i_store___xSE\n", pp, i);
 
             std::fprintf(fp, "%sxy%i___xNE:\n", pp, i);
@@ -179,7 +179,7 @@ int main(int argc, char** argv)
             std::fprintf(fp, "%sxy%i_fill_SWx__:\n", pp, i);
             std::fprintf(fp, "    %s rounded_Dx\n", adc(p));
             std::fprintf(fp, "    tay\n");
-            std::fprintf(fp, "    lda #%u\n", flip(p, 0b0010));
+            std::fprintf(fp, "    lda %s\n", !p ? "l0010" : "l0001");
             std::fprintf(fp, "    or_buffer %i\n", i);
             if(last_i)
                 std::fprintf(fp, "    rts\n");
@@ -207,7 +207,7 @@ int main(int argc, char** argv)
 
             std::fprintf(fp, "%syx%i_NWxSE:\n", pp, i);
             std::fprintf(fp, "    sta subroutine_temp\n");
-            std::fprintf(fp, "    lda #%u\n", flip(p, 0b1001));
+            std::fprintf(fp, "    lda %s\n", !p ? "l1001" : "l0110");
             std::fprintf(fp, "    or_buffer %i\n", i);
             if(last_i)
                 for(int i = 0; i != 12; ++i)
@@ -224,7 +224,7 @@ int main(int argc, char** argv)
 
             std::fprintf(fp, "%syx%i_NWxSW:\n", pp, i);
             std::fprintf(fp, "    sta subroutine_temp\n");
-            std::fprintf(fp, "    lda #%u\n", flip(p, 0b1010));
+            std::fprintf(fp, "    lda %s\n", !p ? "l1010" : "l0101");
             std::fprintf(fp, "    or_buffer %i\n", i);
             if(last_i)
                 for(int i = 0; i != 14; ++i)
@@ -249,7 +249,7 @@ int main(int argc, char** argv)
 
             std::fprintf(fp, "%syx%i_NExSE:\n", pp, i);
             std::fprintf(fp, "    sta subroutine_temp\n");
-            std::fprintf(fp, "    lda #%u\n", flip(p, 0b0101));
+            std::fprintf(fp, "    lda %s\n", !p ? "l0101" : "l1010");
             std::fprintf(fp, "%syx%i_store___xSE:\n", pp, i);
             std::fprintf(fp, "    or_buffer %i\n", i);
             if(last_i)
@@ -272,18 +272,18 @@ int main(int argc, char** argv)
 
             std::fprintf(fp, "%syx%i___xSE:\n", pp, i);
             std::fprintf(fp, "    sta subroutine_temp\n");
-            std::fprintf(fp, "    lda #%u\n", flip(p, 0b0001));
+            std::fprintf(fp, "    lda %s\n", !p ? "l0001" : "l0010");
             std::fprintf(fp, "    jmp %syx%i_store___xSE\n", pp, i);
 
             std::fprintf(fp, "%syx%i_fill_NEx__:\n", pp, i);
             std::fprintf(fp, "    adc rounded_Dy\n");
             std::fprintf(fp, "    sta subroutine_temp\n");
-            std::fprintf(fp, "    lda #%u\n", flip(p, 0b0100));
+            std::fprintf(fp, "    lda %s\n", !p ? "l0100" : "l1000");
             std::fprintf(fp, "    or_buffer %i\n", i);
             std::fprintf(fp, "    %s\n", p ? "dex" : "inx");
 
             std::fprintf(fp, "%syx%i___xSW:\n", pp, i);
-            std::fprintf(fp, "    lda #%u\n", flip(p, 0b0010));
+            std::fprintf(fp, "    lda %s\n", !p ? "l0010" : "l0001");
             std::fprintf(fp, "    or_buffer %i\n", i);
             if(last_i)
                     std::fprintf(fp, "    rts\n");

@@ -479,6 +479,60 @@ cull:
     sec
     lda #64
     sbc p1_dir
+    jsr setup_cos
+    ldy #0
+cosLoop:
+    sec
+    lda (ly_lo_ptr), y
+    sbc p1_y+0
+    sta multiply_store
+    lda (ly_hi_ptr), y
+    sbc p1_y+1
+    jsr multiply
+    sta scratchpad_ly_lo, y
+    txa
+    sta scratchpad_ly_hi, y
+
+    sec
+    lda (lx_lo_ptr), y
+    sbc p1_x+0
+    sta multiply_store
+    lda (lx_hi_ptr), y
+    sbc p1_x+1
+    jsr multiply
+    sta scratchpad_lx_lo, y
+    txa
+    sta scratchpad_lx_hi, y
+
+    sec
+    lda (ry_lo_ptr), y
+    sbc p1_y+0
+    sta multiply_store
+    lda (ry_hi_ptr), y
+    sbc p1_y+1
+    jsr multiply
+    sta scratchpad_ry_lo, y
+    txa
+    sta scratchpad_ry_hi, y
+
+    sec
+    lda (rx_lo_ptr), y
+    sbc p1_x+0
+    sta multiply_store
+    lda (rx_hi_ptr), y
+    sbc p1_x+1
+    jsr multiply
+    sta scratchpad_rx_lo, y
+    txa
+    sta scratchpad_rx_hi, y
+
+    iny
+    cpy #draw_distance
+    bne cosLoop
+
+    sec
+    lda #64
+    sbc p1_dir
     jsr setup_sin
     ldy #0
 sinLoop:
@@ -489,60 +543,6 @@ sinLoop:
     lda (ly_hi_ptr), y
     sbc p1_y+1
     jsr multiply
-    sta scratchpad_lx_lo, y
-    txa
-    sta scratchpad_lx_hi, y
-
-    sec
-    lda (lx_lo_ptr), y
-    sbc p1_x+0
-    sta multiply_store
-    lda (lx_hi_ptr), y
-    sbc p1_x+1
-    jsr multiply
-    sta scratchpad_ly_lo, y
-    txa
-    sta scratchpad_ly_hi, y
-
-    sec
-    lda (ry_lo_ptr), y
-    sbc p1_y+0
-    sta multiply_store
-    lda (ry_hi_ptr), y
-    sbc p1_y+1
-    jsr multiply
-    sta scratchpad_rx_lo, y
-    txa
-    sta scratchpad_rx_hi, y
-
-    sec
-    lda (rx_lo_ptr), y
-    sbc p1_x+0
-    sta multiply_store
-    lda (rx_hi_ptr), y
-    sbc p1_x+1
-    jsr multiply
-    sta scratchpad_ry_lo, y
-    txa
-    sta scratchpad_ry_hi, y
-
-    iny
-    cpy #draw_distance
-    bne sinLoop
-
-    sec
-    lda #64
-    sbc p1_dir
-    jsr setup_cos
-    ldy #0
-cosLoop:
-    sec
-    lda (lx_lo_ptr), y
-    sbc p1_x+0
-    sta multiply_store
-    lda (lx_hi_ptr), y
-    sbc p1_x+1
-    jsr multiply
     sec
     sbc scratchpad_lx_lo, y
     sta scratchpad_lx_lo, y
@@ -551,11 +551,11 @@ cosLoop:
     sta scratchpad_lx_hi, y
 
     sec
-    lda (ly_lo_ptr), y
-    sbc p1_y+0
+    lda (lx_lo_ptr), y
+    sbc p1_x+0
     sta multiply_store
-    lda (ly_hi_ptr), y
-    sbc p1_y+1
+    lda (lx_hi_ptr), y
+    sbc p1_x+1
     jsr multiply
     clc
     adc scratchpad_ly_lo, y
@@ -565,11 +565,11 @@ cosLoop:
     sta scratchpad_ly_hi, y
 
     sec
-    lda (rx_lo_ptr), y
-    sbc p1_x+0
+    lda (ry_lo_ptr), y
+    sbc p1_y+0
     sta multiply_store
-    lda (rx_hi_ptr), y
-    sbc p1_x+1
+    lda (ry_hi_ptr), y
+    sbc p1_y+1
     jsr multiply
     sec
     sbc scratchpad_rx_lo, y
@@ -579,11 +579,11 @@ cosLoop:
     sta scratchpad_rx_hi, y
 
     sec
-    lda (ry_lo_ptr), y
-    sbc p1_y+0
+    lda (rx_lo_ptr), y
+    sbc p1_x+0
     sta multiply_store
-    lda (ry_hi_ptr), y
-    sbc p1_y+1
+    lda (rx_hi_ptr), y
+    sbc p1_x+1
     jsr multiply
     clc
     adc scratchpad_ry_lo, y
@@ -594,7 +594,7 @@ cosLoop:
 
     iny
     cpy #draw_distance
-    bne cosLoop
+    bne sinLoop
 
     ;;;;;;;;;;;;;;;;;;;;;;;;;;
     ; Draw the lines and shit
@@ -602,6 +602,25 @@ cosLoop:
 
     ; Gonna use line routines in bank 0.
     bankswitch 0
+
+    ; Setup color shit
+    lda #%1100
+    sta  l1100
+    ldx #%1010
+    stx  l1010
+    sax  l1000
+    lsr ;%0110
+    sta  l0110
+    ldx #%0101
+    stx  l0101
+    sax  l0100
+    lsr ;%0011
+    sta  l0011
+    ldx #%1001
+    stx  l1001
+    sax  l0001
+    lda #%0010
+    sta  l0010
 
     ; Setup self-modifying multiplication code.
     ldx #$A5            ; LDA (zero page)
@@ -641,6 +660,26 @@ nextIteration:
     bcs :+
     jmp renderWallsLoop
 :
+
+    ; Setup color shit
+    lda #%1100 << 4
+    sta  l1100
+    ldx #%1010 << 4
+    stx  l1010
+    sax  l1000
+    lsr ;%0110
+    sta  l0110
+    ldx #%0101 << 4
+    stx  l0101
+    sax  l0100
+    lsr ;%0011
+    sta  l0011
+    ldx #%1001 << 4
+    stx  l1001
+    sax  l0001
+    lda #%0010 << 4
+    sta  l0010
+
     ldy #1
 renderFloorsLoop:
     sty y_temp

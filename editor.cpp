@@ -121,6 +121,7 @@ void save_cpp(char const* filename, editor const& e)
 
 void save_asm(char const* filename, editor const& e)
 {
+    unsigned const pad = 6;
     FILE* fp = std::fopen(filename, "w");
     if(!fp)
         throw std::runtime_error("can't open file");

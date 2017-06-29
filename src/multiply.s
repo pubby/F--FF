@@ -4,6 +4,7 @@
 .exportzp multiply_store
 .export copy_multiply_code
 .export setup_depth
+.export setup_multiply
 
 .segment "MULT_TABLES"
 square1_lo:
@@ -151,6 +152,7 @@ mvar_hl2:
     clc
 :
 
+    ; Sub
 mvar_lh1:
     lda #0
 mvar_ll1:
@@ -287,3 +289,68 @@ loop:
     rts
 .endproc
 
+; X in = multiplier lobyte 
+; A in = multiplier hibyte
+.proc setup_multiply
+    pha
+    bvs overflowSet
+    bmi negative
+positive:
+    lda #$A5            ; LDA (zero page)
+    sta multiply_label la, 0
+    lda #multiply_label r2, 1
+    sta multiply_label la, 1
+    lda #$A2            ; LDX (immediate)
+    sta multiply_label r3, 0
+    lda #$60            ; RTS
+    sta multiply_label r2, 0
+    pla
+    jmp store
+overflowSet:
+    bmi positive
+negative:
+    lda #$A7            ; LAX (zero page)
+    sta multiply_label la, 0
+    lda #multiply_label FF, 0
+    sta multiply_label la, 1
+    lda #$CB            ; AXS
+    sta multiply_label r3, 0
+    lda #$49            ; EOR
+    sta multiply_label r2, 0
+    txa
+    eor #$FF
+    clc
+    adc #1
+    tax
+    pla
+    eor #$FF
+    adc #0
+store:
+
+    ; Hi
+    sta multiply_label s1, 1
+    sta multiply_label p5, 1
+    sta multiply_label q5, 1
+    sta multiply_label p7, 1
+    sta multiply_label q7, 1
+    eor #$FF
+    sta multiply_label p6, 1
+    sta multiply_label q6, 1
+    sta multiply_label p8, 1
+    sta multiply_label q8, 1
+
+    ; Lo
+    txa
+    sta multiply_label s0, 1
+    sta multiply_label p1, 1
+    sta multiply_label q1, 1
+    sta multiply_label p3, 1
+    sta multiply_label q3, 1
+    eor #$FF
+    sta multiply_label p2, 1
+    sta multiply_label q2, 1
+    sta multiply_label p4, 1
+    sta multiply_label q4, 1
+
+    rts
+.endproc

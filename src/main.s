@@ -7,11 +7,10 @@
 .import copy_multiply_code
 .import p1_move, p2_move
 .import render
-.import draw_line
 
 .export main, nmi_handler, irq_handler
 
-.segment "CODE"
+.segment "NMI"
 
 .proc nmi_handler
     pha
@@ -99,6 +98,8 @@ return:
     rti
 .endproc
 
+.segment "CODE"
+
 ; TODO
 .proc ppu_clear_attributes
     rts
@@ -116,8 +117,8 @@ return:
     bit PPUSTATUS
     jsr ppu_set_palette
 
-    bit PPUSTATUS
 .repeat 2, i
+    bit PPUSTATUS
     lda #$23 + $08*i
     sta PPUADDR
     lda #$C0
@@ -129,6 +130,37 @@ return:
     dex
     bne :-
 .endrepeat
+
+    bit PPUSTATUS
+    lda #$23
+    sta PPUADDR
+    lda #$C0
+    sta PPUADDR
+    lda #%00000000
+    ldx #8
+:
+    sta PPUDATA
+    dex
+    bne :-
+    lda #%01010101
+    ldx #8
+:
+    sta PPUDATA
+    dex
+    bne :-
+    lda #%10101010
+    ldx #16
+:
+    sta PPUDATA
+    dex
+    bne :-
+    lda #%11111111
+    ldx #32
+:
+    sta PPUDATA
+    dex
+    bne :-
+
 
     jsr copy_multiply_code
 
@@ -166,22 +198,6 @@ loop:
 
     jsr p1_move
     jsr render
-
-.if 0
-    bankswitch 0
-    lda #129
-    sta from_x+0
-    sta from_y+0
-    sta to_x+0
-    lda #128
-    sta to_y+0
-    lda #0
-    sta from_x+1
-    sta from_y+1
-    sta to_x+1
-    sta to_y+1
-    jsr draw_line
-.endif
 
     lda #PPUMASK_BG_ON | PPUMASK_GRAYSCALE | PPUMASK_EMPHASIZE_R | PPUMASK_NO_BG_CLIP
     ora #PPUMASK_SPR_ON | PPUMASK_NO_SPR_CLIP

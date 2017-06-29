@@ -7,7 +7,7 @@
     nop
 PPxy0:
 PPxy0_store___xNE:
-    lda #4
+    lda l0100
     or_buffer 0
     cpx to_x
     beq PPxy0_return
@@ -21,7 +21,7 @@ PPxy0_NWx__:
     sbc rounded_Dx
 PPxy0_NWxSE:
     tay
-    lda #9
+    lda l1001
     or_buffer 0
     cpx to_x
     beq PPxy0_return
@@ -33,7 +33,7 @@ PPxy0_NWxSE:
     jmp PPxy1_NWx__
 PPxy0_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 0
     cpx to_x
     beq PPxy0_return
@@ -48,7 +48,7 @@ PPxy0_SWx__:
     bcs PPxy0_fill_SWx__
 PPxy0_SWxSE:
     tay
-    lda #3
+    lda l0011
 PPxy0_store___xSE:
     or_buffer 0
     cpx to_x
@@ -63,7 +63,7 @@ PPxy0_return:
     rts
 PPxy0___xSE:
     tay
-    lda #1
+    lda l0001
     jmp PPxy0_store___xSE
 PPxy0___xNE:
     tay
@@ -71,11 +71,11 @@ PPxy0___xNE:
 PPxy0_fill_SWx__:
     sbc rounded_Dx
     tay
-    lda #2
+    lda l0010
     or_buffer 0
 PPxy1:
 PPxy1_store___xNE:
-    lda #4
+    lda l0100
     or_buffer 1
     cpx to_x
     beq PPxy1_return
@@ -89,7 +89,7 @@ PPxy1_NWx__:
     sbc rounded_Dx
 PPxy1_NWxSE:
     tay
-    lda #9
+    lda l1001
     or_buffer 1
     cpx to_x
     beq PPxy1_return
@@ -101,7 +101,7 @@ PPxy1_NWxSE:
     jmp PPxy2_NWx__
 PPxy1_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 1
     cpx to_x
     beq PPxy1_return
@@ -116,7 +116,7 @@ PPxy1_SWx__:
     bcs PPxy1_fill_SWx__
 PPxy1_SWxSE:
     tay
-    lda #3
+    lda l0011
 PPxy1_store___xSE:
     or_buffer 1
     cpx to_x
@@ -131,7 +131,7 @@ PPxy1_return:
     rts
 PPxy1___xSE:
     tay
-    lda #1
+    lda l0001
     jmp PPxy1_store___xSE
 PPxy1___xNE:
     tay
@@ -139,11 +139,11 @@ PPxy1___xNE:
 PPxy1_fill_SWx__:
     sbc rounded_Dx
     tay
-    lda #2
+    lda l0010
     or_buffer 1
 PPxy2:
 PPxy2_store___xNE:
-    lda #4
+    lda l0100
     or_buffer 2
     cpx to_x
     beq PPxy2_return
@@ -157,7 +157,7 @@ PPxy2_NWx__:
     sbc rounded_Dx
 PPxy2_NWxSE:
     tay
-    lda #9
+    lda l1001
     or_buffer 2
     cpx to_x
     beq PPxy2_return
@@ -169,7 +169,7 @@ PPxy2_NWxSE:
     jmp PPxy3_NWx__
 PPxy2_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 2
     cpx to_x
     beq PPxy2_return
@@ -184,7 +184,7 @@ PPxy2_SWx__:
     bcs PPxy2_fill_SWx__
 PPxy2_SWxSE:
     tay
-    lda #3
+    lda l0011
 PPxy2_store___xSE:
     or_buffer 2
     cpx to_x
@@ -199,7 +199,7 @@ PPxy2_return:
     rts
 PPxy2___xSE:
     tay
-    lda #1
+    lda l0001
     jmp PPxy2_store___xSE
 PPxy2___xNE:
     tay
@@ -207,11 +207,11 @@ PPxy2___xNE:
 PPxy2_fill_SWx__:
     sbc rounded_Dx
     tay
-    lda #2
+    lda l0010
     or_buffer 2
 PPxy3:
 PPxy3_store___xNE:
-    lda #4
+    lda l0100
     or_buffer 3
     cpx to_x
     beq PPxy3_return
@@ -225,7 +225,7 @@ PPxy3_NWx__:
     sbc rounded_Dx
 PPxy3_NWxSE:
     tay
-    lda #9
+    lda l1001
     or_buffer 3
     cpx to_x
     beq PPxy3_return
@@ -237,7 +237,7 @@ PPxy3_NWxSE:
     jmp PPxy4_NWx__
 PPxy3_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 3
     cpx to_x
     beq PPxy3_return
@@ -252,7 +252,7 @@ PPxy3_SWx__:
     bcs PPxy3_fill_SWx__
 PPxy3_SWxSE:
     tay
-    lda #3
+    lda l0011
 PPxy3_store___xSE:
     or_buffer 3
     cpx to_x
@@ -267,7 +267,7 @@ PPxy3_return:
     rts
 PPxy3___xSE:
     tay
-    lda #1
+    lda l0001
     jmp PPxy3_store___xSE
 PPxy3___xNE:
     tay
@@ -275,11 +275,11 @@ PPxy3___xNE:
 PPxy3_fill_SWx__:
     sbc rounded_Dx
     tay
-    lda #2
+    lda l0010
     or_buffer 3
 PPxy4:
 PPxy4_store___xNE:
-    lda #4
+    lda l0100
     or_buffer 4
     cpx to_x
     beq PPxy4_return
@@ -293,7 +293,7 @@ PPxy4_NWx__:
     sbc rounded_Dx
 PPxy4_NWxSE:
     tay
-    lda #9
+    lda l1001
     or_buffer 4
     cpx to_x
     beq PPxy4_return
@@ -305,7 +305,7 @@ PPxy4_NWxSE:
     jmp PPxy5_NWx__
 PPxy4_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 4
     cpx to_x
     beq PPxy4_return
@@ -320,7 +320,7 @@ PPxy4_SWx__:
     bcs PPxy4_fill_SWx__
 PPxy4_SWxSE:
     tay
-    lda #3
+    lda l0011
 PPxy4_store___xSE:
     or_buffer 4
     cpx to_x
@@ -335,7 +335,7 @@ PPxy4_return:
     rts
 PPxy4___xSE:
     tay
-    lda #1
+    lda l0001
     jmp PPxy4_store___xSE
 PPxy4___xNE:
     tay
@@ -343,11 +343,11 @@ PPxy4___xNE:
 PPxy4_fill_SWx__:
     sbc rounded_Dx
     tay
-    lda #2
+    lda l0010
     or_buffer 4
 PPxy5:
 PPxy5_store___xNE:
-    lda #4
+    lda l0100
     or_buffer 5
     cpx to_x
     beq PPxy5_return
@@ -361,7 +361,7 @@ PPxy5_NWx__:
     sbc rounded_Dx
 PPxy5_NWxSE:
     tay
-    lda #9
+    lda l1001
     or_buffer 5
     cpx to_x
     beq PPxy5_return
@@ -373,7 +373,7 @@ PPxy5_NWxSE:
     jmp PPxy6_NWx__
 PPxy5_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 5
     cpx to_x
     beq PPxy5_return
@@ -388,7 +388,7 @@ PPxy5_SWx__:
     bcs PPxy5_fill_SWx__
 PPxy5_SWxSE:
     tay
-    lda #3
+    lda l0011
 PPxy5_store___xSE:
     or_buffer 5
     cpx to_x
@@ -403,7 +403,7 @@ PPxy5_return:
     rts
 PPxy5___xSE:
     tay
-    lda #1
+    lda l0001
     jmp PPxy5_store___xSE
 PPxy5___xNE:
     tay
@@ -411,11 +411,11 @@ PPxy5___xNE:
 PPxy5_fill_SWx__:
     sbc rounded_Dx
     tay
-    lda #2
+    lda l0010
     or_buffer 5
 PPxy6:
 PPxy6_store___xNE:
-    lda #4
+    lda l0100
     or_buffer 6
     cpx to_x
     beq PPxy6_return
@@ -429,7 +429,7 @@ PPxy6_NWx__:
     sbc rounded_Dx
 PPxy6_NWxSE:
     tay
-    lda #9
+    lda l1001
     or_buffer 6
     cpx to_x
     beq PPxy6_return
@@ -441,7 +441,7 @@ PPxy6_NWxSE:
     jmp PPxy7_NWx__
 PPxy6_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 6
     cpx to_x
     beq PPxy6_return
@@ -456,7 +456,7 @@ PPxy6_SWx__:
     bcs PPxy6_fill_SWx__
 PPxy6_SWxSE:
     tay
-    lda #3
+    lda l0011
 PPxy6_store___xSE:
     or_buffer 6
     cpx to_x
@@ -471,7 +471,7 @@ PPxy6_return:
     rts
 PPxy6___xSE:
     tay
-    lda #1
+    lda l0001
     jmp PPxy6_store___xSE
 PPxy6___xNE:
     tay
@@ -479,11 +479,11 @@ PPxy6___xNE:
 PPxy6_fill_SWx__:
     sbc rounded_Dx
     tay
-    lda #2
+    lda l0010
     or_buffer 6
 PPxy7:
 PPxy7_store___xNE:
-    lda #4
+    lda l0100
     or_buffer 7
     cpx to_x
     beq PPxy7_return
@@ -497,7 +497,7 @@ PPxy7_NWx__:
     sbc rounded_Dx
 PPxy7_NWxSE:
     tay
-    lda #9
+    lda l1001
     or_buffer 7
     cpx to_x
     beq PPxy7_return
@@ -509,7 +509,7 @@ PPxy7_NWxSE:
     jmp PPxy8_NWx__
 PPxy7_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 7
     cpx to_x
     beq PPxy7_return
@@ -524,7 +524,7 @@ PPxy7_SWx__:
     bcs PPxy7_fill_SWx__
 PPxy7_SWxSE:
     tay
-    lda #3
+    lda l0011
 PPxy7_store___xSE:
     or_buffer 7
     cpx to_x
@@ -539,7 +539,7 @@ PPxy7_return:
     rts
 PPxy7___xSE:
     tay
-    lda #1
+    lda l0001
     jmp PPxy7_store___xSE
 PPxy7___xNE:
     tay
@@ -547,11 +547,11 @@ PPxy7___xNE:
 PPxy7_fill_SWx__:
     sbc rounded_Dx
     tay
-    lda #2
+    lda l0010
     or_buffer 7
 PPxy8:
 PPxy8_store___xNE:
-    lda #4
+    lda l0100
     or_buffer 8
     cpx to_x
     beq PPxy8_return
@@ -565,7 +565,7 @@ PPxy8_NWx__:
     sbc rounded_Dx
 PPxy8_NWxSE:
     tay
-    lda #9
+    lda l1001
     or_buffer 8
     cpx to_x
     beq PPxy8_return
@@ -577,7 +577,7 @@ PPxy8_NWxSE:
     jmp PPxy9_NWx__
 PPxy8_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 8
     cpx to_x
     beq PPxy8_return
@@ -592,7 +592,7 @@ PPxy8_SWx__:
     bcs PPxy8_fill_SWx__
 PPxy8_SWxSE:
     tay
-    lda #3
+    lda l0011
 PPxy8_store___xSE:
     or_buffer 8
     cpx to_x
@@ -607,7 +607,7 @@ PPxy8_return:
     rts
 PPxy8___xSE:
     tay
-    lda #1
+    lda l0001
     jmp PPxy8_store___xSE
 PPxy8___xNE:
     tay
@@ -615,11 +615,11 @@ PPxy8___xNE:
 PPxy8_fill_SWx__:
     sbc rounded_Dx
     tay
-    lda #2
+    lda l0010
     or_buffer 8
 PPxy9:
 PPxy9_store___xNE:
-    lda #4
+    lda l0100
     or_buffer 9
     cpx to_x
     beq PPxy9_return
@@ -633,7 +633,7 @@ PPxy9_NWx__:
     sbc rounded_Dx
 PPxy9_NWxSE:
     tay
-    lda #9
+    lda l1001
     or_buffer 9
     cpx to_x
     beq PPxy9_return
@@ -645,7 +645,7 @@ PPxy9_NWxSE:
     jmp PPxy10_NWx__
 PPxy9_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 9
     cpx to_x
     beq PPxy9_return
@@ -660,7 +660,7 @@ PPxy9_SWx__:
     bcs PPxy9_fill_SWx__
 PPxy9_SWxSE:
     tay
-    lda #3
+    lda l0011
 PPxy9_store___xSE:
     or_buffer 9
     cpx to_x
@@ -675,7 +675,7 @@ PPxy9_return:
     rts
 PPxy9___xSE:
     tay
-    lda #1
+    lda l0001
     jmp PPxy9_store___xSE
 PPxy9___xNE:
     tay
@@ -683,11 +683,11 @@ PPxy9___xNE:
 PPxy9_fill_SWx__:
     sbc rounded_Dx
     tay
-    lda #2
+    lda l0010
     or_buffer 9
 PPxy10:
 PPxy10_store___xNE:
-    lda #4
+    lda l0100
     or_buffer 10
     cpx to_x
     beq PPxy10_return
@@ -701,7 +701,7 @@ PPxy10_NWx__:
     sbc rounded_Dx
 PPxy10_NWxSE:
     tay
-    lda #9
+    lda l1001
     or_buffer 10
     cpx to_x
     beq PPxy10_return
@@ -713,7 +713,7 @@ PPxy10_NWxSE:
     jmp PPxy11_NWx__
 PPxy10_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 10
     cpx to_x
     beq PPxy10_return
@@ -728,7 +728,7 @@ PPxy10_SWx__:
     bcs PPxy10_fill_SWx__
 PPxy10_SWxSE:
     tay
-    lda #3
+    lda l0011
 PPxy10_store___xSE:
     or_buffer 10
     cpx to_x
@@ -743,7 +743,7 @@ PPxy10_return:
     rts
 PPxy10___xSE:
     tay
-    lda #1
+    lda l0001
     jmp PPxy10_store___xSE
 PPxy10___xNE:
     tay
@@ -751,11 +751,11 @@ PPxy10___xNE:
 PPxy10_fill_SWx__:
     sbc rounded_Dx
     tay
-    lda #2
+    lda l0010
     or_buffer 10
 PPxy11:
 PPxy11_store___xNE:
-    lda #4
+    lda l0100
     or_buffer 11
     cpx to_x
     beq PPxy11_return
@@ -769,7 +769,7 @@ PPxy11_NWx__:
     sbc rounded_Dx
 PPxy11_NWxSE:
     tay
-    lda #9
+    lda l1001
     or_buffer 11
     cpx to_x
     beq PPxy11_return
@@ -781,7 +781,7 @@ PPxy11_NWxSE:
     jmp PPxy12_NWx__
 PPxy11_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 11
     cpx to_x
     beq PPxy11_return
@@ -796,7 +796,7 @@ PPxy11_SWx__:
     bcs PPxy11_fill_SWx__
 PPxy11_SWxSE:
     tay
-    lda #3
+    lda l0011
 PPxy11_store___xSE:
     or_buffer 11
     cpx to_x
@@ -811,7 +811,7 @@ PPxy11_return:
     rts
 PPxy11___xSE:
     tay
-    lda #1
+    lda l0001
     jmp PPxy11_store___xSE
 PPxy11___xNE:
     tay
@@ -819,11 +819,11 @@ PPxy11___xNE:
 PPxy11_fill_SWx__:
     sbc rounded_Dx
     tay
-    lda #2
+    lda l0010
     or_buffer 11
 PPxy12:
 PPxy12_store___xNE:
-    lda #4
+    lda l0100
     or_buffer 12
     cpx to_x
     beq PPxy12_return
@@ -837,7 +837,7 @@ PPxy12_NWx__:
     sbc rounded_Dx
 PPxy12_NWxSE:
     tay
-    lda #9
+    lda l1001
     or_buffer 12
     cpx to_x
     beq PPxy12_return
@@ -849,7 +849,7 @@ PPxy12_NWxSE:
     jmp PPxy13_NWx__
 PPxy12_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 12
     cpx to_x
     beq PPxy12_return
@@ -864,7 +864,7 @@ PPxy12_SWx__:
     bcs PPxy12_fill_SWx__
 PPxy12_SWxSE:
     tay
-    lda #3
+    lda l0011
 PPxy12_store___xSE:
     or_buffer 12
     cpx to_x
@@ -879,7 +879,7 @@ PPxy12_return:
     rts
 PPxy12___xSE:
     tay
-    lda #1
+    lda l0001
     jmp PPxy12_store___xSE
 PPxy12___xNE:
     tay
@@ -887,11 +887,11 @@ PPxy12___xNE:
 PPxy12_fill_SWx__:
     sbc rounded_Dx
     tay
-    lda #2
+    lda l0010
     or_buffer 12
 PPxy13:
 PPxy13_store___xNE:
-    lda #4
+    lda l0100
     or_buffer 13
     cpx to_x
     beq PPxy13_return
@@ -905,7 +905,7 @@ PPxy13_NWx__:
     sbc rounded_Dx
 PPxy13_NWxSE:
     tay
-    lda #9
+    lda l1001
     or_buffer 13
     cpx to_x
     beq PPxy13_return
@@ -917,7 +917,7 @@ PPxy13_NWxSE:
     jmp PPxy14_NWx__
 PPxy13_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 13
     cpx to_x
     beq PPxy13_return
@@ -932,7 +932,7 @@ PPxy13_SWx__:
     bcs PPxy13_fill_SWx__
 PPxy13_SWxSE:
     tay
-    lda #3
+    lda l0011
 PPxy13_store___xSE:
     or_buffer 13
     cpx to_x
@@ -947,7 +947,7 @@ PPxy13_return:
     rts
 PPxy13___xSE:
     tay
-    lda #1
+    lda l0001
     jmp PPxy13_store___xSE
 PPxy13___xNE:
     tay
@@ -955,11 +955,11 @@ PPxy13___xNE:
 PPxy13_fill_SWx__:
     sbc rounded_Dx
     tay
-    lda #2
+    lda l0010
     or_buffer 13
 PPxy14:
 PPxy14_store___xNE:
-    lda #4
+    lda l0100
     or_buffer 14
     cpx to_x
     beq PPxy14_return
@@ -973,7 +973,7 @@ PPxy14_NWx__:
     sbc rounded_Dx
 PPxy14_NWxSE:
     tay
-    lda #9
+    lda l1001
     or_buffer 14
     cpx to_x
     beq PPxy14_return
@@ -985,7 +985,7 @@ PPxy14_NWxSE:
     jmp PPxy15_NWx__
 PPxy14_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 14
     cpx to_x
     beq PPxy14_return
@@ -1000,7 +1000,7 @@ PPxy14_SWx__:
     bcs PPxy14_fill_SWx__
 PPxy14_SWxSE:
     tay
-    lda #3
+    lda l0011
 PPxy14_store___xSE:
     or_buffer 14
     cpx to_x
@@ -1015,7 +1015,7 @@ PPxy14_return:
     rts
 PPxy14___xSE:
     tay
-    lda #1
+    lda l0001
     jmp PPxy14_store___xSE
 PPxy14___xNE:
     tay
@@ -1023,11 +1023,11 @@ PPxy14___xNE:
 PPxy14_fill_SWx__:
     sbc rounded_Dx
     tay
-    lda #2
+    lda l0010
     or_buffer 14
 PPxy15:
 PPxy15_store___xNE:
-    lda #4
+    lda l0100
     or_buffer 15
     cpx to_x
     beq PPxy15_return
@@ -1041,7 +1041,7 @@ PPxy15_NWx__:
     sbc rounded_Dx
 PPxy15_NWxSE:
     tay
-    lda #9
+    lda l1001
     or_buffer 15
     cpx to_x
     beq PPxy15_return
@@ -1053,7 +1053,7 @@ PPxy15_NWxSE:
     jmp PPxy16_NWx__
 PPxy15_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 15
     cpx to_x
     beq PPxy15_return
@@ -1068,7 +1068,7 @@ PPxy15_SWx__:
     bcs PPxy15_fill_SWx__
 PPxy15_SWxSE:
     tay
-    lda #3
+    lda l0011
 PPxy15_store___xSE:
     or_buffer 15
     cpx to_x
@@ -1083,7 +1083,7 @@ PPxy15_return:
     rts
 PPxy15___xSE:
     tay
-    lda #1
+    lda l0001
     jmp PPxy15_store___xSE
 PPxy15___xNE:
     tay
@@ -1091,11 +1091,11 @@ PPxy15___xNE:
 PPxy15_fill_SWx__:
     sbc rounded_Dx
     tay
-    lda #2
+    lda l0010
     or_buffer 15
 PPxy16:
 PPxy16_store___xNE:
-    lda #4
+    lda l0100
     or_buffer 16
     cpx to_x
     beq PPxy16_return
@@ -1109,7 +1109,7 @@ PPxy16_NWx__:
     sbc rounded_Dx
 PPxy16_NWxSE:
     tay
-    lda #9
+    lda l1001
     or_buffer 16
     cpx to_x
     beq PPxy16_return
@@ -1121,7 +1121,7 @@ PPxy16_NWxSE:
     jmp PPxy17_NWx__
 PPxy16_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 16
     cpx to_x
     beq PPxy16_return
@@ -1136,7 +1136,7 @@ PPxy16_SWx__:
     bcs PPxy16_fill_SWx__
 PPxy16_SWxSE:
     tay
-    lda #3
+    lda l0011
 PPxy16_store___xSE:
     or_buffer 16
     cpx to_x
@@ -1151,7 +1151,7 @@ PPxy16_return:
     rts
 PPxy16___xSE:
     tay
-    lda #1
+    lda l0001
     jmp PPxy16_store___xSE
 PPxy16___xNE:
     tay
@@ -1159,11 +1159,11 @@ PPxy16___xNE:
 PPxy16_fill_SWx__:
     sbc rounded_Dx
     tay
-    lda #2
+    lda l0010
     or_buffer 16
 PPxy17:
 PPxy17_store___xNE:
-    lda #4
+    lda l0100
     or_buffer 17
     cpx to_x
     beq PPxy17_return
@@ -1177,7 +1177,7 @@ PPxy17_NWx__:
     sbc rounded_Dx
 PPxy17_NWxSE:
     tay
-    lda #9
+    lda l1001
     or_buffer 17
     cpx to_x
     beq PPxy17_return
@@ -1189,7 +1189,7 @@ PPxy17_NWxSE:
     jmp PPxy18_NWx__
 PPxy17_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 17
     cpx to_x
     beq PPxy17_return
@@ -1204,7 +1204,7 @@ PPxy17_SWx__:
     bcs PPxy17_fill_SWx__
 PPxy17_SWxSE:
     tay
-    lda #3
+    lda l0011
 PPxy17_store___xSE:
     or_buffer 17
     cpx to_x
@@ -1219,7 +1219,7 @@ PPxy17_return:
     rts
 PPxy17___xSE:
     tay
-    lda #1
+    lda l0001
     jmp PPxy17_store___xSE
 PPxy17___xNE:
     tay
@@ -1227,11 +1227,11 @@ PPxy17___xNE:
 PPxy17_fill_SWx__:
     sbc rounded_Dx
     tay
-    lda #2
+    lda l0010
     or_buffer 17
 PPxy18:
 PPxy18_store___xNE:
-    lda #4
+    lda l0100
     or_buffer 18
     cpx to_x
     beq PPxy18_return
@@ -1245,7 +1245,7 @@ PPxy18_NWx__:
     sbc rounded_Dx
 PPxy18_NWxSE:
     tay
-    lda #9
+    lda l1001
     or_buffer 18
     cpx to_x
     beq PPxy18_return
@@ -1257,7 +1257,7 @@ PPxy18_NWxSE:
     jmp PPxy19_NWx__
 PPxy18_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 18
     cpx to_x
     beq PPxy18_return
@@ -1272,7 +1272,7 @@ PPxy18_SWx__:
     bcs PPxy18_fill_SWx__
 PPxy18_SWxSE:
     tay
-    lda #3
+    lda l0011
 PPxy18_store___xSE:
     or_buffer 18
     cpx to_x
@@ -1287,7 +1287,7 @@ PPxy18_return:
     rts
 PPxy18___xSE:
     tay
-    lda #1
+    lda l0001
     jmp PPxy18_store___xSE
 PPxy18___xNE:
     tay
@@ -1295,11 +1295,11 @@ PPxy18___xNE:
 PPxy18_fill_SWx__:
     sbc rounded_Dx
     tay
-    lda #2
+    lda l0010
     or_buffer 18
 PPxy19:
 PPxy19_store___xNE:
-    lda #4
+    lda l0100
     or_buffer 19
     cpx to_x
     beq PPxy19_return
@@ -1313,7 +1313,7 @@ PPxy19_NWx__:
     sbc rounded_Dx
 PPxy19_NWxSE:
     tay
-    lda #9
+    lda l1001
     or_buffer 19
     cpx to_x
     beq PPxy19_return
@@ -1325,7 +1325,7 @@ PPxy19_NWxSE:
     jmp PPxy20_NWx__
 PPxy19_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 19
     cpx to_x
     beq PPxy19_return
@@ -1340,7 +1340,7 @@ PPxy19_SWx__:
     bcs PPxy19_fill_SWx__
 PPxy19_SWxSE:
     tay
-    lda #3
+    lda l0011
 PPxy19_store___xSE:
     or_buffer 19
     cpx to_x
@@ -1355,7 +1355,7 @@ PPxy19_return:
     rts
 PPxy19___xSE:
     tay
-    lda #1
+    lda l0001
     jmp PPxy19_store___xSE
 PPxy19___xNE:
     tay
@@ -1363,11 +1363,11 @@ PPxy19___xNE:
 PPxy19_fill_SWx__:
     sbc rounded_Dx
     tay
-    lda #2
+    lda l0010
     or_buffer 19
 PPxy20:
 PPxy20_store___xNE:
-    lda #4
+    lda l0100
     or_buffer 20
     cpx to_x
     beq PPxy20_return
@@ -1381,7 +1381,7 @@ PPxy20_NWx__:
     sbc rounded_Dx
 PPxy20_NWxSE:
     tay
-    lda #9
+    lda l1001
     or_buffer 20
     cpx to_x
     beq PPxy20_return
@@ -1393,7 +1393,7 @@ PPxy20_NWxSE:
     jmp PPxy21_NWx__
 PPxy20_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 20
     cpx to_x
     beq PPxy20_return
@@ -1408,7 +1408,7 @@ PPxy20_SWx__:
     bcs PPxy20_fill_SWx__
 PPxy20_SWxSE:
     tay
-    lda #3
+    lda l0011
 PPxy20_store___xSE:
     or_buffer 20
     cpx to_x
@@ -1423,7 +1423,7 @@ PPxy20_return:
     rts
 PPxy20___xSE:
     tay
-    lda #1
+    lda l0001
     jmp PPxy20_store___xSE
 PPxy20___xNE:
     tay
@@ -1431,11 +1431,11 @@ PPxy20___xNE:
 PPxy20_fill_SWx__:
     sbc rounded_Dx
     tay
-    lda #2
+    lda l0010
     or_buffer 20
 PPxy21:
 PPxy21_store___xNE:
-    lda #4
+    lda l0100
     or_buffer 21
     cpx to_x
     beq PPxy21_return
@@ -1449,7 +1449,7 @@ PPxy21_NWx__:
     sbc rounded_Dx
 PPxy21_NWxSE:
     tay
-    lda #9
+    lda l1001
     or_buffer 21
     cpx to_x
     beq PPxy21_return
@@ -1464,7 +1464,7 @@ PPxy21_NWxSE:
     nop
 PPxy21_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 21
     cpx to_x
     beq PPxy21_return
@@ -1479,7 +1479,7 @@ PPxy21_SWx__:
     bcs PPxy21_fill_SWx__
 PPxy21_SWxSE:
     tay
-    lda #3
+    lda l0011
 PPxy21_store___xSE:
     or_buffer 21
     cpx to_x
@@ -1497,7 +1497,7 @@ PPxy21_return:
     rts
 PPxy21___xSE:
     tay
-    lda #1
+    lda l0001
     jmp PPxy21_store___xSE
 PPxy21___xNE:
     tay
@@ -1505,7 +1505,7 @@ PPxy21___xNE:
 PPxy21_fill_SWx__:
     sbc rounded_Dx
     tay
-    lda #2
+    lda l0010
     or_buffer 21
     rts
     nop
@@ -1520,7 +1520,7 @@ PPyx0_NWx__:
     adc rounded_Dy
 PPyx0_NWxSE:
     sta subroutine_temp
-    lda #9
+    lda l1001
     or_buffer 0
     dey
     beq PPyx0_return
@@ -1530,7 +1530,7 @@ PPyx0_NWxSE:
     jmp PPyx1_NEx__
 PPyx0_NWxSW:
     sta subroutine_temp
-    lda #10
+    lda l1010
     or_buffer 0
     dey
     beq PPyx0_return
@@ -1546,7 +1546,7 @@ PPyx0_NEx__:
     bcc PPyx0_fill_NEx__
 PPyx0_NExSE:
     sta subroutine_temp
-    lda #5
+    lda l0101
 PPyx0_store___xSE:
     or_buffer 0
     dey
@@ -1561,16 +1561,16 @@ PPyx0_return:
     rts
 PPyx0___xSE:
     sta subroutine_temp
-    lda #1
+    lda l0001
     jmp PPyx0_store___xSE
 PPyx0_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #4
+    lda l0100
     or_buffer 0
     inx
 PPyx0___xSW:
-    lda #2
+    lda l0010
     or_buffer 0
     dey
     beq PPyx0_return
@@ -1589,7 +1589,7 @@ PPyx1_NWx__:
     adc rounded_Dy
 PPyx1_NWxSE:
     sta subroutine_temp
-    lda #9
+    lda l1001
     or_buffer 1
     dey
     beq PPyx1_return
@@ -1599,7 +1599,7 @@ PPyx1_NWxSE:
     jmp PPyx2_NEx__
 PPyx1_NWxSW:
     sta subroutine_temp
-    lda #10
+    lda l1010
     or_buffer 1
     dey
     beq PPyx1_return
@@ -1615,7 +1615,7 @@ PPyx1_NEx__:
     bcc PPyx1_fill_NEx__
 PPyx1_NExSE:
     sta subroutine_temp
-    lda #5
+    lda l0101
 PPyx1_store___xSE:
     or_buffer 1
     dey
@@ -1630,16 +1630,16 @@ PPyx1_return:
     rts
 PPyx1___xSE:
     sta subroutine_temp
-    lda #1
+    lda l0001
     jmp PPyx1_store___xSE
 PPyx1_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #4
+    lda l0100
     or_buffer 1
     inx
 PPyx1___xSW:
-    lda #2
+    lda l0010
     or_buffer 1
     dey
     beq PPyx1_return
@@ -1658,7 +1658,7 @@ PPyx2_NWx__:
     adc rounded_Dy
 PPyx2_NWxSE:
     sta subroutine_temp
-    lda #9
+    lda l1001
     or_buffer 2
     dey
     beq PPyx2_return
@@ -1668,7 +1668,7 @@ PPyx2_NWxSE:
     jmp PPyx3_NEx__
 PPyx2_NWxSW:
     sta subroutine_temp
-    lda #10
+    lda l1010
     or_buffer 2
     dey
     beq PPyx2_return
@@ -1684,7 +1684,7 @@ PPyx2_NEx__:
     bcc PPyx2_fill_NEx__
 PPyx2_NExSE:
     sta subroutine_temp
-    lda #5
+    lda l0101
 PPyx2_store___xSE:
     or_buffer 2
     dey
@@ -1699,16 +1699,16 @@ PPyx2_return:
     rts
 PPyx2___xSE:
     sta subroutine_temp
-    lda #1
+    lda l0001
     jmp PPyx2_store___xSE
 PPyx2_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #4
+    lda l0100
     or_buffer 2
     inx
 PPyx2___xSW:
-    lda #2
+    lda l0010
     or_buffer 2
     dey
     beq PPyx2_return
@@ -1727,7 +1727,7 @@ PPyx3_NWx__:
     adc rounded_Dy
 PPyx3_NWxSE:
     sta subroutine_temp
-    lda #9
+    lda l1001
     or_buffer 3
     dey
     beq PPyx3_return
@@ -1737,7 +1737,7 @@ PPyx3_NWxSE:
     jmp PPyx4_NEx__
 PPyx3_NWxSW:
     sta subroutine_temp
-    lda #10
+    lda l1010
     or_buffer 3
     dey
     beq PPyx3_return
@@ -1753,7 +1753,7 @@ PPyx3_NEx__:
     bcc PPyx3_fill_NEx__
 PPyx3_NExSE:
     sta subroutine_temp
-    lda #5
+    lda l0101
 PPyx3_store___xSE:
     or_buffer 3
     dey
@@ -1768,16 +1768,16 @@ PPyx3_return:
     rts
 PPyx3___xSE:
     sta subroutine_temp
-    lda #1
+    lda l0001
     jmp PPyx3_store___xSE
 PPyx3_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #4
+    lda l0100
     or_buffer 3
     inx
 PPyx3___xSW:
-    lda #2
+    lda l0010
     or_buffer 3
     dey
     beq PPyx3_return
@@ -1796,7 +1796,7 @@ PPyx4_NWx__:
     adc rounded_Dy
 PPyx4_NWxSE:
     sta subroutine_temp
-    lda #9
+    lda l1001
     or_buffer 4
     dey
     beq PPyx4_return
@@ -1806,7 +1806,7 @@ PPyx4_NWxSE:
     jmp PPyx5_NEx__
 PPyx4_NWxSW:
     sta subroutine_temp
-    lda #10
+    lda l1010
     or_buffer 4
     dey
     beq PPyx4_return
@@ -1822,7 +1822,7 @@ PPyx4_NEx__:
     bcc PPyx4_fill_NEx__
 PPyx4_NExSE:
     sta subroutine_temp
-    lda #5
+    lda l0101
 PPyx4_store___xSE:
     or_buffer 4
     dey
@@ -1837,16 +1837,16 @@ PPyx4_return:
     rts
 PPyx4___xSE:
     sta subroutine_temp
-    lda #1
+    lda l0001
     jmp PPyx4_store___xSE
 PPyx4_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #4
+    lda l0100
     or_buffer 4
     inx
 PPyx4___xSW:
-    lda #2
+    lda l0010
     or_buffer 4
     dey
     beq PPyx4_return
@@ -1865,7 +1865,7 @@ PPyx5_NWx__:
     adc rounded_Dy
 PPyx5_NWxSE:
     sta subroutine_temp
-    lda #9
+    lda l1001
     or_buffer 5
     dey
     beq PPyx5_return
@@ -1875,7 +1875,7 @@ PPyx5_NWxSE:
     jmp PPyx6_NEx__
 PPyx5_NWxSW:
     sta subroutine_temp
-    lda #10
+    lda l1010
     or_buffer 5
     dey
     beq PPyx5_return
@@ -1891,7 +1891,7 @@ PPyx5_NEx__:
     bcc PPyx5_fill_NEx__
 PPyx5_NExSE:
     sta subroutine_temp
-    lda #5
+    lda l0101
 PPyx5_store___xSE:
     or_buffer 5
     dey
@@ -1906,16 +1906,16 @@ PPyx5_return:
     rts
 PPyx5___xSE:
     sta subroutine_temp
-    lda #1
+    lda l0001
     jmp PPyx5_store___xSE
 PPyx5_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #4
+    lda l0100
     or_buffer 5
     inx
 PPyx5___xSW:
-    lda #2
+    lda l0010
     or_buffer 5
     dey
     beq PPyx5_return
@@ -1934,7 +1934,7 @@ PPyx6_NWx__:
     adc rounded_Dy
 PPyx6_NWxSE:
     sta subroutine_temp
-    lda #9
+    lda l1001
     or_buffer 6
     dey
     beq PPyx6_return
@@ -1944,7 +1944,7 @@ PPyx6_NWxSE:
     jmp PPyx7_NEx__
 PPyx6_NWxSW:
     sta subroutine_temp
-    lda #10
+    lda l1010
     or_buffer 6
     dey
     beq PPyx6_return
@@ -1960,7 +1960,7 @@ PPyx6_NEx__:
     bcc PPyx6_fill_NEx__
 PPyx6_NExSE:
     sta subroutine_temp
-    lda #5
+    lda l0101
 PPyx6_store___xSE:
     or_buffer 6
     dey
@@ -1975,16 +1975,16 @@ PPyx6_return:
     rts
 PPyx6___xSE:
     sta subroutine_temp
-    lda #1
+    lda l0001
     jmp PPyx6_store___xSE
 PPyx6_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #4
+    lda l0100
     or_buffer 6
     inx
 PPyx6___xSW:
-    lda #2
+    lda l0010
     or_buffer 6
     dey
     beq PPyx6_return
@@ -2003,7 +2003,7 @@ PPyx7_NWx__:
     adc rounded_Dy
 PPyx7_NWxSE:
     sta subroutine_temp
-    lda #9
+    lda l1001
     or_buffer 7
     dey
     beq PPyx7_return
@@ -2013,7 +2013,7 @@ PPyx7_NWxSE:
     jmp PPyx8_NEx__
 PPyx7_NWxSW:
     sta subroutine_temp
-    lda #10
+    lda l1010
     or_buffer 7
     dey
     beq PPyx7_return
@@ -2029,7 +2029,7 @@ PPyx7_NEx__:
     bcc PPyx7_fill_NEx__
 PPyx7_NExSE:
     sta subroutine_temp
-    lda #5
+    lda l0101
 PPyx7_store___xSE:
     or_buffer 7
     dey
@@ -2044,16 +2044,16 @@ PPyx7_return:
     rts
 PPyx7___xSE:
     sta subroutine_temp
-    lda #1
+    lda l0001
     jmp PPyx7_store___xSE
 PPyx7_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #4
+    lda l0100
     or_buffer 7
     inx
 PPyx7___xSW:
-    lda #2
+    lda l0010
     or_buffer 7
     dey
     beq PPyx7_return
@@ -2072,7 +2072,7 @@ PPyx8_NWx__:
     adc rounded_Dy
 PPyx8_NWxSE:
     sta subroutine_temp
-    lda #9
+    lda l1001
     or_buffer 8
     dey
     beq PPyx8_return
@@ -2082,7 +2082,7 @@ PPyx8_NWxSE:
     jmp PPyx9_NEx__
 PPyx8_NWxSW:
     sta subroutine_temp
-    lda #10
+    lda l1010
     or_buffer 8
     dey
     beq PPyx8_return
@@ -2098,7 +2098,7 @@ PPyx8_NEx__:
     bcc PPyx8_fill_NEx__
 PPyx8_NExSE:
     sta subroutine_temp
-    lda #5
+    lda l0101
 PPyx8_store___xSE:
     or_buffer 8
     dey
@@ -2113,16 +2113,16 @@ PPyx8_return:
     rts
 PPyx8___xSE:
     sta subroutine_temp
-    lda #1
+    lda l0001
     jmp PPyx8_store___xSE
 PPyx8_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #4
+    lda l0100
     or_buffer 8
     inx
 PPyx8___xSW:
-    lda #2
+    lda l0010
     or_buffer 8
     dey
     beq PPyx8_return
@@ -2141,7 +2141,7 @@ PPyx9_NWx__:
     adc rounded_Dy
 PPyx9_NWxSE:
     sta subroutine_temp
-    lda #9
+    lda l1001
     or_buffer 9
     dey
     beq PPyx9_return
@@ -2151,7 +2151,7 @@ PPyx9_NWxSE:
     jmp PPyx10_NEx__
 PPyx9_NWxSW:
     sta subroutine_temp
-    lda #10
+    lda l1010
     or_buffer 9
     dey
     beq PPyx9_return
@@ -2167,7 +2167,7 @@ PPyx9_NEx__:
     bcc PPyx9_fill_NEx__
 PPyx9_NExSE:
     sta subroutine_temp
-    lda #5
+    lda l0101
 PPyx9_store___xSE:
     or_buffer 9
     dey
@@ -2182,16 +2182,16 @@ PPyx9_return:
     rts
 PPyx9___xSE:
     sta subroutine_temp
-    lda #1
+    lda l0001
     jmp PPyx9_store___xSE
 PPyx9_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #4
+    lda l0100
     or_buffer 9
     inx
 PPyx9___xSW:
-    lda #2
+    lda l0010
     or_buffer 9
     dey
     beq PPyx9_return
@@ -2210,7 +2210,7 @@ PPyx10_NWx__:
     adc rounded_Dy
 PPyx10_NWxSE:
     sta subroutine_temp
-    lda #9
+    lda l1001
     or_buffer 10
     dey
     beq PPyx10_return
@@ -2220,7 +2220,7 @@ PPyx10_NWxSE:
     jmp PPyx11_NEx__
 PPyx10_NWxSW:
     sta subroutine_temp
-    lda #10
+    lda l1010
     or_buffer 10
     dey
     beq PPyx10_return
@@ -2236,7 +2236,7 @@ PPyx10_NEx__:
     bcc PPyx10_fill_NEx__
 PPyx10_NExSE:
     sta subroutine_temp
-    lda #5
+    lda l0101
 PPyx10_store___xSE:
     or_buffer 10
     dey
@@ -2251,16 +2251,16 @@ PPyx10_return:
     rts
 PPyx10___xSE:
     sta subroutine_temp
-    lda #1
+    lda l0001
     jmp PPyx10_store___xSE
 PPyx10_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #4
+    lda l0100
     or_buffer 10
     inx
 PPyx10___xSW:
-    lda #2
+    lda l0010
     or_buffer 10
     dey
     beq PPyx10_return
@@ -2279,7 +2279,7 @@ PPyx11_NWx__:
     adc rounded_Dy
 PPyx11_NWxSE:
     sta subroutine_temp
-    lda #9
+    lda l1001
     or_buffer 11
     dey
     beq PPyx11_return
@@ -2289,7 +2289,7 @@ PPyx11_NWxSE:
     jmp PPyx12_NEx__
 PPyx11_NWxSW:
     sta subroutine_temp
-    lda #10
+    lda l1010
     or_buffer 11
     dey
     beq PPyx11_return
@@ -2305,7 +2305,7 @@ PPyx11_NEx__:
     bcc PPyx11_fill_NEx__
 PPyx11_NExSE:
     sta subroutine_temp
-    lda #5
+    lda l0101
 PPyx11_store___xSE:
     or_buffer 11
     dey
@@ -2320,16 +2320,16 @@ PPyx11_return:
     rts
 PPyx11___xSE:
     sta subroutine_temp
-    lda #1
+    lda l0001
     jmp PPyx11_store___xSE
 PPyx11_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #4
+    lda l0100
     or_buffer 11
     inx
 PPyx11___xSW:
-    lda #2
+    lda l0010
     or_buffer 11
     dey
     beq PPyx11_return
@@ -2348,7 +2348,7 @@ PPyx12_NWx__:
     adc rounded_Dy
 PPyx12_NWxSE:
     sta subroutine_temp
-    lda #9
+    lda l1001
     or_buffer 12
     dey
     beq PPyx12_return
@@ -2358,7 +2358,7 @@ PPyx12_NWxSE:
     jmp PPyx13_NEx__
 PPyx12_NWxSW:
     sta subroutine_temp
-    lda #10
+    lda l1010
     or_buffer 12
     dey
     beq PPyx12_return
@@ -2374,7 +2374,7 @@ PPyx12_NEx__:
     bcc PPyx12_fill_NEx__
 PPyx12_NExSE:
     sta subroutine_temp
-    lda #5
+    lda l0101
 PPyx12_store___xSE:
     or_buffer 12
     dey
@@ -2389,16 +2389,16 @@ PPyx12_return:
     rts
 PPyx12___xSE:
     sta subroutine_temp
-    lda #1
+    lda l0001
     jmp PPyx12_store___xSE
 PPyx12_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #4
+    lda l0100
     or_buffer 12
     inx
 PPyx12___xSW:
-    lda #2
+    lda l0010
     or_buffer 12
     dey
     beq PPyx12_return
@@ -2417,7 +2417,7 @@ PPyx13_NWx__:
     adc rounded_Dy
 PPyx13_NWxSE:
     sta subroutine_temp
-    lda #9
+    lda l1001
     or_buffer 13
     dey
     beq PPyx13_return
@@ -2427,7 +2427,7 @@ PPyx13_NWxSE:
     jmp PPyx14_NEx__
 PPyx13_NWxSW:
     sta subroutine_temp
-    lda #10
+    lda l1010
     or_buffer 13
     dey
     beq PPyx13_return
@@ -2443,7 +2443,7 @@ PPyx13_NEx__:
     bcc PPyx13_fill_NEx__
 PPyx13_NExSE:
     sta subroutine_temp
-    lda #5
+    lda l0101
 PPyx13_store___xSE:
     or_buffer 13
     dey
@@ -2458,16 +2458,16 @@ PPyx13_return:
     rts
 PPyx13___xSE:
     sta subroutine_temp
-    lda #1
+    lda l0001
     jmp PPyx13_store___xSE
 PPyx13_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #4
+    lda l0100
     or_buffer 13
     inx
 PPyx13___xSW:
-    lda #2
+    lda l0010
     or_buffer 13
     dey
     beq PPyx13_return
@@ -2486,7 +2486,7 @@ PPyx14_NWx__:
     adc rounded_Dy
 PPyx14_NWxSE:
     sta subroutine_temp
-    lda #9
+    lda l1001
     or_buffer 14
     dey
     beq PPyx14_return
@@ -2496,7 +2496,7 @@ PPyx14_NWxSE:
     jmp PPyx15_NEx__
 PPyx14_NWxSW:
     sta subroutine_temp
-    lda #10
+    lda l1010
     or_buffer 14
     dey
     beq PPyx14_return
@@ -2512,7 +2512,7 @@ PPyx14_NEx__:
     bcc PPyx14_fill_NEx__
 PPyx14_NExSE:
     sta subroutine_temp
-    lda #5
+    lda l0101
 PPyx14_store___xSE:
     or_buffer 14
     dey
@@ -2527,16 +2527,16 @@ PPyx14_return:
     rts
 PPyx14___xSE:
     sta subroutine_temp
-    lda #1
+    lda l0001
     jmp PPyx14_store___xSE
 PPyx14_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #4
+    lda l0100
     or_buffer 14
     inx
 PPyx14___xSW:
-    lda #2
+    lda l0010
     or_buffer 14
     dey
     beq PPyx14_return
@@ -2555,7 +2555,7 @@ PPyx15_NWx__:
     adc rounded_Dy
 PPyx15_NWxSE:
     sta subroutine_temp
-    lda #9
+    lda l1001
     or_buffer 15
     dey
     beq PPyx15_return
@@ -2565,7 +2565,7 @@ PPyx15_NWxSE:
     jmp PPyx16_NEx__
 PPyx15_NWxSW:
     sta subroutine_temp
-    lda #10
+    lda l1010
     or_buffer 15
     dey
     beq PPyx15_return
@@ -2581,7 +2581,7 @@ PPyx15_NEx__:
     bcc PPyx15_fill_NEx__
 PPyx15_NExSE:
     sta subroutine_temp
-    lda #5
+    lda l0101
 PPyx15_store___xSE:
     or_buffer 15
     dey
@@ -2596,16 +2596,16 @@ PPyx15_return:
     rts
 PPyx15___xSE:
     sta subroutine_temp
-    lda #1
+    lda l0001
     jmp PPyx15_store___xSE
 PPyx15_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #4
+    lda l0100
     or_buffer 15
     inx
 PPyx15___xSW:
-    lda #2
+    lda l0010
     or_buffer 15
     dey
     beq PPyx15_return
@@ -2624,7 +2624,7 @@ PPyx16_NWx__:
     adc rounded_Dy
 PPyx16_NWxSE:
     sta subroutine_temp
-    lda #9
+    lda l1001
     or_buffer 16
     dey
     beq PPyx16_return
@@ -2634,7 +2634,7 @@ PPyx16_NWxSE:
     jmp PPyx17_NEx__
 PPyx16_NWxSW:
     sta subroutine_temp
-    lda #10
+    lda l1010
     or_buffer 16
     dey
     beq PPyx16_return
@@ -2650,7 +2650,7 @@ PPyx16_NEx__:
     bcc PPyx16_fill_NEx__
 PPyx16_NExSE:
     sta subroutine_temp
-    lda #5
+    lda l0101
 PPyx16_store___xSE:
     or_buffer 16
     dey
@@ -2665,16 +2665,16 @@ PPyx16_return:
     rts
 PPyx16___xSE:
     sta subroutine_temp
-    lda #1
+    lda l0001
     jmp PPyx16_store___xSE
 PPyx16_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #4
+    lda l0100
     or_buffer 16
     inx
 PPyx16___xSW:
-    lda #2
+    lda l0010
     or_buffer 16
     dey
     beq PPyx16_return
@@ -2693,7 +2693,7 @@ PPyx17_NWx__:
     adc rounded_Dy
 PPyx17_NWxSE:
     sta subroutine_temp
-    lda #9
+    lda l1001
     or_buffer 17
     dey
     beq PPyx17_return
@@ -2703,7 +2703,7 @@ PPyx17_NWxSE:
     jmp PPyx18_NEx__
 PPyx17_NWxSW:
     sta subroutine_temp
-    lda #10
+    lda l1010
     or_buffer 17
     dey
     beq PPyx17_return
@@ -2719,7 +2719,7 @@ PPyx17_NEx__:
     bcc PPyx17_fill_NEx__
 PPyx17_NExSE:
     sta subroutine_temp
-    lda #5
+    lda l0101
 PPyx17_store___xSE:
     or_buffer 17
     dey
@@ -2734,16 +2734,16 @@ PPyx17_return:
     rts
 PPyx17___xSE:
     sta subroutine_temp
-    lda #1
+    lda l0001
     jmp PPyx17_store___xSE
 PPyx17_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #4
+    lda l0100
     or_buffer 17
     inx
 PPyx17___xSW:
-    lda #2
+    lda l0010
     or_buffer 17
     dey
     beq PPyx17_return
@@ -2762,7 +2762,7 @@ PPyx18_NWx__:
     adc rounded_Dy
 PPyx18_NWxSE:
     sta subroutine_temp
-    lda #9
+    lda l1001
     or_buffer 18
     dey
     beq PPyx18_return
@@ -2772,7 +2772,7 @@ PPyx18_NWxSE:
     jmp PPyx19_NEx__
 PPyx18_NWxSW:
     sta subroutine_temp
-    lda #10
+    lda l1010
     or_buffer 18
     dey
     beq PPyx18_return
@@ -2788,7 +2788,7 @@ PPyx18_NEx__:
     bcc PPyx18_fill_NEx__
 PPyx18_NExSE:
     sta subroutine_temp
-    lda #5
+    lda l0101
 PPyx18_store___xSE:
     or_buffer 18
     dey
@@ -2803,16 +2803,16 @@ PPyx18_return:
     rts
 PPyx18___xSE:
     sta subroutine_temp
-    lda #1
+    lda l0001
     jmp PPyx18_store___xSE
 PPyx18_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #4
+    lda l0100
     or_buffer 18
     inx
 PPyx18___xSW:
-    lda #2
+    lda l0010
     or_buffer 18
     dey
     beq PPyx18_return
@@ -2831,7 +2831,7 @@ PPyx19_NWx__:
     adc rounded_Dy
 PPyx19_NWxSE:
     sta subroutine_temp
-    lda #9
+    lda l1001
     or_buffer 19
     dey
     beq PPyx19_return
@@ -2841,7 +2841,7 @@ PPyx19_NWxSE:
     jmp PPyx20_NEx__
 PPyx19_NWxSW:
     sta subroutine_temp
-    lda #10
+    lda l1010
     or_buffer 19
     dey
     beq PPyx19_return
@@ -2857,7 +2857,7 @@ PPyx19_NEx__:
     bcc PPyx19_fill_NEx__
 PPyx19_NExSE:
     sta subroutine_temp
-    lda #5
+    lda l0101
 PPyx19_store___xSE:
     or_buffer 19
     dey
@@ -2872,16 +2872,16 @@ PPyx19_return:
     rts
 PPyx19___xSE:
     sta subroutine_temp
-    lda #1
+    lda l0001
     jmp PPyx19_store___xSE
 PPyx19_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #4
+    lda l0100
     or_buffer 19
     inx
 PPyx19___xSW:
-    lda #2
+    lda l0010
     or_buffer 19
     dey
     beq PPyx19_return
@@ -2900,7 +2900,7 @@ PPyx20_NWx__:
     adc rounded_Dy
 PPyx20_NWxSE:
     sta subroutine_temp
-    lda #9
+    lda l1001
     or_buffer 20
     dey
     beq PPyx20_return
@@ -2910,7 +2910,7 @@ PPyx20_NWxSE:
     jmp PPyx21_NEx__
 PPyx20_NWxSW:
     sta subroutine_temp
-    lda #10
+    lda l1010
     or_buffer 20
     dey
     beq PPyx20_return
@@ -2926,7 +2926,7 @@ PPyx20_NEx__:
     bcc PPyx20_fill_NEx__
 PPyx20_NExSE:
     sta subroutine_temp
-    lda #5
+    lda l0101
 PPyx20_store___xSE:
     or_buffer 20
     dey
@@ -2941,16 +2941,16 @@ PPyx20_return:
     rts
 PPyx20___xSE:
     sta subroutine_temp
-    lda #1
+    lda l0001
     jmp PPyx20_store___xSE
 PPyx20_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #4
+    lda l0100
     or_buffer 20
     inx
 PPyx20___xSW:
-    lda #2
+    lda l0010
     or_buffer 20
     dey
     beq PPyx20_return
@@ -2969,7 +2969,7 @@ PPyx21_NWx__:
     adc rounded_Dy
 PPyx21_NWxSE:
     sta subroutine_temp
-    lda #9
+    lda l1001
     or_buffer 21
     rts
     rts
@@ -2985,7 +2985,7 @@ PPyx21_NWxSE:
     rts
 PPyx21_NWxSW:
     sta subroutine_temp
-    lda #10
+    lda l1010
     or_buffer 21
     rts
     rts
@@ -3008,7 +3008,7 @@ PPyx21_NEx__:
     bcc PPyx21_fill_NEx__
 PPyx21_NExSE:
     sta subroutine_temp
-    lda #5
+    lda l0101
 PPyx21_store___xSE:
     or_buffer 21
     rts
@@ -3030,16 +3030,16 @@ PPyx21_return:
     rts
 PPyx21___xSE:
     sta subroutine_temp
-    lda #1
+    lda l0001
     jmp PPyx21_store___xSE
 PPyx21_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #4
+    lda l0100
     or_buffer 21
     inx
 PPyx21___xSW:
-    lda #2
+    lda l0010
     or_buffer 21
     rts
 .segment "RODATA"
@@ -3634,7 +3634,7 @@ PPyx_offset:
     nop
 NPxy0:
 NPxy0_store___xNE:
-    lda #8
+    lda l1000
     or_buffer 0
     cpx to_x
     beq NPxy0_return
@@ -3648,7 +3648,7 @@ NPxy0_NWx__:
     adc rounded_Dx
 NPxy0_NWxSE:
     tay
-    lda #6
+    lda l0110
     or_buffer 0
     cpx to_x
     beq NPxy0_return
@@ -3660,7 +3660,7 @@ NPxy0_NWxSE:
     jmp NPxy1_NWx__
 NPxy0_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 0
     cpx to_x
     beq NPxy0_return
@@ -3675,7 +3675,7 @@ NPxy0_SWx__:
     bcc NPxy0_fill_SWx__
 NPxy0_SWxSE:
     tay
-    lda #3
+    lda l0011
 NPxy0_store___xSE:
     or_buffer 0
     cpx to_x
@@ -3690,7 +3690,7 @@ NPxy0_return:
     rts
 NPxy0___xSE:
     tay
-    lda #2
+    lda l0010
     jmp NPxy0_store___xSE
 NPxy0___xNE:
     tay
@@ -3698,11 +3698,11 @@ NPxy0___xNE:
 NPxy0_fill_SWx__:
     adc rounded_Dx
     tay
-    lda #1
+    lda l0001
     or_buffer 0
 NPxy1:
 NPxy1_store___xNE:
-    lda #8
+    lda l1000
     or_buffer 1
     cpx to_x
     beq NPxy1_return
@@ -3716,7 +3716,7 @@ NPxy1_NWx__:
     adc rounded_Dx
 NPxy1_NWxSE:
     tay
-    lda #6
+    lda l0110
     or_buffer 1
     cpx to_x
     beq NPxy1_return
@@ -3728,7 +3728,7 @@ NPxy1_NWxSE:
     jmp NPxy2_NWx__
 NPxy1_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 1
     cpx to_x
     beq NPxy1_return
@@ -3743,7 +3743,7 @@ NPxy1_SWx__:
     bcc NPxy1_fill_SWx__
 NPxy1_SWxSE:
     tay
-    lda #3
+    lda l0011
 NPxy1_store___xSE:
     or_buffer 1
     cpx to_x
@@ -3758,7 +3758,7 @@ NPxy1_return:
     rts
 NPxy1___xSE:
     tay
-    lda #2
+    lda l0010
     jmp NPxy1_store___xSE
 NPxy1___xNE:
     tay
@@ -3766,11 +3766,11 @@ NPxy1___xNE:
 NPxy1_fill_SWx__:
     adc rounded_Dx
     tay
-    lda #1
+    lda l0001
     or_buffer 1
 NPxy2:
 NPxy2_store___xNE:
-    lda #8
+    lda l1000
     or_buffer 2
     cpx to_x
     beq NPxy2_return
@@ -3784,7 +3784,7 @@ NPxy2_NWx__:
     adc rounded_Dx
 NPxy2_NWxSE:
     tay
-    lda #6
+    lda l0110
     or_buffer 2
     cpx to_x
     beq NPxy2_return
@@ -3796,7 +3796,7 @@ NPxy2_NWxSE:
     jmp NPxy3_NWx__
 NPxy2_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 2
     cpx to_x
     beq NPxy2_return
@@ -3811,7 +3811,7 @@ NPxy2_SWx__:
     bcc NPxy2_fill_SWx__
 NPxy2_SWxSE:
     tay
-    lda #3
+    lda l0011
 NPxy2_store___xSE:
     or_buffer 2
     cpx to_x
@@ -3826,7 +3826,7 @@ NPxy2_return:
     rts
 NPxy2___xSE:
     tay
-    lda #2
+    lda l0010
     jmp NPxy2_store___xSE
 NPxy2___xNE:
     tay
@@ -3834,11 +3834,11 @@ NPxy2___xNE:
 NPxy2_fill_SWx__:
     adc rounded_Dx
     tay
-    lda #1
+    lda l0001
     or_buffer 2
 NPxy3:
 NPxy3_store___xNE:
-    lda #8
+    lda l1000
     or_buffer 3
     cpx to_x
     beq NPxy3_return
@@ -3852,7 +3852,7 @@ NPxy3_NWx__:
     adc rounded_Dx
 NPxy3_NWxSE:
     tay
-    lda #6
+    lda l0110
     or_buffer 3
     cpx to_x
     beq NPxy3_return
@@ -3864,7 +3864,7 @@ NPxy3_NWxSE:
     jmp NPxy4_NWx__
 NPxy3_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 3
     cpx to_x
     beq NPxy3_return
@@ -3879,7 +3879,7 @@ NPxy3_SWx__:
     bcc NPxy3_fill_SWx__
 NPxy3_SWxSE:
     tay
-    lda #3
+    lda l0011
 NPxy3_store___xSE:
     or_buffer 3
     cpx to_x
@@ -3894,7 +3894,7 @@ NPxy3_return:
     rts
 NPxy3___xSE:
     tay
-    lda #2
+    lda l0010
     jmp NPxy3_store___xSE
 NPxy3___xNE:
     tay
@@ -3902,11 +3902,11 @@ NPxy3___xNE:
 NPxy3_fill_SWx__:
     adc rounded_Dx
     tay
-    lda #1
+    lda l0001
     or_buffer 3
 NPxy4:
 NPxy4_store___xNE:
-    lda #8
+    lda l1000
     or_buffer 4
     cpx to_x
     beq NPxy4_return
@@ -3920,7 +3920,7 @@ NPxy4_NWx__:
     adc rounded_Dx
 NPxy4_NWxSE:
     tay
-    lda #6
+    lda l0110
     or_buffer 4
     cpx to_x
     beq NPxy4_return
@@ -3932,7 +3932,7 @@ NPxy4_NWxSE:
     jmp NPxy5_NWx__
 NPxy4_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 4
     cpx to_x
     beq NPxy4_return
@@ -3947,7 +3947,7 @@ NPxy4_SWx__:
     bcc NPxy4_fill_SWx__
 NPxy4_SWxSE:
     tay
-    lda #3
+    lda l0011
 NPxy4_store___xSE:
     or_buffer 4
     cpx to_x
@@ -3962,7 +3962,7 @@ NPxy4_return:
     rts
 NPxy4___xSE:
     tay
-    lda #2
+    lda l0010
     jmp NPxy4_store___xSE
 NPxy4___xNE:
     tay
@@ -3970,11 +3970,11 @@ NPxy4___xNE:
 NPxy4_fill_SWx__:
     adc rounded_Dx
     tay
-    lda #1
+    lda l0001
     or_buffer 4
 NPxy5:
 NPxy5_store___xNE:
-    lda #8
+    lda l1000
     or_buffer 5
     cpx to_x
     beq NPxy5_return
@@ -3988,7 +3988,7 @@ NPxy5_NWx__:
     adc rounded_Dx
 NPxy5_NWxSE:
     tay
-    lda #6
+    lda l0110
     or_buffer 5
     cpx to_x
     beq NPxy5_return
@@ -4000,7 +4000,7 @@ NPxy5_NWxSE:
     jmp NPxy6_NWx__
 NPxy5_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 5
     cpx to_x
     beq NPxy5_return
@@ -4015,7 +4015,7 @@ NPxy5_SWx__:
     bcc NPxy5_fill_SWx__
 NPxy5_SWxSE:
     tay
-    lda #3
+    lda l0011
 NPxy5_store___xSE:
     or_buffer 5
     cpx to_x
@@ -4030,7 +4030,7 @@ NPxy5_return:
     rts
 NPxy5___xSE:
     tay
-    lda #2
+    lda l0010
     jmp NPxy5_store___xSE
 NPxy5___xNE:
     tay
@@ -4038,11 +4038,11 @@ NPxy5___xNE:
 NPxy5_fill_SWx__:
     adc rounded_Dx
     tay
-    lda #1
+    lda l0001
     or_buffer 5
 NPxy6:
 NPxy6_store___xNE:
-    lda #8
+    lda l1000
     or_buffer 6
     cpx to_x
     beq NPxy6_return
@@ -4056,7 +4056,7 @@ NPxy6_NWx__:
     adc rounded_Dx
 NPxy6_NWxSE:
     tay
-    lda #6
+    lda l0110
     or_buffer 6
     cpx to_x
     beq NPxy6_return
@@ -4068,7 +4068,7 @@ NPxy6_NWxSE:
     jmp NPxy7_NWx__
 NPxy6_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 6
     cpx to_x
     beq NPxy6_return
@@ -4083,7 +4083,7 @@ NPxy6_SWx__:
     bcc NPxy6_fill_SWx__
 NPxy6_SWxSE:
     tay
-    lda #3
+    lda l0011
 NPxy6_store___xSE:
     or_buffer 6
     cpx to_x
@@ -4098,7 +4098,7 @@ NPxy6_return:
     rts
 NPxy6___xSE:
     tay
-    lda #2
+    lda l0010
     jmp NPxy6_store___xSE
 NPxy6___xNE:
     tay
@@ -4106,11 +4106,11 @@ NPxy6___xNE:
 NPxy6_fill_SWx__:
     adc rounded_Dx
     tay
-    lda #1
+    lda l0001
     or_buffer 6
 NPxy7:
 NPxy7_store___xNE:
-    lda #8
+    lda l1000
     or_buffer 7
     cpx to_x
     beq NPxy7_return
@@ -4124,7 +4124,7 @@ NPxy7_NWx__:
     adc rounded_Dx
 NPxy7_NWxSE:
     tay
-    lda #6
+    lda l0110
     or_buffer 7
     cpx to_x
     beq NPxy7_return
@@ -4136,7 +4136,7 @@ NPxy7_NWxSE:
     jmp NPxy8_NWx__
 NPxy7_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 7
     cpx to_x
     beq NPxy7_return
@@ -4151,7 +4151,7 @@ NPxy7_SWx__:
     bcc NPxy7_fill_SWx__
 NPxy7_SWxSE:
     tay
-    lda #3
+    lda l0011
 NPxy7_store___xSE:
     or_buffer 7
     cpx to_x
@@ -4166,7 +4166,7 @@ NPxy7_return:
     rts
 NPxy7___xSE:
     tay
-    lda #2
+    lda l0010
     jmp NPxy7_store___xSE
 NPxy7___xNE:
     tay
@@ -4174,11 +4174,11 @@ NPxy7___xNE:
 NPxy7_fill_SWx__:
     adc rounded_Dx
     tay
-    lda #1
+    lda l0001
     or_buffer 7
 NPxy8:
 NPxy8_store___xNE:
-    lda #8
+    lda l1000
     or_buffer 8
     cpx to_x
     beq NPxy8_return
@@ -4192,7 +4192,7 @@ NPxy8_NWx__:
     adc rounded_Dx
 NPxy8_NWxSE:
     tay
-    lda #6
+    lda l0110
     or_buffer 8
     cpx to_x
     beq NPxy8_return
@@ -4204,7 +4204,7 @@ NPxy8_NWxSE:
     jmp NPxy9_NWx__
 NPxy8_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 8
     cpx to_x
     beq NPxy8_return
@@ -4219,7 +4219,7 @@ NPxy8_SWx__:
     bcc NPxy8_fill_SWx__
 NPxy8_SWxSE:
     tay
-    lda #3
+    lda l0011
 NPxy8_store___xSE:
     or_buffer 8
     cpx to_x
@@ -4234,7 +4234,7 @@ NPxy8_return:
     rts
 NPxy8___xSE:
     tay
-    lda #2
+    lda l0010
     jmp NPxy8_store___xSE
 NPxy8___xNE:
     tay
@@ -4242,11 +4242,11 @@ NPxy8___xNE:
 NPxy8_fill_SWx__:
     adc rounded_Dx
     tay
-    lda #1
+    lda l0001
     or_buffer 8
 NPxy9:
 NPxy9_store___xNE:
-    lda #8
+    lda l1000
     or_buffer 9
     cpx to_x
     beq NPxy9_return
@@ -4260,7 +4260,7 @@ NPxy9_NWx__:
     adc rounded_Dx
 NPxy9_NWxSE:
     tay
-    lda #6
+    lda l0110
     or_buffer 9
     cpx to_x
     beq NPxy9_return
@@ -4272,7 +4272,7 @@ NPxy9_NWxSE:
     jmp NPxy10_NWx__
 NPxy9_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 9
     cpx to_x
     beq NPxy9_return
@@ -4287,7 +4287,7 @@ NPxy9_SWx__:
     bcc NPxy9_fill_SWx__
 NPxy9_SWxSE:
     tay
-    lda #3
+    lda l0011
 NPxy9_store___xSE:
     or_buffer 9
     cpx to_x
@@ -4302,7 +4302,7 @@ NPxy9_return:
     rts
 NPxy9___xSE:
     tay
-    lda #2
+    lda l0010
     jmp NPxy9_store___xSE
 NPxy9___xNE:
     tay
@@ -4310,11 +4310,11 @@ NPxy9___xNE:
 NPxy9_fill_SWx__:
     adc rounded_Dx
     tay
-    lda #1
+    lda l0001
     or_buffer 9
 NPxy10:
 NPxy10_store___xNE:
-    lda #8
+    lda l1000
     or_buffer 10
     cpx to_x
     beq NPxy10_return
@@ -4328,7 +4328,7 @@ NPxy10_NWx__:
     adc rounded_Dx
 NPxy10_NWxSE:
     tay
-    lda #6
+    lda l0110
     or_buffer 10
     cpx to_x
     beq NPxy10_return
@@ -4340,7 +4340,7 @@ NPxy10_NWxSE:
     jmp NPxy11_NWx__
 NPxy10_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 10
     cpx to_x
     beq NPxy10_return
@@ -4355,7 +4355,7 @@ NPxy10_SWx__:
     bcc NPxy10_fill_SWx__
 NPxy10_SWxSE:
     tay
-    lda #3
+    lda l0011
 NPxy10_store___xSE:
     or_buffer 10
     cpx to_x
@@ -4370,7 +4370,7 @@ NPxy10_return:
     rts
 NPxy10___xSE:
     tay
-    lda #2
+    lda l0010
     jmp NPxy10_store___xSE
 NPxy10___xNE:
     tay
@@ -4378,11 +4378,11 @@ NPxy10___xNE:
 NPxy10_fill_SWx__:
     adc rounded_Dx
     tay
-    lda #1
+    lda l0001
     or_buffer 10
 NPxy11:
 NPxy11_store___xNE:
-    lda #8
+    lda l1000
     or_buffer 11
     cpx to_x
     beq NPxy11_return
@@ -4396,7 +4396,7 @@ NPxy11_NWx__:
     adc rounded_Dx
 NPxy11_NWxSE:
     tay
-    lda #6
+    lda l0110
     or_buffer 11
     cpx to_x
     beq NPxy11_return
@@ -4408,7 +4408,7 @@ NPxy11_NWxSE:
     jmp NPxy12_NWx__
 NPxy11_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 11
     cpx to_x
     beq NPxy11_return
@@ -4423,7 +4423,7 @@ NPxy11_SWx__:
     bcc NPxy11_fill_SWx__
 NPxy11_SWxSE:
     tay
-    lda #3
+    lda l0011
 NPxy11_store___xSE:
     or_buffer 11
     cpx to_x
@@ -4438,7 +4438,7 @@ NPxy11_return:
     rts
 NPxy11___xSE:
     tay
-    lda #2
+    lda l0010
     jmp NPxy11_store___xSE
 NPxy11___xNE:
     tay
@@ -4446,11 +4446,11 @@ NPxy11___xNE:
 NPxy11_fill_SWx__:
     adc rounded_Dx
     tay
-    lda #1
+    lda l0001
     or_buffer 11
 NPxy12:
 NPxy12_store___xNE:
-    lda #8
+    lda l1000
     or_buffer 12
     cpx to_x
     beq NPxy12_return
@@ -4464,7 +4464,7 @@ NPxy12_NWx__:
     adc rounded_Dx
 NPxy12_NWxSE:
     tay
-    lda #6
+    lda l0110
     or_buffer 12
     cpx to_x
     beq NPxy12_return
@@ -4476,7 +4476,7 @@ NPxy12_NWxSE:
     jmp NPxy13_NWx__
 NPxy12_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 12
     cpx to_x
     beq NPxy12_return
@@ -4491,7 +4491,7 @@ NPxy12_SWx__:
     bcc NPxy12_fill_SWx__
 NPxy12_SWxSE:
     tay
-    lda #3
+    lda l0011
 NPxy12_store___xSE:
     or_buffer 12
     cpx to_x
@@ -4506,7 +4506,7 @@ NPxy12_return:
     rts
 NPxy12___xSE:
     tay
-    lda #2
+    lda l0010
     jmp NPxy12_store___xSE
 NPxy12___xNE:
     tay
@@ -4514,11 +4514,11 @@ NPxy12___xNE:
 NPxy12_fill_SWx__:
     adc rounded_Dx
     tay
-    lda #1
+    lda l0001
     or_buffer 12
 NPxy13:
 NPxy13_store___xNE:
-    lda #8
+    lda l1000
     or_buffer 13
     cpx to_x
     beq NPxy13_return
@@ -4532,7 +4532,7 @@ NPxy13_NWx__:
     adc rounded_Dx
 NPxy13_NWxSE:
     tay
-    lda #6
+    lda l0110
     or_buffer 13
     cpx to_x
     beq NPxy13_return
@@ -4544,7 +4544,7 @@ NPxy13_NWxSE:
     jmp NPxy14_NWx__
 NPxy13_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 13
     cpx to_x
     beq NPxy13_return
@@ -4559,7 +4559,7 @@ NPxy13_SWx__:
     bcc NPxy13_fill_SWx__
 NPxy13_SWxSE:
     tay
-    lda #3
+    lda l0011
 NPxy13_store___xSE:
     or_buffer 13
     cpx to_x
@@ -4574,7 +4574,7 @@ NPxy13_return:
     rts
 NPxy13___xSE:
     tay
-    lda #2
+    lda l0010
     jmp NPxy13_store___xSE
 NPxy13___xNE:
     tay
@@ -4582,11 +4582,11 @@ NPxy13___xNE:
 NPxy13_fill_SWx__:
     adc rounded_Dx
     tay
-    lda #1
+    lda l0001
     or_buffer 13
 NPxy14:
 NPxy14_store___xNE:
-    lda #8
+    lda l1000
     or_buffer 14
     cpx to_x
     beq NPxy14_return
@@ -4600,7 +4600,7 @@ NPxy14_NWx__:
     adc rounded_Dx
 NPxy14_NWxSE:
     tay
-    lda #6
+    lda l0110
     or_buffer 14
     cpx to_x
     beq NPxy14_return
@@ -4612,7 +4612,7 @@ NPxy14_NWxSE:
     jmp NPxy15_NWx__
 NPxy14_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 14
     cpx to_x
     beq NPxy14_return
@@ -4627,7 +4627,7 @@ NPxy14_SWx__:
     bcc NPxy14_fill_SWx__
 NPxy14_SWxSE:
     tay
-    lda #3
+    lda l0011
 NPxy14_store___xSE:
     or_buffer 14
     cpx to_x
@@ -4642,7 +4642,7 @@ NPxy14_return:
     rts
 NPxy14___xSE:
     tay
-    lda #2
+    lda l0010
     jmp NPxy14_store___xSE
 NPxy14___xNE:
     tay
@@ -4650,11 +4650,11 @@ NPxy14___xNE:
 NPxy14_fill_SWx__:
     adc rounded_Dx
     tay
-    lda #1
+    lda l0001
     or_buffer 14
 NPxy15:
 NPxy15_store___xNE:
-    lda #8
+    lda l1000
     or_buffer 15
     cpx to_x
     beq NPxy15_return
@@ -4668,7 +4668,7 @@ NPxy15_NWx__:
     adc rounded_Dx
 NPxy15_NWxSE:
     tay
-    lda #6
+    lda l0110
     or_buffer 15
     cpx to_x
     beq NPxy15_return
@@ -4680,7 +4680,7 @@ NPxy15_NWxSE:
     jmp NPxy16_NWx__
 NPxy15_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 15
     cpx to_x
     beq NPxy15_return
@@ -4695,7 +4695,7 @@ NPxy15_SWx__:
     bcc NPxy15_fill_SWx__
 NPxy15_SWxSE:
     tay
-    lda #3
+    lda l0011
 NPxy15_store___xSE:
     or_buffer 15
     cpx to_x
@@ -4710,7 +4710,7 @@ NPxy15_return:
     rts
 NPxy15___xSE:
     tay
-    lda #2
+    lda l0010
     jmp NPxy15_store___xSE
 NPxy15___xNE:
     tay
@@ -4718,11 +4718,11 @@ NPxy15___xNE:
 NPxy15_fill_SWx__:
     adc rounded_Dx
     tay
-    lda #1
+    lda l0001
     or_buffer 15
 NPxy16:
 NPxy16_store___xNE:
-    lda #8
+    lda l1000
     or_buffer 16
     cpx to_x
     beq NPxy16_return
@@ -4736,7 +4736,7 @@ NPxy16_NWx__:
     adc rounded_Dx
 NPxy16_NWxSE:
     tay
-    lda #6
+    lda l0110
     or_buffer 16
     cpx to_x
     beq NPxy16_return
@@ -4748,7 +4748,7 @@ NPxy16_NWxSE:
     jmp NPxy17_NWx__
 NPxy16_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 16
     cpx to_x
     beq NPxy16_return
@@ -4763,7 +4763,7 @@ NPxy16_SWx__:
     bcc NPxy16_fill_SWx__
 NPxy16_SWxSE:
     tay
-    lda #3
+    lda l0011
 NPxy16_store___xSE:
     or_buffer 16
     cpx to_x
@@ -4778,7 +4778,7 @@ NPxy16_return:
     rts
 NPxy16___xSE:
     tay
-    lda #2
+    lda l0010
     jmp NPxy16_store___xSE
 NPxy16___xNE:
     tay
@@ -4786,11 +4786,11 @@ NPxy16___xNE:
 NPxy16_fill_SWx__:
     adc rounded_Dx
     tay
-    lda #1
+    lda l0001
     or_buffer 16
 NPxy17:
 NPxy17_store___xNE:
-    lda #8
+    lda l1000
     or_buffer 17
     cpx to_x
     beq NPxy17_return
@@ -4804,7 +4804,7 @@ NPxy17_NWx__:
     adc rounded_Dx
 NPxy17_NWxSE:
     tay
-    lda #6
+    lda l0110
     or_buffer 17
     cpx to_x
     beq NPxy17_return
@@ -4816,7 +4816,7 @@ NPxy17_NWxSE:
     jmp NPxy18_NWx__
 NPxy17_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 17
     cpx to_x
     beq NPxy17_return
@@ -4831,7 +4831,7 @@ NPxy17_SWx__:
     bcc NPxy17_fill_SWx__
 NPxy17_SWxSE:
     tay
-    lda #3
+    lda l0011
 NPxy17_store___xSE:
     or_buffer 17
     cpx to_x
@@ -4846,7 +4846,7 @@ NPxy17_return:
     rts
 NPxy17___xSE:
     tay
-    lda #2
+    lda l0010
     jmp NPxy17_store___xSE
 NPxy17___xNE:
     tay
@@ -4854,11 +4854,11 @@ NPxy17___xNE:
 NPxy17_fill_SWx__:
     adc rounded_Dx
     tay
-    lda #1
+    lda l0001
     or_buffer 17
 NPxy18:
 NPxy18_store___xNE:
-    lda #8
+    lda l1000
     or_buffer 18
     cpx to_x
     beq NPxy18_return
@@ -4872,7 +4872,7 @@ NPxy18_NWx__:
     adc rounded_Dx
 NPxy18_NWxSE:
     tay
-    lda #6
+    lda l0110
     or_buffer 18
     cpx to_x
     beq NPxy18_return
@@ -4884,7 +4884,7 @@ NPxy18_NWxSE:
     jmp NPxy19_NWx__
 NPxy18_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 18
     cpx to_x
     beq NPxy18_return
@@ -4899,7 +4899,7 @@ NPxy18_SWx__:
     bcc NPxy18_fill_SWx__
 NPxy18_SWxSE:
     tay
-    lda #3
+    lda l0011
 NPxy18_store___xSE:
     or_buffer 18
     cpx to_x
@@ -4914,7 +4914,7 @@ NPxy18_return:
     rts
 NPxy18___xSE:
     tay
-    lda #2
+    lda l0010
     jmp NPxy18_store___xSE
 NPxy18___xNE:
     tay
@@ -4922,11 +4922,11 @@ NPxy18___xNE:
 NPxy18_fill_SWx__:
     adc rounded_Dx
     tay
-    lda #1
+    lda l0001
     or_buffer 18
 NPxy19:
 NPxy19_store___xNE:
-    lda #8
+    lda l1000
     or_buffer 19
     cpx to_x
     beq NPxy19_return
@@ -4940,7 +4940,7 @@ NPxy19_NWx__:
     adc rounded_Dx
 NPxy19_NWxSE:
     tay
-    lda #6
+    lda l0110
     or_buffer 19
     cpx to_x
     beq NPxy19_return
@@ -4952,7 +4952,7 @@ NPxy19_NWxSE:
     jmp NPxy20_NWx__
 NPxy19_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 19
     cpx to_x
     beq NPxy19_return
@@ -4967,7 +4967,7 @@ NPxy19_SWx__:
     bcc NPxy19_fill_SWx__
 NPxy19_SWxSE:
     tay
-    lda #3
+    lda l0011
 NPxy19_store___xSE:
     or_buffer 19
     cpx to_x
@@ -4982,7 +4982,7 @@ NPxy19_return:
     rts
 NPxy19___xSE:
     tay
-    lda #2
+    lda l0010
     jmp NPxy19_store___xSE
 NPxy19___xNE:
     tay
@@ -4990,11 +4990,11 @@ NPxy19___xNE:
 NPxy19_fill_SWx__:
     adc rounded_Dx
     tay
-    lda #1
+    lda l0001
     or_buffer 19
 NPxy20:
 NPxy20_store___xNE:
-    lda #8
+    lda l1000
     or_buffer 20
     cpx to_x
     beq NPxy20_return
@@ -5008,7 +5008,7 @@ NPxy20_NWx__:
     adc rounded_Dx
 NPxy20_NWxSE:
     tay
-    lda #6
+    lda l0110
     or_buffer 20
     cpx to_x
     beq NPxy20_return
@@ -5020,7 +5020,7 @@ NPxy20_NWxSE:
     jmp NPxy21_NWx__
 NPxy20_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 20
     cpx to_x
     beq NPxy20_return
@@ -5035,7 +5035,7 @@ NPxy20_SWx__:
     bcc NPxy20_fill_SWx__
 NPxy20_SWxSE:
     tay
-    lda #3
+    lda l0011
 NPxy20_store___xSE:
     or_buffer 20
     cpx to_x
@@ -5050,7 +5050,7 @@ NPxy20_return:
     rts
 NPxy20___xSE:
     tay
-    lda #2
+    lda l0010
     jmp NPxy20_store___xSE
 NPxy20___xNE:
     tay
@@ -5058,11 +5058,11 @@ NPxy20___xNE:
 NPxy20_fill_SWx__:
     adc rounded_Dx
     tay
-    lda #1
+    lda l0001
     or_buffer 20
 NPxy21:
 NPxy21_store___xNE:
-    lda #8
+    lda l1000
     or_buffer 21
     cpx to_x
     beq NPxy21_return
@@ -5076,7 +5076,7 @@ NPxy21_NWx__:
     adc rounded_Dx
 NPxy21_NWxSE:
     tay
-    lda #6
+    lda l0110
     or_buffer 21
     cpx to_x
     beq NPxy21_return
@@ -5091,7 +5091,7 @@ NPxy21_NWxSE:
     nop
 NPxy21_NWxNE:
     tay
-    lda #12
+    lda l1100
     or_buffer 21
     cpx to_x
     beq NPxy21_return
@@ -5106,7 +5106,7 @@ NPxy21_SWx__:
     bcc NPxy21_fill_SWx__
 NPxy21_SWxSE:
     tay
-    lda #3
+    lda l0011
 NPxy21_store___xSE:
     or_buffer 21
     cpx to_x
@@ -5124,7 +5124,7 @@ NPxy21_return:
     rts
 NPxy21___xSE:
     tay
-    lda #2
+    lda l0010
     jmp NPxy21_store___xSE
 NPxy21___xNE:
     tay
@@ -5132,7 +5132,7 @@ NPxy21___xNE:
 NPxy21_fill_SWx__:
     adc rounded_Dx
     tay
-    lda #1
+    lda l0001
     or_buffer 21
     rts
     nop
@@ -5148,7 +5148,7 @@ NPyx0_NWx__:
     adc rounded_Dy
 NPyx0_NWxSE:
     sta subroutine_temp
-    lda #6
+    lda l0110
     or_buffer 0
     dey
     beq NPyx0_return
@@ -5158,7 +5158,7 @@ NPyx0_NWxSE:
     jmp NPyx1_NEx__
 NPyx0_NWxSW:
     sta subroutine_temp
-    lda #5
+    lda l0101
     or_buffer 0
     dey
     beq NPyx0_return
@@ -5174,7 +5174,7 @@ NPyx0_NEx__:
     bcc NPyx0_fill_NEx__
 NPyx0_NExSE:
     sta subroutine_temp
-    lda #10
+    lda l1010
 NPyx0_store___xSE:
     or_buffer 0
     dey
@@ -5189,16 +5189,16 @@ NPyx0_return:
     rts
 NPyx0___xSE:
     sta subroutine_temp
-    lda #2
+    lda l0010
     jmp NPyx0_store___xSE
 NPyx0_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #8
+    lda l1000
     or_buffer 0
     dex
 NPyx0___xSW:
-    lda #1
+    lda l0001
     or_buffer 0
     dey
     beq NPyx0_return
@@ -5217,7 +5217,7 @@ NPyx1_NWx__:
     adc rounded_Dy
 NPyx1_NWxSE:
     sta subroutine_temp
-    lda #6
+    lda l0110
     or_buffer 1
     dey
     beq NPyx1_return
@@ -5227,7 +5227,7 @@ NPyx1_NWxSE:
     jmp NPyx2_NEx__
 NPyx1_NWxSW:
     sta subroutine_temp
-    lda #5
+    lda l0101
     or_buffer 1
     dey
     beq NPyx1_return
@@ -5243,7 +5243,7 @@ NPyx1_NEx__:
     bcc NPyx1_fill_NEx__
 NPyx1_NExSE:
     sta subroutine_temp
-    lda #10
+    lda l1010
 NPyx1_store___xSE:
     or_buffer 1
     dey
@@ -5258,16 +5258,16 @@ NPyx1_return:
     rts
 NPyx1___xSE:
     sta subroutine_temp
-    lda #2
+    lda l0010
     jmp NPyx1_store___xSE
 NPyx1_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #8
+    lda l1000
     or_buffer 1
     dex
 NPyx1___xSW:
-    lda #1
+    lda l0001
     or_buffer 1
     dey
     beq NPyx1_return
@@ -5286,7 +5286,7 @@ NPyx2_NWx__:
     adc rounded_Dy
 NPyx2_NWxSE:
     sta subroutine_temp
-    lda #6
+    lda l0110
     or_buffer 2
     dey
     beq NPyx2_return
@@ -5296,7 +5296,7 @@ NPyx2_NWxSE:
     jmp NPyx3_NEx__
 NPyx2_NWxSW:
     sta subroutine_temp
-    lda #5
+    lda l0101
     or_buffer 2
     dey
     beq NPyx2_return
@@ -5312,7 +5312,7 @@ NPyx2_NEx__:
     bcc NPyx2_fill_NEx__
 NPyx2_NExSE:
     sta subroutine_temp
-    lda #10
+    lda l1010
 NPyx2_store___xSE:
     or_buffer 2
     dey
@@ -5327,16 +5327,16 @@ NPyx2_return:
     rts
 NPyx2___xSE:
     sta subroutine_temp
-    lda #2
+    lda l0010
     jmp NPyx2_store___xSE
 NPyx2_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #8
+    lda l1000
     or_buffer 2
     dex
 NPyx2___xSW:
-    lda #1
+    lda l0001
     or_buffer 2
     dey
     beq NPyx2_return
@@ -5355,7 +5355,7 @@ NPyx3_NWx__:
     adc rounded_Dy
 NPyx3_NWxSE:
     sta subroutine_temp
-    lda #6
+    lda l0110
     or_buffer 3
     dey
     beq NPyx3_return
@@ -5365,7 +5365,7 @@ NPyx3_NWxSE:
     jmp NPyx4_NEx__
 NPyx3_NWxSW:
     sta subroutine_temp
-    lda #5
+    lda l0101
     or_buffer 3
     dey
     beq NPyx3_return
@@ -5381,7 +5381,7 @@ NPyx3_NEx__:
     bcc NPyx3_fill_NEx__
 NPyx3_NExSE:
     sta subroutine_temp
-    lda #10
+    lda l1010
 NPyx3_store___xSE:
     or_buffer 3
     dey
@@ -5396,16 +5396,16 @@ NPyx3_return:
     rts
 NPyx3___xSE:
     sta subroutine_temp
-    lda #2
+    lda l0010
     jmp NPyx3_store___xSE
 NPyx3_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #8
+    lda l1000
     or_buffer 3
     dex
 NPyx3___xSW:
-    lda #1
+    lda l0001
     or_buffer 3
     dey
     beq NPyx3_return
@@ -5424,7 +5424,7 @@ NPyx4_NWx__:
     adc rounded_Dy
 NPyx4_NWxSE:
     sta subroutine_temp
-    lda #6
+    lda l0110
     or_buffer 4
     dey
     beq NPyx4_return
@@ -5434,7 +5434,7 @@ NPyx4_NWxSE:
     jmp NPyx5_NEx__
 NPyx4_NWxSW:
     sta subroutine_temp
-    lda #5
+    lda l0101
     or_buffer 4
     dey
     beq NPyx4_return
@@ -5450,7 +5450,7 @@ NPyx4_NEx__:
     bcc NPyx4_fill_NEx__
 NPyx4_NExSE:
     sta subroutine_temp
-    lda #10
+    lda l1010
 NPyx4_store___xSE:
     or_buffer 4
     dey
@@ -5465,16 +5465,16 @@ NPyx4_return:
     rts
 NPyx4___xSE:
     sta subroutine_temp
-    lda #2
+    lda l0010
     jmp NPyx4_store___xSE
 NPyx4_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #8
+    lda l1000
     or_buffer 4
     dex
 NPyx4___xSW:
-    lda #1
+    lda l0001
     or_buffer 4
     dey
     beq NPyx4_return
@@ -5493,7 +5493,7 @@ NPyx5_NWx__:
     adc rounded_Dy
 NPyx5_NWxSE:
     sta subroutine_temp
-    lda #6
+    lda l0110
     or_buffer 5
     dey
     beq NPyx5_return
@@ -5503,7 +5503,7 @@ NPyx5_NWxSE:
     jmp NPyx6_NEx__
 NPyx5_NWxSW:
     sta subroutine_temp
-    lda #5
+    lda l0101
     or_buffer 5
     dey
     beq NPyx5_return
@@ -5519,7 +5519,7 @@ NPyx5_NEx__:
     bcc NPyx5_fill_NEx__
 NPyx5_NExSE:
     sta subroutine_temp
-    lda #10
+    lda l1010
 NPyx5_store___xSE:
     or_buffer 5
     dey
@@ -5534,16 +5534,16 @@ NPyx5_return:
     rts
 NPyx5___xSE:
     sta subroutine_temp
-    lda #2
+    lda l0010
     jmp NPyx5_store___xSE
 NPyx5_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #8
+    lda l1000
     or_buffer 5
     dex
 NPyx5___xSW:
-    lda #1
+    lda l0001
     or_buffer 5
     dey
     beq NPyx5_return
@@ -5562,7 +5562,7 @@ NPyx6_NWx__:
     adc rounded_Dy
 NPyx6_NWxSE:
     sta subroutine_temp
-    lda #6
+    lda l0110
     or_buffer 6
     dey
     beq NPyx6_return
@@ -5572,7 +5572,7 @@ NPyx6_NWxSE:
     jmp NPyx7_NEx__
 NPyx6_NWxSW:
     sta subroutine_temp
-    lda #5
+    lda l0101
     or_buffer 6
     dey
     beq NPyx6_return
@@ -5588,7 +5588,7 @@ NPyx6_NEx__:
     bcc NPyx6_fill_NEx__
 NPyx6_NExSE:
     sta subroutine_temp
-    lda #10
+    lda l1010
 NPyx6_store___xSE:
     or_buffer 6
     dey
@@ -5603,16 +5603,16 @@ NPyx6_return:
     rts
 NPyx6___xSE:
     sta subroutine_temp
-    lda #2
+    lda l0010
     jmp NPyx6_store___xSE
 NPyx6_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #8
+    lda l1000
     or_buffer 6
     dex
 NPyx6___xSW:
-    lda #1
+    lda l0001
     or_buffer 6
     dey
     beq NPyx6_return
@@ -5631,7 +5631,7 @@ NPyx7_NWx__:
     adc rounded_Dy
 NPyx7_NWxSE:
     sta subroutine_temp
-    lda #6
+    lda l0110
     or_buffer 7
     dey
     beq NPyx7_return
@@ -5641,7 +5641,7 @@ NPyx7_NWxSE:
     jmp NPyx8_NEx__
 NPyx7_NWxSW:
     sta subroutine_temp
-    lda #5
+    lda l0101
     or_buffer 7
     dey
     beq NPyx7_return
@@ -5657,7 +5657,7 @@ NPyx7_NEx__:
     bcc NPyx7_fill_NEx__
 NPyx7_NExSE:
     sta subroutine_temp
-    lda #10
+    lda l1010
 NPyx7_store___xSE:
     or_buffer 7
     dey
@@ -5672,16 +5672,16 @@ NPyx7_return:
     rts
 NPyx7___xSE:
     sta subroutine_temp
-    lda #2
+    lda l0010
     jmp NPyx7_store___xSE
 NPyx7_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #8
+    lda l1000
     or_buffer 7
     dex
 NPyx7___xSW:
-    lda #1
+    lda l0001
     or_buffer 7
     dey
     beq NPyx7_return
@@ -5700,7 +5700,7 @@ NPyx8_NWx__:
     adc rounded_Dy
 NPyx8_NWxSE:
     sta subroutine_temp
-    lda #6
+    lda l0110
     or_buffer 8
     dey
     beq NPyx8_return
@@ -5710,7 +5710,7 @@ NPyx8_NWxSE:
     jmp NPyx9_NEx__
 NPyx8_NWxSW:
     sta subroutine_temp
-    lda #5
+    lda l0101
     or_buffer 8
     dey
     beq NPyx8_return
@@ -5726,7 +5726,7 @@ NPyx8_NEx__:
     bcc NPyx8_fill_NEx__
 NPyx8_NExSE:
     sta subroutine_temp
-    lda #10
+    lda l1010
 NPyx8_store___xSE:
     or_buffer 8
     dey
@@ -5741,16 +5741,16 @@ NPyx8_return:
     rts
 NPyx8___xSE:
     sta subroutine_temp
-    lda #2
+    lda l0010
     jmp NPyx8_store___xSE
 NPyx8_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #8
+    lda l1000
     or_buffer 8
     dex
 NPyx8___xSW:
-    lda #1
+    lda l0001
     or_buffer 8
     dey
     beq NPyx8_return
@@ -5769,7 +5769,7 @@ NPyx9_NWx__:
     adc rounded_Dy
 NPyx9_NWxSE:
     sta subroutine_temp
-    lda #6
+    lda l0110
     or_buffer 9
     dey
     beq NPyx9_return
@@ -5779,7 +5779,7 @@ NPyx9_NWxSE:
     jmp NPyx10_NEx__
 NPyx9_NWxSW:
     sta subroutine_temp
-    lda #5
+    lda l0101
     or_buffer 9
     dey
     beq NPyx9_return
@@ -5795,7 +5795,7 @@ NPyx9_NEx__:
     bcc NPyx9_fill_NEx__
 NPyx9_NExSE:
     sta subroutine_temp
-    lda #10
+    lda l1010
 NPyx9_store___xSE:
     or_buffer 9
     dey
@@ -5810,16 +5810,16 @@ NPyx9_return:
     rts
 NPyx9___xSE:
     sta subroutine_temp
-    lda #2
+    lda l0010
     jmp NPyx9_store___xSE
 NPyx9_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #8
+    lda l1000
     or_buffer 9
     dex
 NPyx9___xSW:
-    lda #1
+    lda l0001
     or_buffer 9
     dey
     beq NPyx9_return
@@ -5838,7 +5838,7 @@ NPyx10_NWx__:
     adc rounded_Dy
 NPyx10_NWxSE:
     sta subroutine_temp
-    lda #6
+    lda l0110
     or_buffer 10
     dey
     beq NPyx10_return
@@ -5848,7 +5848,7 @@ NPyx10_NWxSE:
     jmp NPyx11_NEx__
 NPyx10_NWxSW:
     sta subroutine_temp
-    lda #5
+    lda l0101
     or_buffer 10
     dey
     beq NPyx10_return
@@ -5864,7 +5864,7 @@ NPyx10_NEx__:
     bcc NPyx10_fill_NEx__
 NPyx10_NExSE:
     sta subroutine_temp
-    lda #10
+    lda l1010
 NPyx10_store___xSE:
     or_buffer 10
     dey
@@ -5879,16 +5879,16 @@ NPyx10_return:
     rts
 NPyx10___xSE:
     sta subroutine_temp
-    lda #2
+    lda l0010
     jmp NPyx10_store___xSE
 NPyx10_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #8
+    lda l1000
     or_buffer 10
     dex
 NPyx10___xSW:
-    lda #1
+    lda l0001
     or_buffer 10
     dey
     beq NPyx10_return
@@ -5907,7 +5907,7 @@ NPyx11_NWx__:
     adc rounded_Dy
 NPyx11_NWxSE:
     sta subroutine_temp
-    lda #6
+    lda l0110
     or_buffer 11
     dey
     beq NPyx11_return
@@ -5917,7 +5917,7 @@ NPyx11_NWxSE:
     jmp NPyx12_NEx__
 NPyx11_NWxSW:
     sta subroutine_temp
-    lda #5
+    lda l0101
     or_buffer 11
     dey
     beq NPyx11_return
@@ -5933,7 +5933,7 @@ NPyx11_NEx__:
     bcc NPyx11_fill_NEx__
 NPyx11_NExSE:
     sta subroutine_temp
-    lda #10
+    lda l1010
 NPyx11_store___xSE:
     or_buffer 11
     dey
@@ -5948,16 +5948,16 @@ NPyx11_return:
     rts
 NPyx11___xSE:
     sta subroutine_temp
-    lda #2
+    lda l0010
     jmp NPyx11_store___xSE
 NPyx11_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #8
+    lda l1000
     or_buffer 11
     dex
 NPyx11___xSW:
-    lda #1
+    lda l0001
     or_buffer 11
     dey
     beq NPyx11_return
@@ -5976,7 +5976,7 @@ NPyx12_NWx__:
     adc rounded_Dy
 NPyx12_NWxSE:
     sta subroutine_temp
-    lda #6
+    lda l0110
     or_buffer 12
     dey
     beq NPyx12_return
@@ -5986,7 +5986,7 @@ NPyx12_NWxSE:
     jmp NPyx13_NEx__
 NPyx12_NWxSW:
     sta subroutine_temp
-    lda #5
+    lda l0101
     or_buffer 12
     dey
     beq NPyx12_return
@@ -6002,7 +6002,7 @@ NPyx12_NEx__:
     bcc NPyx12_fill_NEx__
 NPyx12_NExSE:
     sta subroutine_temp
-    lda #10
+    lda l1010
 NPyx12_store___xSE:
     or_buffer 12
     dey
@@ -6017,16 +6017,16 @@ NPyx12_return:
     rts
 NPyx12___xSE:
     sta subroutine_temp
-    lda #2
+    lda l0010
     jmp NPyx12_store___xSE
 NPyx12_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #8
+    lda l1000
     or_buffer 12
     dex
 NPyx12___xSW:
-    lda #1
+    lda l0001
     or_buffer 12
     dey
     beq NPyx12_return
@@ -6045,7 +6045,7 @@ NPyx13_NWx__:
     adc rounded_Dy
 NPyx13_NWxSE:
     sta subroutine_temp
-    lda #6
+    lda l0110
     or_buffer 13
     dey
     beq NPyx13_return
@@ -6055,7 +6055,7 @@ NPyx13_NWxSE:
     jmp NPyx14_NEx__
 NPyx13_NWxSW:
     sta subroutine_temp
-    lda #5
+    lda l0101
     or_buffer 13
     dey
     beq NPyx13_return
@@ -6071,7 +6071,7 @@ NPyx13_NEx__:
     bcc NPyx13_fill_NEx__
 NPyx13_NExSE:
     sta subroutine_temp
-    lda #10
+    lda l1010
 NPyx13_store___xSE:
     or_buffer 13
     dey
@@ -6086,16 +6086,16 @@ NPyx13_return:
     rts
 NPyx13___xSE:
     sta subroutine_temp
-    lda #2
+    lda l0010
     jmp NPyx13_store___xSE
 NPyx13_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #8
+    lda l1000
     or_buffer 13
     dex
 NPyx13___xSW:
-    lda #1
+    lda l0001
     or_buffer 13
     dey
     beq NPyx13_return
@@ -6114,7 +6114,7 @@ NPyx14_NWx__:
     adc rounded_Dy
 NPyx14_NWxSE:
     sta subroutine_temp
-    lda #6
+    lda l0110
     or_buffer 14
     dey
     beq NPyx14_return
@@ -6124,7 +6124,7 @@ NPyx14_NWxSE:
     jmp NPyx15_NEx__
 NPyx14_NWxSW:
     sta subroutine_temp
-    lda #5
+    lda l0101
     or_buffer 14
     dey
     beq NPyx14_return
@@ -6140,7 +6140,7 @@ NPyx14_NEx__:
     bcc NPyx14_fill_NEx__
 NPyx14_NExSE:
     sta subroutine_temp
-    lda #10
+    lda l1010
 NPyx14_store___xSE:
     or_buffer 14
     dey
@@ -6155,16 +6155,16 @@ NPyx14_return:
     rts
 NPyx14___xSE:
     sta subroutine_temp
-    lda #2
+    lda l0010
     jmp NPyx14_store___xSE
 NPyx14_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #8
+    lda l1000
     or_buffer 14
     dex
 NPyx14___xSW:
-    lda #1
+    lda l0001
     or_buffer 14
     dey
     beq NPyx14_return
@@ -6183,7 +6183,7 @@ NPyx15_NWx__:
     adc rounded_Dy
 NPyx15_NWxSE:
     sta subroutine_temp
-    lda #6
+    lda l0110
     or_buffer 15
     dey
     beq NPyx15_return
@@ -6193,7 +6193,7 @@ NPyx15_NWxSE:
     jmp NPyx16_NEx__
 NPyx15_NWxSW:
     sta subroutine_temp
-    lda #5
+    lda l0101
     or_buffer 15
     dey
     beq NPyx15_return
@@ -6209,7 +6209,7 @@ NPyx15_NEx__:
     bcc NPyx15_fill_NEx__
 NPyx15_NExSE:
     sta subroutine_temp
-    lda #10
+    lda l1010
 NPyx15_store___xSE:
     or_buffer 15
     dey
@@ -6224,16 +6224,16 @@ NPyx15_return:
     rts
 NPyx15___xSE:
     sta subroutine_temp
-    lda #2
+    lda l0010
     jmp NPyx15_store___xSE
 NPyx15_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #8
+    lda l1000
     or_buffer 15
     dex
 NPyx15___xSW:
-    lda #1
+    lda l0001
     or_buffer 15
     dey
     beq NPyx15_return
@@ -6252,7 +6252,7 @@ NPyx16_NWx__:
     adc rounded_Dy
 NPyx16_NWxSE:
     sta subroutine_temp
-    lda #6
+    lda l0110
     or_buffer 16
     dey
     beq NPyx16_return
@@ -6262,7 +6262,7 @@ NPyx16_NWxSE:
     jmp NPyx17_NEx__
 NPyx16_NWxSW:
     sta subroutine_temp
-    lda #5
+    lda l0101
     or_buffer 16
     dey
     beq NPyx16_return
@@ -6278,7 +6278,7 @@ NPyx16_NEx__:
     bcc NPyx16_fill_NEx__
 NPyx16_NExSE:
     sta subroutine_temp
-    lda #10
+    lda l1010
 NPyx16_store___xSE:
     or_buffer 16
     dey
@@ -6293,16 +6293,16 @@ NPyx16_return:
     rts
 NPyx16___xSE:
     sta subroutine_temp
-    lda #2
+    lda l0010
     jmp NPyx16_store___xSE
 NPyx16_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #8
+    lda l1000
     or_buffer 16
     dex
 NPyx16___xSW:
-    lda #1
+    lda l0001
     or_buffer 16
     dey
     beq NPyx16_return
@@ -6321,7 +6321,7 @@ NPyx17_NWx__:
     adc rounded_Dy
 NPyx17_NWxSE:
     sta subroutine_temp
-    lda #6
+    lda l0110
     or_buffer 17
     dey
     beq NPyx17_return
@@ -6331,7 +6331,7 @@ NPyx17_NWxSE:
     jmp NPyx18_NEx__
 NPyx17_NWxSW:
     sta subroutine_temp
-    lda #5
+    lda l0101
     or_buffer 17
     dey
     beq NPyx17_return
@@ -6347,7 +6347,7 @@ NPyx17_NEx__:
     bcc NPyx17_fill_NEx__
 NPyx17_NExSE:
     sta subroutine_temp
-    lda #10
+    lda l1010
 NPyx17_store___xSE:
     or_buffer 17
     dey
@@ -6362,16 +6362,16 @@ NPyx17_return:
     rts
 NPyx17___xSE:
     sta subroutine_temp
-    lda #2
+    lda l0010
     jmp NPyx17_store___xSE
 NPyx17_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #8
+    lda l1000
     or_buffer 17
     dex
 NPyx17___xSW:
-    lda #1
+    lda l0001
     or_buffer 17
     dey
     beq NPyx17_return
@@ -6390,7 +6390,7 @@ NPyx18_NWx__:
     adc rounded_Dy
 NPyx18_NWxSE:
     sta subroutine_temp
-    lda #6
+    lda l0110
     or_buffer 18
     dey
     beq NPyx18_return
@@ -6400,7 +6400,7 @@ NPyx18_NWxSE:
     jmp NPyx19_NEx__
 NPyx18_NWxSW:
     sta subroutine_temp
-    lda #5
+    lda l0101
     or_buffer 18
     dey
     beq NPyx18_return
@@ -6416,7 +6416,7 @@ NPyx18_NEx__:
     bcc NPyx18_fill_NEx__
 NPyx18_NExSE:
     sta subroutine_temp
-    lda #10
+    lda l1010
 NPyx18_store___xSE:
     or_buffer 18
     dey
@@ -6431,16 +6431,16 @@ NPyx18_return:
     rts
 NPyx18___xSE:
     sta subroutine_temp
-    lda #2
+    lda l0010
     jmp NPyx18_store___xSE
 NPyx18_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #8
+    lda l1000
     or_buffer 18
     dex
 NPyx18___xSW:
-    lda #1
+    lda l0001
     or_buffer 18
     dey
     beq NPyx18_return
@@ -6459,7 +6459,7 @@ NPyx19_NWx__:
     adc rounded_Dy
 NPyx19_NWxSE:
     sta subroutine_temp
-    lda #6
+    lda l0110
     or_buffer 19
     dey
     beq NPyx19_return
@@ -6469,7 +6469,7 @@ NPyx19_NWxSE:
     jmp NPyx20_NEx__
 NPyx19_NWxSW:
     sta subroutine_temp
-    lda #5
+    lda l0101
     or_buffer 19
     dey
     beq NPyx19_return
@@ -6485,7 +6485,7 @@ NPyx19_NEx__:
     bcc NPyx19_fill_NEx__
 NPyx19_NExSE:
     sta subroutine_temp
-    lda #10
+    lda l1010
 NPyx19_store___xSE:
     or_buffer 19
     dey
@@ -6500,16 +6500,16 @@ NPyx19_return:
     rts
 NPyx19___xSE:
     sta subroutine_temp
-    lda #2
+    lda l0010
     jmp NPyx19_store___xSE
 NPyx19_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #8
+    lda l1000
     or_buffer 19
     dex
 NPyx19___xSW:
-    lda #1
+    lda l0001
     or_buffer 19
     dey
     beq NPyx19_return
@@ -6528,7 +6528,7 @@ NPyx20_NWx__:
     adc rounded_Dy
 NPyx20_NWxSE:
     sta subroutine_temp
-    lda #6
+    lda l0110
     or_buffer 20
     dey
     beq NPyx20_return
@@ -6538,7 +6538,7 @@ NPyx20_NWxSE:
     jmp NPyx21_NEx__
 NPyx20_NWxSW:
     sta subroutine_temp
-    lda #5
+    lda l0101
     or_buffer 20
     dey
     beq NPyx20_return
@@ -6554,7 +6554,7 @@ NPyx20_NEx__:
     bcc NPyx20_fill_NEx__
 NPyx20_NExSE:
     sta subroutine_temp
-    lda #10
+    lda l1010
 NPyx20_store___xSE:
     or_buffer 20
     dey
@@ -6569,16 +6569,16 @@ NPyx20_return:
     rts
 NPyx20___xSE:
     sta subroutine_temp
-    lda #2
+    lda l0010
     jmp NPyx20_store___xSE
 NPyx20_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #8
+    lda l1000
     or_buffer 20
     dex
 NPyx20___xSW:
-    lda #1
+    lda l0001
     or_buffer 20
     dey
     beq NPyx20_return
@@ -6597,7 +6597,7 @@ NPyx21_NWx__:
     adc rounded_Dy
 NPyx21_NWxSE:
     sta subroutine_temp
-    lda #6
+    lda l0110
     or_buffer 21
     rts
     rts
@@ -6613,7 +6613,7 @@ NPyx21_NWxSE:
     rts
 NPyx21_NWxSW:
     sta subroutine_temp
-    lda #5
+    lda l0101
     or_buffer 21
     rts
     rts
@@ -6636,7 +6636,7 @@ NPyx21_NEx__:
     bcc NPyx21_fill_NEx__
 NPyx21_NExSE:
     sta subroutine_temp
-    lda #10
+    lda l1010
 NPyx21_store___xSE:
     or_buffer 21
     rts
@@ -6658,16 +6658,16 @@ NPyx21_return:
     rts
 NPyx21___xSE:
     sta subroutine_temp
-    lda #2
+    lda l0010
     jmp NPyx21_store___xSE
 NPyx21_fill_NEx__:
     adc rounded_Dy
     sta subroutine_temp
-    lda #8
+    lda l1000
     or_buffer 21
     dex
 NPyx21___xSW:
-    lda #1
+    lda l0001
     or_buffer 21
     rts
 .segment "RODATA"
