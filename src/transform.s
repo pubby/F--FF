@@ -13,10 +13,7 @@
 
 .export render
 
-draw_distance = 6
-
-.segment "RODATA"
-.include "foo.level.inc"
+draw_distance = 5
 
 .segment "CODE"
 
@@ -402,7 +399,7 @@ cull:
     jsr setup_depth
     lda from_y+0
     clc
-    adc #128
+    adc camera_height
     sta multiply_store
     bcc :+
     inx
@@ -437,7 +434,7 @@ cull:
     jsr setup_depth
     lda to_y+0
     clc
-    adc #128
+    adc camera_height
     sta multiply_store
     bcc :+
     inx
@@ -466,21 +463,14 @@ cull:
 .endproc
 
 .proc render
-    ; setup pointers (TODO)
-    store16into #ltx_lo, lx_lo_ptr
-    store16into #ltx_hi, lx_hi_ptr
-    store16into #lty_lo, ly_lo_ptr
-    store16into #lty_hi, ly_hi_ptr
-    store16into #rtx_lo, rx_lo_ptr
-    store16into #rtx_hi, rx_hi_ptr
-    store16into #rty_lo, ry_lo_ptr
-    store16into #rty_hi, ry_hi_ptr
+    ; Levels are in bank 2
+    bankswitch 2
 
     sec
     lda #64
     sbc p1_dir
     jsr setup_cos
-    ldy #0
+    ldy #draw_distance - 1
 cosLoop:
     sec
     lda (ly_lo_ptr), y
@@ -526,15 +516,14 @@ cosLoop:
     txa
     sta scratchpad_rx_hi, y
 
-    iny
-    cpy #draw_distance
-    bne cosLoop
+    dey
+    bpl cosLoop
 
     sec
     lda #64
     sbc p1_dir
     jsr setup_sin
-    ldy #0
+    ldy #draw_distance - 1
 sinLoop:
     sec
     lda (ly_lo_ptr), y
@@ -559,6 +548,11 @@ sinLoop:
     jsr multiply
     clc
     adc scratchpad_ly_lo, y
+    bcc :+
+    inx
+    clc
+:
+    adc #200
     sta scratchpad_ly_lo, y
     txa
     adc scratchpad_ly_hi, y
@@ -587,14 +581,18 @@ sinLoop:
     jsr multiply
     clc
     adc scratchpad_ry_lo, y
+    bcc :+
+    inx
+    clc
+:
+    adc #200
     sta scratchpad_ry_lo, y
     txa
     adc scratchpad_ry_hi, y
     sta scratchpad_ry_hi, y
 
-    iny
-    cpy #draw_distance
-    bne sinLoop
+    dey
+    bpl sinLoop
 
     ;;;;;;;;;;;;;;;;;;;;;;;;;;
     ; Draw the lines and shit

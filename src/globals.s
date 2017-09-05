@@ -31,6 +31,17 @@ p2_y:     .res 2
 p2_dir:   .res 1
 p2_speed: .res 2
 
+level_length: .res 2
+
+lx_lo_ptr: .res 2
+lx_hi_ptr: .res 2
+ly_lo_ptr: .res 2
+ly_hi_ptr: .res 2
+rx_lo_ptr: .res 2
+rx_hi_ptr: .res 2
+ry_lo_ptr: .res 2
+ry_hi_ptr: .res 2
+
 ; Line Drawing
 from_x_sub:  .res 1
 from_x:      .res 2
@@ -59,14 +70,7 @@ multiply_sub: .res 1
 y_temp: .res 1
 recip_ptr: .res 2
 
-lx_lo_ptr: .res 2
-lx_hi_ptr: .res 2
-ly_lo_ptr: .res 2
-ly_hi_ptr: .res 2
-rx_lo_ptr: .res 2
-rx_hi_ptr: .res 2
-ry_lo_ptr: .res 2
-ry_hi_ptr: .res 2
+camera_height: .res 1
 
 .segment "BSS" ; RAM
 pad_size = 6

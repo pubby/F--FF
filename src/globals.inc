@@ -69,6 +69,17 @@ multiply = $78
 .globalzp p2_dir
 .globalzp p2_speed
 
+.globalzp level_length
+
+.globalzp lx_lo_ptr
+.globalzp lx_hi_ptr
+.globalzp ly_lo_ptr
+.globalzp ly_hi_ptr
+.globalzp rx_lo_ptr
+.globalzp rx_hi_ptr
+.globalzp ry_lo_ptr
+.globalzp ry_hi_ptr
+
 ; Line drawing
 .globalzp from_x_sub
 .globalzp from_x
@@ -97,14 +108,7 @@ multiply = $78
 .globalzp y_temp
 .globalzp recip_ptr
 
-.globalzp lx_lo_ptr
-.globalzp lx_hi_ptr
-.globalzp ly_lo_ptr
-.globalzp ly_hi_ptr
-.globalzp rx_lo_ptr
-.globalzp rx_hi_ptr
-.globalzp ry_lo_ptr
-.globalzp ry_hi_ptr
+.globalzp camera_height
 
 .global scratchpad
 .global scratchpad_lx_lo

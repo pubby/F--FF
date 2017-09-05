@@ -129,33 +129,65 @@ void save_asm(char const* filename, editor const& e)
     std::fprintf(fp, "track_size:\n");
         std::fprintf(fp, "    .byt %i\n", e.l_nodes.size());
 
+    std::fprintf(fp, ".align 256\n");
     std::fprintf(fp, "ltx_lo:\n");
-    for(unsigned i = 0; i != e.l_nodes.size(); ++i)
-        std::fprintf(fp, "    .byt .lobyte(%i)\n", to_short(e.l_nodes[i].x));
+    for(unsigned i = 0; i != 256; ++i)
+    {
+        std::fprintf(fp, "    .byt .lobyte(%i)\n", 
+                     to_short(e.l_nodes[i % e.l_nodes.size()].x));
+    }
+    std::fprintf(fp, ".align 256\n");
     std::fprintf(fp, "ltx_hi:\n");
-    for(unsigned i = 0; i != e.l_nodes.size(); ++i)
-        std::fprintf(fp, "    .byt .hibyte(%i)\n", to_short(e.l_nodes[i].x));
+    for(unsigned i = 0; i != 256; ++i)
+    {
+        std::fprintf(fp, "    .byt .hibyte(%i)\n", 
+                     to_short(e.l_nodes[i % e.l_nodes.size()].x));
+    }
 
+    std::fprintf(fp, ".align 256\n");
     std::fprintf(fp, "lty_lo:\n");
-    for(unsigned i = 0; i != e.l_nodes.size(); ++i)
-        std::fprintf(fp, "    .byt .lobyte(%i)\n", to_short(e.l_nodes[i].y));
+    for(unsigned i = 0; i != 256; ++i)
+    {
+        std::fprintf(fp, "    .byt .lobyte(%i)\n", 
+                     to_short(e.l_nodes[i % e.l_nodes.size()].y));
+    }
+    std::fprintf(fp, ".align 256\n");
     std::fprintf(fp, "lty_hi:\n");
-    for(unsigned i = 0; i != e.l_nodes.size(); ++i)
-        std::fprintf(fp, "    .byt .hibyte(%i)\n", to_short(e.l_nodes[i].y));
+    for(unsigned i = 0; i != 256; ++i)
+    {
+        std::fprintf(fp, "    .byt .hibyte(%i)\n", 
+                     to_short(e.l_nodes[i % e.l_nodes.size()].y));
+    }
 
+    std::fprintf(fp, ".align 256\n");
     std::fprintf(fp, "rtx_lo:\n");
-    for(unsigned i = 0; i != e.l_nodes.size(); ++i)
-        std::fprintf(fp, "    .byt .lobyte(%i)\n", to_short(e.r_nodes[i].x));
+    for(unsigned i = 0; i != 256; ++i)
+    {
+        std::fprintf(fp, "    .byt .lobyte(%i)\n", 
+                     to_short(e.r_nodes[i % e.r_nodes.size()].x));
+    }
+    std::fprintf(fp, ".align 256\n");
     std::fprintf(fp, "rtx_hi:\n");
-    for(unsigned i = 0; i != e.l_nodes.size(); ++i)
-        std::fprintf(fp, "    .byt .hibyte(%i)\n", to_short(e.r_nodes[i].x));
+    for(unsigned i = 0; i != 256; ++i)
+    {
+        std::fprintf(fp, "    .byt .hibyte(%i)\n", 
+                     to_short(e.r_nodes[i % e.r_nodes.size()].x));
+    }
 
+    std::fprintf(fp, ".align 256\n");
     std::fprintf(fp, "rty_lo:\n");
-    for(unsigned i = 0; i != e.l_nodes.size(); ++i)
-        std::fprintf(fp, "    .byt .lobyte(%i)\n", to_short(e.r_nodes[i].y));
+    for(unsigned i = 0; i != 256; ++i)
+    {
+        std::fprintf(fp, "    .byt .lobyte(%i)\n", 
+                     to_short(e.r_nodes[i % e.r_nodes.size()].y));
+    }
+    std::fprintf(fp, ".align 256\n");
     std::fprintf(fp, "rty_hi:\n");
-    for(unsigned i = 0; i != e.l_nodes.size(); ++i)
-        std::fprintf(fp, "    .byt .hibyte(%i)\n", to_short(e.r_nodes[i].y));
+    for(unsigned i = 0; i != 256; ++i)
+    {
+        std::fprintf(fp, "    .byt .hibyte(%i)\n", 
+                     to_short(e.r_nodes[i % e.r_nodes.size()].y));
+    }
 
     std::fclose(fp);
 }

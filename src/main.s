@@ -10,6 +10,9 @@
 
 .export main, nmi_handler, irq_handler
 
+.segment "LEVELS"
+.include "foo.level.inc"
+
 .segment "NMI"
 
 .proc nmi_handler
@@ -60,6 +63,7 @@ renderFrame:
     ; Do OAM DMA (without reading controllers)
     lda #.hibyte(CPU_OAM) ; A = $03
     sta OAMDMA
+    lda #%00000011
     sta subframes_left
 
     bit PPUSTATUS
@@ -164,6 +168,9 @@ return:
 
     jsr copy_multiply_code
 
+    lda #128
+    sta camera_height
+
     ; TODO
     lda #63;+128
     jsr setup_sin
@@ -174,6 +181,18 @@ return:
 ;:
     ;jmp :-
 
+
+    ; setup pointers (TODO)
+    store16into #ltx_lo, lx_lo_ptr
+    store16into #ltx_hi, lx_hi_ptr
+    store16into #lty_lo, ly_lo_ptr
+    store16into #lty_hi, ly_hi_ptr
+    store16into #rtx_lo, rx_lo_ptr
+    store16into #rtx_hi, rx_hi_ptr
+    store16into #rty_lo, ry_lo_ptr
+    store16into #rty_hi, ry_hi_ptr
+    lda #12
+    sta level_length
 
     bankswitch_to ppu_load_4x4_pixels_chr
     jsr ppu_load_4x4_pixels_chr
@@ -189,18 +208,20 @@ loop:
     cmp nmi_counter
     beq :-
 
+    sta debug
+
     bankswitch_to clear_nt_buffer
     jsr clear_nt_buffer
 
-    lda #PPUMASK_BG_ON | PPUMASK_GRAYSCALE | PPUMASK_EMPHASIZE_B | PPUMASK_NO_BG_CLIP
-    ora #PPUMASK_SPR_ON | PPUMASK_NO_SPR_CLIP
+    ;lda #PPUMASK_BG_ON | PPUMASK_GRAYSCALE | PPUMASK_EMPHASIZE_B | PPUMASK_NO_BG_CLIP
+    ;ora #PPUMASK_SPR_ON | PPUMASK_NO_SPR_CLIP
     ;sta PPUMASK
 
     jsr p1_move
     jsr render
 
-    lda #PPUMASK_BG_ON | PPUMASK_GRAYSCALE | PPUMASK_EMPHASIZE_R | PPUMASK_NO_BG_CLIP
-    ora #PPUMASK_SPR_ON | PPUMASK_NO_SPR_CLIP
+    ;lda #PPUMASK_BG_ON | PPUMASK_GRAYSCALE | PPUMASK_EMPHASIZE_R | PPUMASK_NO_BG_CLIP
+    ;ora #PPUMASK_SPR_ON | PPUMASK_NO_SPR_CLIP
     ;sta PPUMASK
 
     jsr prepare_game_sprites
@@ -208,6 +229,7 @@ loop:
     lda #1 
     sta frame_ready
     inc frame_number
+    sta debug
     jmp loop
 
 .endproc
