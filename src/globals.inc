@@ -28,6 +28,11 @@ multiply = $78
     sta banktable+bank
 .endmacro
 
+.macro bankswitch_y
+    lda banktable, y
+    sta banktable, y
+.endmacro
+
 .macro bankswitch_to label
     lda banktable+.lobyte(.bank(label))
     sta banktable+.lobyte(.bank(label))
@@ -39,6 +44,7 @@ multiply = $78
 
 .globalzp nmi_x
 .globalzp nmi_y
+.globalzp nmi_bank
 
 .globalzp nmi_counter
 .globalzp frame_number
@@ -110,6 +116,7 @@ multiply = $78
 
 .globalzp camera_height
 
+.global tokumaru_storage
 .global scratchpad
 .global scratchpad_lx_lo
 .global scratchpad_lx_hi

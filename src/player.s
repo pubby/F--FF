@@ -8,6 +8,9 @@
 
 .segment "CODE"
 
+PSPEED = 128
+PTURN = 3
+
 .repeat 2, i
 .proc P i, _move 
     ldy P i, _buttons_held       ; Keep buttons_held in Y.
@@ -18,13 +21,13 @@
     and #BUTTON_LEFT
     beq notPressingLeft
     txa
-    axs #2
+    axs #PTURN
 notPressingLeft:
     tya
     and #BUTTON_RIGHT
     beq notPressingRight
     txa
-    axs #.lobyte(-2)
+    axs #.lobyte(-PTURN)
 notPressingRight:
     stx P i, _dir
 
@@ -35,7 +38,7 @@ notPressingRight:
 
     lda P i, _dir
     jsr setup_cos
-    lda #64
+    lda #PSPEED
     sta multiply_store
     lda #0
     jsr multiply
@@ -48,7 +51,7 @@ notPressingRight:
 
     lda P i, _dir
     jsr setup_sin
-    lda #64
+    lda #PSPEED
     sta multiply_store
     lda #0
     jsr multiply
@@ -101,23 +104,11 @@ notPressingDown:
     beq :+
     inc camera_height
     inc camera_height
-    inc camera_height
-    inc camera_height
-    inc camera_height
-    inc camera_height
-    inc camera_height
-    inc camera_height
 :
 
     lda P i, _buttons_held
     and #BUTTON_B
     beq :+
-    dec camera_height
-    dec camera_height
-    dec camera_height
-    dec camera_height
-    dec camera_height
-    dec camera_height
     dec camera_height
     dec camera_height
 :
@@ -134,12 +125,9 @@ notPressingDown:
     front_edge_result_hi = scratchpad + 1
     left_edge_result_lo = scratchpad + 2
     left_edge_result_hi = scratchpad + 3
-    back_edge_result_lo = scratchpad + 2
-    back_edge_result_hi = scratchpad + 3
-
-    ldy #1
 
     ; Front railing (and set up multiply for left railing)
+    ldy #1
     sec
     lda 0+P i, _x
     sbc (lx_lo_ptr), y
@@ -158,16 +146,16 @@ notPressingDown:
     stx front_edge_result_hi
 
     ; Left railing
-    iny
-    lda (ly_lo_ptr), y  ; (ly[1] - ly[0]) is stored in odd indices.
+    ldy #128
+    lda (ly_lo_ptr), y  ; (ly[1] - ly[0]) is stored in Y=128
     sta multiply_store
     lda (ly_hi_ptr), y
     jsr multiply
     sta left_edge_result_lo
     stx left_edge_result_hi
-    dey
 
     ; Front railing
+    ldy #1
     sec
     lda 0+P i, _y
     sbc (ly_lo_ptr), y
@@ -175,6 +163,31 @@ notPressingDown:
     lda 1+P i, _y
     sbc (ly_hi_ptr), y
     jsr setup_multiply
+
+    ; Left railing
+    ldy #128
+    lda (lx_lo_ptr), y  ; (lx[1] - lx[0]) is stored in Y=128
+    sta multiply_store
+    lax (lx_hi_ptr), y
+    jsr multiply+1      ; +1 to skip TAX
+    cmp left_edge_result_lo
+    txa
+    sbc left_edge_result_hi
+    bvc :+
+    eor #$80
+:
+    bpl doneOutsideLeftRailing
+
+    lda #1
+    ;sta debug
+    jmp poop
+doneOutsideLeftRailing:
+    lda #0
+    ;sta debug
+poop:
+
+    ; Front railing
+    ldy #1
     sec
     lda (rx_lo_ptr), y
     sbc (lx_lo_ptr), y
@@ -182,9 +195,7 @@ notPressingDown:
     lda (rx_hi_ptr), y
     sbc (lx_hi_ptr), y
     jsr multiply
-
-    sec
-    sbc front_edge_result_lo
+    cmp front_edge_result_lo
     txa
     sbc front_edge_result_hi
     bvc :+
@@ -193,8 +204,7 @@ notPressingDown:
     bpl doneOutsideFrontRailing
 
     ; Increment the level pointers.
-    lax lx_lo_ptr
-    ;axs #.lobyte(-2)
+    ldx lx_lo_ptr
     inx
     cpx level_length
     bcc :+
@@ -209,23 +219,6 @@ notPressingDown:
     stx ry_lo_ptr
     stx ry_hi_ptr
 doneOutsideFrontRailing:
-
-    ; Left railing
-    dey
-    lda (lx_lo_ptr), y  ; (lx[1] - lx[0]) is stored in odd indices.
-    sta multiply_store
-    lda (lx_hi_ptr), y
-    jsr multiply
-    sec
-    sbc left_edge_result_lo
-    txa
-    sbc left_edge_result_hi
-    bvc :+
-    eor #$80
-:
-    bpl doneOutsideLeftRailing
-
-doneOutsideLeftRailing:
 
     rts
 .endproc

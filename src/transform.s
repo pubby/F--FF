@@ -13,7 +13,7 @@
 
 .export render
 
-draw_distance = 5
+draw_distance = 4
 
 .segment "CODE"
 

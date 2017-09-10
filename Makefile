@@ -18,7 +18,7 @@ version := 0.01
 # PRG ROM.  If it gets too long for one line, you can add a backslash
 # (the \ character) at the end of the line and continue on the next.
 objlist := nrom init main globals palette line line_unrolled sprites player \
-           multiply transform
+           multiply transform tokumaru
 
 
 AS65 := ca65
@@ -55,25 +55,23 @@ map.txt $(title).nes: uxrom.cfg $(objlistntsc)
 	$(LD65) -o $(title).nes -m map.txt -C $^
 
 $(objdir)/%.o: $(srcdir)/%.s $(srcdir)/nes.inc $(srcdir)/globals.inc \
-               $(srcdir)/clip.inc $(srcdir)/sin.inc $(srcdir)/recip.inc
+               $(srcdir)/clip.inc $(srcdir)/sin.inc $(srcdir)/recip.inc \
+               $(srcdir)/foo.level.inc
 	$(AS65) $(CFLAGS65) $< -o $@
 
 $(objdir)/%.o: $(objdir)/%.s
 	$(AS65) $(CFLAGS65) $< -o $@
 
 # Files that depend on .incbin'd files
-$(objdir)/main.o: $(srcdir)/line.chr
+$(objdir)/main.o: $(srcdir)/spr16.cchr
 
 # Rules for CHR ROM
 
-$(title).chr: $(objdir)/bg.chr $(objdir)/sprites16.chr
-	cat $^ > $@
+$(srcdir)/%16.chr: $(imgdir)/%.png
+	python3 pilbmp2nes.py -H 16 $< $@
 
-$(objdir)/%.chr: $(imgdir)/%.png
-	tools/pilbmp2nes.py $< $@
-
-$(objdir)/%16.chr: $(imgdir)/%.png
-	tools/pilbmp2nes.py -H 16 $< $@
+$(srcdir)/%.cchr: $(srcdir)/%.chr 
+	./tokumaru -e $< $@
 
 # cpp
 chrc: chrc.cpp
@@ -111,3 +109,7 @@ $(srcdir)/clip.inc: clip
 
 $(srcdir)/recip.inc: recip
 	./recip $@
+
+tokumaru: tokumaru.cc
+	g++ -std=c++14 -o "$@" "$<" $(CXXFLAGS)
+

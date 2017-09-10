@@ -2,12 +2,13 @@
 
 .segment "ZEROPAGE"
 
-debug: .res 2
+debug: .res 4
 subroutine_temp: .res 1
 ptr_temp: .res 2
 
 nmi_x: .res 1
 nmi_y: .res 1
+nmi_bank: .res 1
 
 nmi_counter:    .res 1
 frame_number:   .res 1
@@ -75,6 +76,7 @@ camera_height: .res 1
 .segment "BSS" ; RAM
 pad_size = 6
 
+tokumaru_storage:
 scratchpad:
 scratchpad_lx_lo: .res pad_size
 scratchpad_lx_hi: .res pad_size

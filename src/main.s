@@ -1,5 +1,6 @@
 .include "globals.inc"
 
+.import decompress_tokumaru
 .import ppu_set_palette
 .import prepare_game_sprites
 .import setup_cos, setup_sin
@@ -10,16 +11,18 @@
 
 .export main, nmi_handler, irq_handler
 
+.segment "P0B"
+.byt 0
+.segment "P1B"
+.byt 1
+.segment "P2B"
+.byt 2
+
 .segment "LEVELS"
 .include "foo.level.inc"
 
-.segment "NMI"
-
-.proc nmi_handler
-    pha
-    stx nmi_x
-    sty nmi_y
-
+.segment "NMI_CODE"
+.proc nmi_body
     lsr subframes_left
     bne :+ 
     lsr frame_ready
@@ -63,7 +66,6 @@ renderFrame:
     ; Do OAM DMA (without reading controllers)
     lda #.hibyte(CPU_OAM) ; A = $03
     sta OAMDMA
-    lda #%00000011
     sta subframes_left
 
     bit PPUSTATUS
@@ -88,10 +90,28 @@ return:
 
     lda #PPUMASK_BG_ON | PPUMASK_NO_BG_CLIP| PPUMASK_SPR_ON | PPUMASK_NO_SPR_CLIP
     sta PPUMASK
-    lda #PPUCTRL_NMI_ON
+    lda #PPUCTRL_NMI_ON | PPUCTRL_8X16_SPR
     sta PPUCTRL
 
+    jmp nmi_return
+.endproc
+
+.segment "CODE"
+
+.proc nmi_handler
+    pha
+    stx nmi_x
+    sty nmi_y
+    lda $8000 ; current bank
+    sta nmi_bank
+    bankswitch_to nmi_body
+    jmp nmi_body
+.endproc
+
+.proc nmi_return
     ; Restore registers and return.
+    ldy nmi_bank
+    bankswitch_y
     ldx nmi_x
     ldy nmi_y
     pla
@@ -101,8 +121,6 @@ return:
 .proc irq_handler
     rti
 .endproc
-
-.segment "CODE"
 
 ; TODO
 .proc ppu_clear_attributes
@@ -196,11 +214,13 @@ return:
 
     bankswitch_to ppu_load_4x4_pixels_chr
     jsr ppu_load_4x4_pixels_chr
+    store16into #sprites_chr, ptr_temp
+    jsr decompress_tokumaru
 
     lda #128
     sta p1_dir
 
-    lda #PPUCTRL_NMI_ON
+    lda #PPUCTRL_NMI_ON | PPUCTRL_8X16_SPR
     sta PPUCTRL
 loop:
     lda nmi_counter
@@ -208,7 +228,7 @@ loop:
     cmp nmi_counter
     beq :-
 
-    sta debug
+    ;sta debug
 
     bankswitch_to clear_nt_buffer
     jsr clear_nt_buffer
@@ -218,7 +238,9 @@ loop:
     ;sta PPUMASK
 
     jsr p1_move
+    sta debug
     jsr render
+    sta debug
 
     ;lda #PPUMASK_BG_ON | PPUMASK_GRAYSCALE | PPUMASK_EMPHASIZE_R | PPUMASK_NO_BG_CLIP
     ;ora #PPUMASK_SPR_ON | PPUMASK_NO_SPR_CLIP
@@ -229,7 +251,7 @@ loop:
     lda #1 
     sta frame_ready
     inc frame_number
-    sta debug
+    ;sta debug
     jmp loop
 
 .endproc
@@ -270,6 +292,9 @@ bottom_pixel_pattern_table:
 .endproc
 
 .segment "CHR"
+sprites_chr:
+    .incbin "spr16.cchr"
+
 .proc ppu_load_4x4_pixels_chr
     ldx #0
     stx PPUADDR
@@ -301,6 +326,4 @@ store:
     rts
 .endproc
 
-
-    ;.incbin "line.chr"
     ;.incbin "bullets.chr"
