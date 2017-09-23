@@ -2,18 +2,21 @@
 
 .segment "ZEROPAGE"
 
-debug: .res 4
+debug: .res 1
 subroutine_temp: .res 1
 ptr_temp: .res 2
 
 nmi_x: .res 1
 nmi_y: .res 1
 nmi_bank: .res 1
+nmi_ptr: .res 2
 
 nmi_counter:    .res 1
 frame_number:   .res 1
 frame_ready:    .res 1
 subframes_left: .res 1
+
+update_ptr: .res 2
 
 ; Game
 p1:
@@ -21,16 +24,18 @@ p1_buttons_held: .res 1
 p1_buttons_pressed: .res 1
 p1_x:     .res 2
 p1_y:     .res 2
-p1_dir:   .res 1
+p1_dir:   .res 2
 p1_speed: .res 2
+p1_dir_speed: .res 1
 
 p2:
 p2_buttons_held: .res 1
 p2_buttons_pressed: .res 1
 p2_x:     .res 2
 p2_y:     .res 2
-p2_dir:   .res 1
+p2_dir:   .res 2
 p2_speed: .res 2
+p2_dir_speed: .res 1
 
 level_length: .res 2
 
@@ -52,6 +57,8 @@ to_x_sub:    .res 1
 to_x:        .res 2
 to_y_sub:    .res 1
 to_y:        .res 2
+
+line_splitscreen: .res 1
 
 l1100: .res 1
 l1010: .res 1
@@ -97,6 +104,8 @@ depthpad_ry_lo: .res pad_size
 depthpad_ry_hi: .res pad_size
 
 nt_buffer: .res 32*22
+
+palette_buffer: .res 32
 
 .segment "SMALL_TABLES"
 banktable:

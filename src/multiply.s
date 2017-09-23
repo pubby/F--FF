@@ -289,6 +289,7 @@ loop:
     rts
 .endproc
 
+; REQUIRES N and V flags set appropriately!
 ; X in = multiplier lobyte 
 ; A in = multiplier hibyte
 .proc setup_multiply

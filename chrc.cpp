@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <array>
+#include <vector>
 
 using tile_t = std::array<unsigned char, 16>;
 

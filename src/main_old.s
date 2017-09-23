@@ -8,13 +8,12 @@
 .import copy_multiply_code
 .import p1_move, p2_move
 .import render
-.import init_menu
+.import ppu_init_rad_menu
+.import menu_nmi
+.import update_menu
 .import read_gamepads
 
 .export main, nmi_handler, irq_handler, nmi_return
-.export update_return
-.export sprites_chr, rad_chr
-.export init_game
 
 .segment "P0B"
 .byt 0
@@ -27,20 +26,6 @@
 .include "foo.level.inc"
 
 .segment "NMI_CODE"
-
-.proc copy_palette_buffer
-    ppu_palette_address = $3F00
-    lda #.hibyte(ppu_palette_address)
-    sta PPUADDR
-    lda #.lobyte(ppu_palette_address)
-    sta PPUADDR
-    .repeat 32, i
-        lda palette_buffer+i
-        sta PPUDATA
-    .endrepeat
-    rts
-.endproc
-
 .proc game_nmi
     lsr subframes_left
     bne :+ 
@@ -54,8 +39,7 @@
 
     ldx #$00
     stx PPUMASK
-    ldx #$20
-.repeat 3, i
+.repeat 2, i
 :
     lda $00
     dex
@@ -70,6 +54,7 @@
     jmp return
 
 renderFrame:
+    jmp return ; TODO
     ; Do OAM DMA (without reading controllers)
     lda #.hibyte(CPU_OAM) ; A = $03
     sta OAMDMA
@@ -129,48 +114,44 @@ return:
     rti
 .endproc
 
-update_return:
-    lda nmi_counter
-:
-    cmp nmi_counter
-    beq :-
-    inc frame_number
-    jmp (update_ptr)
-
-
-.proc update_game
-    lda #0
-    sta frame_ready
-
-    bankswitch_to clear_nt_buffer
-    jsr clear_nt_buffer
-    jsr read_gamepads
-    jsr p1_move
-    jsr render
-    jsr prepare_game_sprites
-
-    lda #1 
-    sta frame_ready
-    jmp update_return
+; TODO
+.proc ppu_clear_attributes
+    rts
 .endproc
 
-main:
-    jsr ppu_set_palette
-    jmp init_menu
-.proc init_game
+.proc main
+    ;store16into #menu_nmi, nmi_ptr
+    store16into #game_nmi, nmi_ptr
     ldx #0
-    stx PPUMASK
     stx PPUCTRL
+    stx PPUMASK
+    stx frame_number
     stx subframes_left
     inx                 ; X = 1
     stx frame_ready
-    jsr ppu_set_palette
-    store16into #game_nmi, nmi_ptr
-    store16into #update_game, update_ptr
 
-    ; Setup attributes.
     bit PPUSTATUS
-    storePPUADDR #$23C0
+    jsr ppu_set_palette
+
+.repeat 2, i
+    bit PPUSTATUS
+    lda #$23 + $08*i
+    sta PPUADDR
+    lda #$C0
+    sta PPUADDR
+    lda #0
+    ldx #64
+:
+    sta PPUDATA
+    dex
+    bne :-
+.endrepeat
+
+    bit PPUSTATUS
+    lda #$23
+    sta PPUADDR
+    lda #$C0
+    sta PPUADDR
     lda #%00000000
     ldx #8
 :
@@ -201,6 +182,17 @@ main:
     lda #128
     sta camera_height
 
+    ; TODO
+    lda #63;+128
+    jsr setup_sin
+    lda #.lobyte(-$2020)
+    sta multiply_store
+    lda #.hibyte(-$2020)
+    jsr multiply
+;:
+    ;jmp :-
+
+
     ; setup pointers (TODO)
     store16into #ltx_lo, lx_lo_ptr
     store16into #ltx_hi, lx_hi_ptr
@@ -212,16 +204,69 @@ main:
     store16into #rty_hi, ry_hi_ptr
     lda #12
     sta level_length
-    lda #128
-    sta p1_dir
 
     bankswitch_to ppu_load_4x4_pixels_chr
     jsr ppu_load_4x4_pixels_chr
+    store16into #sprites_chr, ptr_temp
+    jsr decompress_tokumaru
+.if 0
+    ldx #0
+    stx PPUADDR
+    stx PPUADDR
+    store16into #sprites_chr, ptr_temp
+    jsr decompress_tokumaru
+    store16into #menu_sprites_chr, ptr_temp
+    jsr decompress_tokumaru
+    jsr ppu_init_rad_menu
+.endif
+
+    lda #128
+    sta p1_dir
+
 
     lda #PPUCTRL_NMI_ON | PPUCTRL_8X16_SPR
-    bit PPUSTATUS
     sta PPUCTRL
-    jmp update_return
+loop:
+    lda nmi_counter
+:
+    cmp nmi_counter
+    beq :-
+
+    lda #0
+    sta frame_ready
+
+    jsr read_gamepads
+
+    ;bankswitch_to update_menu
+    ;jsr update_menu
+
+    bankswitch_to clear_nt_buffer
+    jsr clear_nt_buffer
+
+    ;lda #PPUMASK_BG_ON | PPUMASK_GRAYSCALE | PPUMASK_EMPHASIZE_B | PPUMASK_NO_BG_CLIP
+    ;ora #PPUMASK_SPR_ON | PPUMASK_NO_SPR_CLIP
+    ;sta PPUMASK
+
+    jsr p1_move
+    ;lda #SPLITSCREEN_LEFT
+    lda #0
+    sta line_splitscreen
+    jsr render
+    ;lda #SPLITSCREEN_RIGHT
+    ;sta line_splitscreen
+    ;jsr render
+
+    ;lda #PPUMASK_BG_ON | PPUMASK_GRAYSCALE | PPUMASK_EMPHASIZE_R | PPUMASK_NO_BG_CLIP
+    ;ora #PPUMASK_SPR_ON | PPUMASK_NO_SPR_CLIP
+    ;sta PPUMASK
+
+    jsr prepare_game_sprites
+
+    lda #1 
+    sta frame_ready
+    inc frame_number
+    jmp loop
+
 .endproc
 
 .segment "SMALL_TABLES"
@@ -261,9 +306,10 @@ bottom_pixel_pattern_table:
 
 .segment "CHR"
 sprites_chr:
-    .incbin "sprpack.cchr"
-rad_chr:
+    .incbin "spr16.cchr"
     .incbin "rad.cchr"
+menu_sprites_chr:
+    .incbin "rad316.cchr"
 
 .proc ppu_load_4x4_pixels_chr
     ldx #0

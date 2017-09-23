@@ -8,110 +8,152 @@
 
 .segment "CODE"
 
-PSPEED = 128
-PTURN = 3
+PSPEED = 128*3/2
+PTURN = 3*3/2
+
+dir_accel_table_left:
+.repeat 8, i
+    .byt .lobyte((20*i)-1)
+.endrepeat
+dir_accel_table_right:
+.repeat 8, i
+    .byt (20*i)
+.endrepeat
 
 .repeat 2, i
 .proc P i, _move 
-    ldy P i, _buttons_held       ; Keep buttons_held in Y.
+    ;ldy frames_since_movement_update
+    ;bne :+
+    ;rts
+;:
+    ;cpy #8
+    ;bcc :+
+    ;ldy #8
+;:
 
     ; Left/Right: Change direction
-    ldx P i, _dir
-    tya
-    and #BUTTON_LEFT
+    lax P i, _buttons_held
+    anc #BUTTON_LEFT | BUTTON_RIGHT
+    bne checkLeft
+    ; TODO
+    lda P i, _dir_speed
+    cmp #$80
+    ;arr #$FF
+    ror
+    sta P i, _dir_speed
+    jmp doneLeftRight
+checkLeft:
+    anc #BUTTON_LEFT    ; Clears carry
     beq notPressingLeft
-    txa
-    axs #PTURN
+    lda P i, _dir_speed
+    ;sbc dir_accel_table_left, y
+    sbc #50-1
+    bvs :+
+    sta P i, _dir_speed
+:
 notPressingLeft:
-    tya
-    and #BUTTON_RIGHT
+    txa                 ; X = buttons_held
+    anc #BUTTON_RIGHT   ; Clears carry
     beq notPressingRight
-    txa
-    axs #.lobyte(-PTURN)
+    lda P i, _dir_speed
+    adc #50
+    bvs :+
+    sta P i, _dir_speed
+:
 notPressingRight:
-    stx P i, _dir
+doneLeftRight:
 
-    ; Up/Down: Move forwards/backwards
-    tya
-    and #BUTTON_UP
-    beq notPressingUp
-
-    lda P i, _dir
-    jsr setup_cos
-    lda #PSPEED
-    sta multiply_store
-    lda #0
-    jsr multiply
-    clc
-    adc P i, _x
-    sta P i, _x
-    txa
-    adc 1 + P i, _x
-    sta 1 + P i, _x
-
-    lda P i, _dir
-    jsr setup_sin
-    lda #PSPEED
-    sta multiply_store
-    lda #0
-    jsr multiply
-    clc
-    adc P i, _y
-    sta P i, _y
-    txa
-    adc 1 + P i, _y
-    sta 1 + P i, _y
-notPressingUp:
-
-    ; Up/Down: Move forwards/backwards
-    lda p1_buttons_held
-    and #BUTTON_DOWN
-    beq notPressingDown
-
-    lda P i, _dir
-    clc
-    adc #128
-    jsr setup_cos
-    lda #64
-    sta multiply_store
-    lda #0
-    jsr multiply
-    clc
-    adc P i, _x
-    sta P i, _x
-    txa
-    adc 1 + P i, _x
-    sta 1 + P i, _x
-
-    lda P i, _dir
-    clc
-    adc #128
-    jsr setup_sin
-    lda #64
-    sta multiply_store
-    lda #0
-    jsr multiply
-    clc
-    adc P i, _y
-    sta P i, _y
-    txa
-    adc 1 + P i, _y
-    sta 1 + P i, _y
-notPressingDown:
-
-    lda P i, _buttons_held
+    ; A: Turn (debug)
+    txa                 ; X = buttons_held
     and #BUTTON_A
-    beq :+
-    inc camera_height
-    inc camera_height
-:
+    beq notPressingA
+    inc 1+P i, _dir
+    inc 1+P i, _dir
+notPressingA:
 
-    lda P i, _buttons_held
-    and #BUTTON_B
-    beq :+
-    dec camera_height
-    dec camera_height
-:
+
+    ; B: Accelerate
+    txa                 ; X = buttons_held
+    anc #BUTTON_B       ; Clears carry
+    beq notPressingB
+    lda P i, _speed
+    adc #4
+    cmp #100
+    bcc storeSpeed
+    jmp doneAccelerate
+notPressingB:
+    ; De-accelerate
+    lda P i, _speed
+    sbc #3
+    bcs storeSpeed
+    lda #0
+storeSpeed:
+    sta P i, _speed
+doneAccelerate:
+
+    ; Apply dir_speed to dir
+    ldx #0
+    lda P i, _dir_speed ; set N flag for setup_multiply
+    clv                 ; set V flag for setup_multiply
+    jsr setup_multiply
+
+    lda P i, _speed
+    sta multiply_store
+    ldx #0
+    jsr multiply+1
+    stx subroutine_temp
+    .repeat 4
+        asl
+        rol subroutine_temp
+    .endrepeat
+    clc
+    adc 0+P i, _dir
+    sta 0+P i, _dir
+    lda subroutine_temp
+    adc 1+P i, _dir
+    sta 1+P i, _dir
+
+    ; Apply speed
+    lda 1+P i, _dir
+    jsr setup_cos
+    lda P i, _speed
+    sta multiply_store
+    ldx #0
+    jsr multiply+1
+    clc
+    adc P i, _x
+    sta P i, _x
+    txa
+    adc 1 + P i, _x
+    sta 1 + P i, _x
+
+    lda 1+P i, _dir
+    jsr setup_sin
+    lda P i, _speed
+    sta multiply_store
+    lda #0
+    jsr multiply
+    clc
+    adc P i, _y
+    sta P i, _y
+    txa
+    adc 1 + P i, _y
+    sta 1 + P i, _y
+
+
+    ;lda P i, _buttons_held
+    ;and #BUTTON_A
+    ;beq :+
+    ;inc camera_height
+    ;inc camera_height
+;:
+
+    ;lda P i, _buttons_held
+    ;and #BUTTON_B
+    ;beq :+
+    ;dec camera_height
+    ;dec camera_height
+;:
 
     ; Check if we're ahead
     ;int a = to_signed(c.x - l[0].x) * to_signed(l[1].y - l[0].y);

@@ -18,7 +18,7 @@ version := 0.01
 # PRG ROM.  If it gets too long for one line, you can add a backslash
 # (the \ character) at the end of the line and continue on the next.
 objlist := nrom init main globals palette line line_unrolled sprites player \
-           multiply transform tokumaru
+           multiply transform tokumaru menu gamepad
 
 
 AS65 := ca65
@@ -56,14 +56,15 @@ map.txt $(title).nes: uxrom.cfg $(objlistntsc)
 
 $(objdir)/%.o: $(srcdir)/%.s $(srcdir)/nes.inc $(srcdir)/globals.inc \
                $(srcdir)/clip.inc $(srcdir)/sin.inc $(srcdir)/recip.inc \
-               $(srcdir)/foo.level.inc
+               $(srcdir)/foo.level.inc $(srcdir)/rad.inc \
+               $(srcdir)/metasprites.inc
 	$(AS65) $(CFLAGS65) $< -o $@
 
 $(objdir)/%.o: $(objdir)/%.s
 	$(AS65) $(CFLAGS65) $< -o $@
 
 # Files that depend on .incbin'd files
-$(objdir)/main.o: $(srcdir)/spr16.cchr
+$(objdir)/main.o: $(srcdir)/sprpack.cchr $(srcdir)/rad.cchr 
 
 # Rules for CHR ROM
 
@@ -75,25 +76,28 @@ $(srcdir)/%.cchr: $(srcdir)/%.chr
 
 # cpp
 chrc: chrc.cpp
-	 $(CXX) -std=c++14 $< -o $@
+	 $(CXX) -std=c++17 $< -o $@
 
 line: line.cpp
-	 $(CXX) -std=c++14 $< -o $@
+	 $(CXX) -std=c++17 $< -o $@
 
 clip: clip.cpp
-	 $(CXX) -std=c++14 $< -o $@
+	 $(CXX) -std=c++17 $< -o $@
 
 editor: editor.cpp
-	 $(CXX) -std=c++14 $< -o $@ -lsfml-system -lsfml-graphics -lsfml-window
+	 $(CXX) -std=c++17 $< -o $@ -lsfml-system -lsfml-graphics -lsfml-window
 
 3d: 3d.cpp
-	 $(CXX) -std=c++14 $< -o $@ -lsfml-system -lsfml-graphics -lsfml-window
+	 $(CXX) -std=c++17 $< -o $@ -lsfml-system -lsfml-graphics -lsfml-window
 
 sin: sin.cpp
-	 $(CXX) -std=c++14 $< -o $@
+	 $(CXX) -std=c++17 $< -o $@
 
 recip: recip.cpp
-	 $(CXX) -std=c++14 $< -o $@
+	 $(CXX) -std=c++17 $< -o $@
+
+rad: rad.cpp
+	 $(CXX) -std=c++17 $< -o $@
 
 $(srcdir)/line.chr: chrc
 	./chrc $@
@@ -110,6 +114,18 @@ $(srcdir)/clip.inc: clip
 $(srcdir)/recip.inc: recip
 	./recip $@
 
+$(srcdir)/sprpack.chr: $(srcdir)/rad316.chr $(srcdir)/menutext16.chr
+	cat $^ > $@
+
+$(srcdir)/rad.inc: rad $(srcdir)/rad16.chr $(srcdir)/rad216.chr  $(srcdir)/rad316.chr
+	./rad $(srcdir)/rad16.chr $(srcdir)/rad216.chr $(srcdir)/rad316.chr $(srcdir)/rad.chr $@
+
 tokumaru: tokumaru.cc
-	g++ -std=c++14 -o "$@" "$<" $(CXXFLAGS)
+	g++ -std=c++17 -o "$@" "$<" $(CXXFLAGS)
+
+metaspritegen: metaspritegen.cpp
+	 $(CXX) -std=c++17 $< -o $@
+
+$(srcdir)/metasprites.inc: metaspritegen
+	./metaspritegen $@
 

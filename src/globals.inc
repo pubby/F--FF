@@ -10,6 +10,9 @@ rom_bank = $3FFF
 FB_READY  = 1 << 0
 FPS_READY = 1 << 1
 
+SPLITSCREEN_LEFT = 1
+SPLITSCREEN_RIGHT = 2
+
 draw_line_octant1 = $0300
 
 Dx_sub      = 0 ; 1 byte
@@ -20,12 +23,26 @@ rounded_Dx  = 6 ; 1 byte
 rounded_Dy  = 7 ; 1 byte
 to_out_code = 6 ; 1 byte, shared with rounded_Dx
 
+menu_state = scratchpad+0
+menu_data = scratchpad+1
+menu_timer = scratchpad+2
+menu_scroll = scratchpad+3
+menu_icy_x = scratchpad+4
+menu_spicy_x = scratchpad+5
+menu_dicey_x = scratchpad+6
+menu_cursor = scratchpad+7
+menu_update_ptr = scratchpad+8 ; 2 bytes
+
+MENU_2P = 1
+MENU_SHOW_CURSOR = 2
+
+
 multiply = $78
 .define multiply_label(l, o) .lobyte(multiply + .ident(.sprintf("mvar_%s", .string(l))) - multiply_code + o)
 
 .macro bankswitch bank
-    lda banktable+bank
-    sta banktable+bank
+    lda #bank
+    sta *-1
 .endmacro
 
 .macro bankswitch_y
@@ -34,8 +51,8 @@ multiply = $78
 .endmacro
 
 .macro bankswitch_to label
-    lda banktable+.lobyte(.bank(label))
-    sta banktable+.lobyte(.bank(label))
+    lda #.lobyte(.bank(label))
+    sta *-1
 .endmacro
 
 .globalzp debug
@@ -45,18 +62,14 @@ multiply = $78
 .globalzp nmi_x
 .globalzp nmi_y
 .globalzp nmi_bank
+.globalzp nmi_ptr
 
 .globalzp nmi_counter
 .globalzp frame_number
 .globalzp frame_ready
 .globalzp subframes_left
 
-.globalzp rng_state
-
-.globalzp px
-.globalzp py
-.globalzp fx
-.globalzp fy
+.globalzp update_ptr
 
 ; Game
 .globalzp p1
@@ -66,6 +79,7 @@ multiply = $78
 .globalzp p1_y
 .globalzp p1_dir
 .globalzp p1_speed
+.globalzp p1_dir_speed
 
 .globalzp p2
 .globalzp p2_buttons_held
@@ -74,6 +88,7 @@ multiply = $78
 .globalzp p2_y
 .globalzp p2_dir
 .globalzp p2_speed
+.globalzp p2_dir_speed
 
 .globalzp level_length
 
@@ -95,6 +110,8 @@ multiply = $78
 .globalzp to_x
 .globalzp to_y_sub
 .globalzp to_y
+
+.globalzp line_splitscreen
 
 .globalzp l1100
 .globalzp l1010
@@ -203,5 +220,8 @@ multiply = $78
 .global mvar_last_branch
 .global mvar_FF
 .global multiply_code_end
+
+; Palette
+.global palette_buffer
 
 .endif

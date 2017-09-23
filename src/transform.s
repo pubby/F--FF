@@ -468,7 +468,7 @@ cull:
 
     sec
     lda #64
-    sbc p1_dir
+    sbc 1+p1_dir
     jsr setup_cos
     ldy #draw_distance - 1
 cosLoop:
@@ -521,7 +521,7 @@ cosLoop:
 
     sec
     lda #64
-    sbc p1_dir
+    sbc 1+p1_dir
     jsr setup_sin
     ldy #draw_distance - 1
 sinLoop:

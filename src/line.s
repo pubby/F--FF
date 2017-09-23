@@ -417,11 +417,25 @@ posDy:
     ; Neg Dx
     .scope clipNegX
         clip sub
+        lda line_splitscreen
+        beq :+
+        cmp #SPLITSCREEN_RIGHT
+        ror from_x
+        cmp #SPLITSCREEN_RIGHT
+        ror to_x
+    :
         bressenham sub
     .endscope
 posDx:
     .scope clipPosX
         clip add
+        lda line_splitscreen
+        beq :+
+        cmp #SPLITSCREEN_RIGHT
+        ror from_x
+        cmp #SPLITSCREEN_RIGHT
+        ror to_x
+    :
         bressenham add
     .endscope
 .endproc
