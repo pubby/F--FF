@@ -10,6 +10,7 @@
 .import render
 .import init_menu
 .import read_gamepads
+.import init_flag
 
 .export main, nmi_handler, irq_handler, nmi_return
 .export update_return
@@ -105,6 +106,7 @@ return:
 
 .segment "CODE"
 
+; 4+3+3+4+3+2+4+5 = 28 cycles
 .proc nmi_handler
     pha
     stx nmi_x
@@ -156,7 +158,7 @@ update_return:
 
 main:
     jsr ppu_set_palette
-    jmp init_menu
+    jmp init_flag
 .proc init_game
     ldx #0
     stx PPUMASK

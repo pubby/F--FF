@@ -103,6 +103,7 @@ depthpad_rx_hi: .res pad_size
 depthpad_ry_lo: .res pad_size
 depthpad_ry_hi: .res pad_size
 
+.align 256
 nt_buffer: .res 32*22
 
 palette_buffer: .res 32

@@ -20,15 +20,20 @@ palette:
     ;.byt $0F,$11,$2C,$3A, $0F,$11,$2C,$26, $0F,$21,$24,$28, $0F,$21,$24,$28
 
     ; MENU PALETTE:
-    .byt $20,$29,$16,$33
-    .byt $20,$29,$16,$22
-    .byt $20,$11,$16,$33
-    .byt $20,$11,$16,$22
+    .byt $25,$2A,$02,$0F
+    .byt $25,$2A,$02,$0F
+    .byt $25,$06,$02,$0F
+    .byt $25,$06,$02,$0F
 
-    .byt $20,$11,$24,$20
-    .byt $20,$20,$0F,$20
-    .byt $20,$11,$24,$20
-    .byt $20,$20,$11,$24
+    ;.byt $20,$2A,$15,$0F
+    ;.byt $20,$2A,$15,$0F
+    ;.byt $20,$0F,$15,$0F
+    ;.byt $20,$0F,$15,$0F
+
+    .byt $20,$06,$24,$20
+    .byt $25,$20,$0F,$20
+    .byt $25,$11,$0F,$20
+    .byt $25,$20,$11,$24
 
 .segment "CODE"
 ; Clobbers A, X. Preserves Y.
@@ -51,13 +56,12 @@ copyPaletteLoop:
 .segment "NMI_CODE"
 
 .proc ppu_copy_palette_buffer
-    ppu_palette_address = $3F00
-    lda #.hibyte(ppu_palette_address)
-    sta PPUADDR
-    lda #.lobyte(ppu_palette_address)
-    sta PPUADDR
+    storePPUADDR #$3F00
+    lda palette_buffer
     .repeat 32, i
-        lda palette_buffer+i
+        .if ((i .mod 4) <> 0) | (i = 16)
+            lda palette_buffer+i
+        .endif
         sta PPUDATA
     .endrepeat
     rts

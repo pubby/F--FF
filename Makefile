@@ -18,7 +18,7 @@ version := 0.01
 # PRG ROM.  If it gets too long for one line, you can add a backslash
 # (the \ character) at the end of the line and continue on the next.
 objlist := nrom init main globals palette line line_unrolled sprites player \
-           multiply transform tokumaru menu gamepad
+           multiply transform tokumaru menu gamepad delay flag
 
 
 AS65 := ca65
@@ -57,7 +57,8 @@ map.txt $(title).nes: uxrom.cfg $(objlistntsc)
 $(objdir)/%.o: $(srcdir)/%.s $(srcdir)/nes.inc $(srcdir)/globals.inc \
                $(srcdir)/clip.inc $(srcdir)/sin.inc $(srcdir)/recip.inc \
                $(srcdir)/foo.level.inc $(srcdir)/rad.inc \
-               $(srcdir)/metasprites.inc
+               $(srcdir)/metasprites.inc $(srcdir)/flag_nt.inc \
+               $(srcdir)/sin_scroll.inc $(srcdir)/flag_chr.inc
 	$(AS65) $(CFLAGS65) $< -o $@
 
 $(objdir)/%.o: $(objdir)/%.s

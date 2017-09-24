@@ -1,5 +1,6 @@
 .include "globals.inc"
 
+.import clear_remaining_cpu_oam
 .import nmi_return
 .import prepare_menu_sprites
 .import ppu_copy_palette_buffer
@@ -52,10 +53,11 @@ doneNTSwaps:
 
 .segment "CODE"
 .proc init_menu
-    lda #0
-    sta menu_scroll
-    sta PPUMASK
-    sta PPUCTRL
+    ldx #0
+    stx menu_scroll
+    stx PPUMASK
+    stx PPUCTRL
+    jsr clear_remaining_cpu_oam
     store16into #update_menu, update_ptr
     store16into #menu_nmi, nmi_ptr
 
@@ -222,15 +224,15 @@ doneStart:
 
     ldx menu_cursor
     bne notCursor0
-        lda #$33
+        lda #$2C
         jmp storePalette
 notCursor0:
     dex
     bne notCursor1
-        lda #$35
+        lda #$25
         jmp storePalette
 notCursor1:
-        lda #$39
+        lda #$29
 storePalette:
     sta palette_buffer+3
     sta palette_buffer+11

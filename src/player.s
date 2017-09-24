@@ -78,7 +78,7 @@ notPressingA:
     beq notPressingB
     lda P i, _speed
     adc #4
-    cmp #100
+    cmp #120
     bcc storeSpeed
     jmp doneAccelerate
 notPressingB:
