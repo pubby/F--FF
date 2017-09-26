@@ -121,7 +121,50 @@ static std::vector<animation_t> const animations =
         },
     }},
 
-};
+    { "ship", 0, 0, 0, {
+        { 
+            { 8* 0, 0, PATTERN(0x30), 0 },
+            { 8* 1, 3, PATTERN(0x31), 0 },
+            { 8* 2, 3, PATTERN(0x32), 0 },
+            { 8* 3, 3, PATTERN(0x32), HFLIP },
+            { 8* 4, 3, PATTERN(0x31), HFLIP },
+            { 8* 5, 0, PATTERN(0x30), HFLIP },
+
+            { 8* 0, 16+0, PATTERN(0x40), 0 },
+            { 8* 1, 16+3, PATTERN(0x41), 0 },
+            { 8* 2, 16+3, PATTERN(0x42), 0 },
+            { 8* 3, 16+3, PATTERN(0x42), HFLIP },
+            { 8* 4, 16+3, PATTERN(0x41), HFLIP },
+            { 8* 5, 16+0, PATTERN(0x40), HFLIP },
+        },
+    }},
+
+    { "shadow", 0, 0, 0, {
+        { 
+            { 8* 2, 0, PATTERN(0x35), 0 },
+            { 8* 3, 0, PATTERN(0x35), HFLIP },
+
+            { 8* 1, 1, PATTERN(0x34), 0 },
+            { 8* 4, 1, PATTERN(0x34), HFLIP },
+
+            { 8* 5, 3, PATTERN(0x33), HFLIP },
+            { 8* 0, 3, PATTERN(0x33), 0 },
+        },
+    }},
+
+    { "shadow_tight", 0, 0, 0, {
+        { 
+            { 8* 2, 0, PATTERN(0x35), 0 },
+            { 8* 3, 0, PATTERN(0x35), HFLIP },
+
+            { 8* 1, 1, PATTERN(0x34), 0 },
+            { 8* 4, 1, PATTERN(0x34), HFLIP },
+
+            { 8* 5-2, 2, PATTERN(0x33), HFLIP },
+            { 8* 0+2, 2, PATTERN(0x33), 0 },
+        },
+    }},
+} ;
 
 int get_width(std::vector<sprite_t> const& sprites)
 {

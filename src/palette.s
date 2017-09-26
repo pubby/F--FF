@@ -1,18 +1,30 @@
 .include "globals.inc"
 
-.export ppu_set_palette
 .export ppu_copy_palette_buffer
-.export palette
+.export icy_palette
+.export menu_palette
 
 .segment "RODATA"
-palette:
-    ; BLUE PALETTE:
-    ;.byt $0F,$13,$03,$13, $0F,$22,$12,$22, $0F,$31,$21,$31, $0F,$20,$31,$20
-    ;.byt $0F,$11,$2C,$3A, $0F,$11,$2C,$26, $0F,$21,$24,$28, $0F,$21,$24,$28
+icy_palette:
+    .if 0
+    .byt $0F,$13,$03,$13
+    .byt $0F,$22,$12,$22
+    .byt $0F,$31,$21,$31
+    .byt $0F,$20,$31,$20
 
-    ; RED PALETTE:
-    ;.byt $0F,$14,$04,$14, $0F,$25,$15,$25, $0F,$36,$26,$36, $0F,$27,$37,$27
-    ;.byt $0F,$11,$2C,$3A, $0F,$11,$2C,$26, $0F,$21,$24,$28, $0F,$21,$24,$28
+    .byt $0F,$11,$2C,$3A
+    .byt $0F,$11,$2C,$26
+    .byt $0F,$01,$01,$01
+    .byt $0F,$21,$24,$28
+.endif
+
+spicy_palette:
+    .byt $0F,$14,$04,$14, $0F,$25,$15,$25, $0F,$36,$26,$36, $0F,$27,$37,$27
+
+    .byt $0F,$2C,$26,$11
+    .byt $0F,$01,$0C,$0A
+    .byt $0F,$01,$01,$01
+    .byt $0F,$21,$24,$28
     ;.byt $0F,$15,$27,$39, $0F,$15,$27,$2B, $0F,$21,$24,$28, $0F,$21,$24,$28
 
     ; GREEN PALETTE:
@@ -20,38 +32,16 @@ palette:
     ;.byt $0F,$11,$2C,$3A, $0F,$11,$2C,$26, $0F,$21,$24,$28, $0F,$21,$24,$28
 
     ; MENU PALETTE:
+menu_palette:
     .byt $25,$2A,$02,$0F
     .byt $25,$2A,$02,$0F
     .byt $25,$06,$02,$0F
     .byt $25,$06,$02,$0F
-
-    ;.byt $20,$2A,$15,$0F
-    ;.byt $20,$2A,$15,$0F
-    ;.byt $20,$0F,$15,$0F
-    ;.byt $20,$0F,$15,$0F
 
     .byt $20,$06,$24,$20
     .byt $25,$20,$0F,$20
     .byt $25,$11,$0F,$20
     .byt $25,$20,$11,$24
-
-.segment "CODE"
-; Clobbers A, X. Preserves Y.
-.proc ppu_set_palette
-    ppu_palette_address = $3F00
-    lda #.hibyte(ppu_palette_address)
-    sta PPUADDR
-    lda #.lobyte(ppu_palette_address)
-    sta PPUADDR
-    ldx #0
-copyPaletteLoop:
-    lda palette, x
-    sta PPUDATA
-    inx
-    cpx #32
-    bne copyPaletteLoop
-    rts
-.endproc
 
 .segment "NMI_CODE"
 

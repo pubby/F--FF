@@ -64,12 +64,22 @@ notPressingRight:
 doneLeftRight:
 
     ; A: Turn (debug)
+    ldy p1_lift
     txa                 ; X = buttons_held
     and #BUTTON_A
-    beq notPressingA
-    inc 1+P i, _dir
-    inc 1+P i, _dir
-notPressingA:
+    bne pressingA
+    iny
+    cpy #7
+    bcc storeLift
+    ldy #7
+    jmp storeLift
+pressingA:
+    dey
+    cpy #4
+    bcs storeLift
+    ldy #4
+storeLift:
+    sty p1_lift
 
 
     ; B: Accelerate
@@ -78,7 +88,7 @@ notPressingA:
     beq notPressingB
     lda P i, _speed
     adc #4
-    cmp #120
+    cmp #140
     bcc storeSpeed
     jmp doneAccelerate
 notPressingB:

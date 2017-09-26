@@ -229,7 +229,6 @@ infiniteLoop:
 .endproc
 
 .segment "SMALL_TABLES"
-.align 64
 flag_pal0:
     .byt $0F,$20,$0F,$20
     .byt $0F,$0F,$20,$0F

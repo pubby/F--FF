@@ -1,7 +1,6 @@
 .include "globals.inc"
 
 .import decompress_tokumaru
-.import ppu_set_palette
 .import prepare_game_sprites
 .import setup_cos, setup_sin
 .importzp multiply_store
@@ -11,6 +10,9 @@
 .import init_menu
 .import read_gamepads
 .import init_flag
+.import ppu_copy_palette_buffer
+.import icy_palette
+.import init_game_sprites
 
 .export main, nmi_handler, irq_handler, nmi_return
 .export update_return
@@ -53,6 +55,8 @@
     lda #.hibyte(CPU_OAM)
     sta OAMDMA
 
+    jsr ppu_copy_palette_buffer
+
     ldx #$00
     stx PPUMASK
     ldx #$20
@@ -62,7 +66,7 @@
     dex
     bne :-
 .endrepeat
-    ldx #$A8
+    ldx #$83
 :
     lda $00
     dex
@@ -114,10 +118,12 @@ return:
     lda $8000 ; current bank
     sta nmi_bank
     bankswitch_to game_nmi
+    sta debug
     jmp (nmi_ptr)
 .endproc
 
 .proc nmi_return
+    sta debug
     ; Restore registers and return.
     ldy nmi_bank
     bankswitch_y
@@ -144,12 +150,13 @@ update_return:
     lda #0
     sta frame_ready
 
+    jsr prepare_game_sprites
+
     bankswitch_to clear_nt_buffer
     jsr clear_nt_buffer
     jsr read_gamepads
     jsr p1_move
     jsr render
-    jsr prepare_game_sprites
 
     lda #1 
     sta frame_ready
@@ -157,8 +164,8 @@ update_return:
 .endproc
 
 main:
-    jsr ppu_set_palette
-    jmp init_flag
+    jmp init_menu
+    ;jmp init_flag
 .proc init_game
     ldx #0
     stx PPUMASK
@@ -166,7 +173,6 @@ main:
     stx subframes_left
     inx                 ; X = 1
     stx frame_ready
-    jsr ppu_set_palette
     store16into #game_nmi, nmi_ptr
     store16into #update_game, update_ptr
 
@@ -200,6 +206,19 @@ main:
 
     jsr copy_multiply_code
 
+
+    ; Palette
+    ldx #0
+paletteLoop:
+    lda icy_palette, x
+    sta palette_buffer, x
+    inx
+    cpx #32
+    bne paletteLoop
+
+    ; Sprites
+    jsr init_game_sprites
+
     lda #128
     sta camera_height
 
@@ -214,11 +233,15 @@ main:
     store16into #rty_hi, ry_hi_ptr
     lda #12
     sta level_length
-    lda #128
-    sta p1_dir
 
     bankswitch_to ppu_load_4x4_pixels_chr
     jsr ppu_load_4x4_pixels_chr
+
+    lda #0
+    sta p1_dir_speed
+    sta p1_dir+0
+    lda #180
+    sta p1_dir+1
 
     lda #PPUCTRL_NMI_ON | PPUCTRL_8X16_SPR
     bit PPUSTATUS

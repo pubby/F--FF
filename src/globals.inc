@@ -80,6 +80,7 @@ multiply = $78
 .globalzp p1_dir
 .globalzp p1_speed
 .globalzp p1_dir_speed
+.globalzp p1_lift
 
 .globalzp p2
 .globalzp p2_buttons_held
@@ -89,6 +90,7 @@ multiply = $78
 .globalzp p2_dir
 .globalzp p2_speed
 .globalzp p2_dir_speed
+.globalzp p2_lift
 
 .globalzp level_length
 

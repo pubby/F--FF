@@ -27,6 +27,7 @@ p1_y:     .res 2
 p1_dir:   .res 2
 p1_speed: .res 2
 p1_dir_speed: .res 1
+p1_lift: .res 1
 
 p2:
 p2_buttons_held: .res 1
@@ -36,6 +37,7 @@ p2_y:     .res 2
 p2_dir:   .res 2
 p2_speed: .res 2
 p2_dir_speed: .res 1
+p2_lift: .res 1
 
 level_length: .res 2
 

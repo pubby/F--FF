@@ -1,10 +1,15 @@
 .include "globals.inc"
 
 .export clear_remaining_cpu_oam
+.export init_game_sprites
 .export prepare_blank_sprites
 .export prepare_game_sprites
 .export prepare_metasprite
 .export prepare_menu_sprites
+
+OAM_SHIP = CPU_OAM + 0
+OAM_SHADOW = CPU_OAM + 12*4
+OAM_START = OAM_SHADOW + 6*4
 
 .segment "RODATA"
 .include "metasprites.inc"
@@ -20,12 +25,12 @@ draw_y = 1
 ; This writes sprite data to CPU_OAM. Does not write to PPU.
 ; Clobbers A, X, Y.
 .proc prepare_game_sprites
-    ; Use X as an index into CPU_OAM. The 'prepare_sprite' functions will
-    ; use and increment X as they write to 'CPU_OAM'.
-    ldx #0
-
     ; Write to CPU_OAM.
     jsr prepare_player_sprites
+
+    ; Use X as an index into CPU_OAM. The 'prepare_sprite' functions will
+    ; use and increment X as they write to 'CPU_OAM'.
+    ldx #.lobyte(OAM_START)
 
     ; Clear the remaining portion of CPU_OAM so that unused/glitchy
     ; sprites aren't drawn.
@@ -47,76 +52,213 @@ clearOAMLoop:
 .endproc
 
 ship_y_offsets:
-    .byt  <+3, <+2, <+1, <-0, <-1, <-2, $FF, $FF
-    .byt  <+2, <+1, <+0, <-0, <-1, <-2, $FF, $FF
-    .byt  <+1, <+0, <+0, <-0, <-0, <-1, $FF, $FF
-    .byt  <+0, <+0, <+0, <+0, <+0, <+0, $FF, $FF
-    .byt  <-1, <+0, <+0, <+0, <+0, <+1, $FF, $FF
-    .byt  <-2, <-1, <+0, <+0, <+1, <+2, $FF, $FF
-    .byt  <-2, <-1, <+0, <+1, <+2, <+3, $FF, $FF
-    .byt  <-2, <-1, <+0, <+1, <+2, <+3, $FF, $FF
+    .byt  <(+3-4), <+2, <+1, <-0, <-1, <(-2-4), $FF, $FF
+    .byt  <(+2-4), <+1, <+0, <-0, <-1, <(-2-4), $FF, $FF
+    .byt  <(+1-4), <+0, <+0, <-0, <-0, <(-1-4), $FF, $FF
+    .byt  <(+0-4), <+0, <+0, <+0, <+0, <(+0-4), $FF, $FF
+    .byt  <(+0-4), <+0, <+0, <+0, <+0, <(+0-4), $FF, $FF
+    .byt  <(-1-4), <+0, <+0, <+0, <+0, <(+1-4), $FF, $FF
+    .byt  <(-2-4), <-1, <+0, <+0, <+1, <(+2-4), $FF, $FF
+    .byt  <(-2-4), <-1, <+0, <+1, <+2, <(+3-4), $FF, $FF
+    .byt  <(-2-4), <-1, <+0, <+1, <+2, <(+3-4), $FF, $FF
+
+.proc init_game_sprites
+    ldx #0
+    jsr clear_remaining_cpu_oam
+
+    ; x-positions
+    .repeat 6, i
+        lda #104+8*i
+        ; Ship
+        sta OAM_SHIP+(4*(i+0))+3
+        sta OAM_SHIP+(4*(i+6))+3
+        ; Shadow
+        sta OAM_SHADOW+(4*(i))+3
+    .endrepeat
+
+    ; ship patterns
+    .repeat 3, i
+        lda #PATTERN($30+i)
+        sta OAM_SHIP+(4*(i+0))+1
+        lda #PATTERN($40+i)
+        sta OAM_SHIP+(4*(i+6))+1
+        lda #PATTERN($30+2-i)
+        sta OAM_SHIP+(4*(i+3))+1
+        lda #PATTERN($40+2-i)
+        sta OAM_SHIP+(4*(i+9))+1
+    .endrepeat
+
+    ; attributes
+    lda #%01000000
+    ldx #%00100001
+    sax OAM_SHIP+(4*0)+2
+    sax OAM_SHIP+(4*1)+2
+    sax OAM_SHIP+(4*2)+2
+    sax OAM_SHIP+(4*6)+2
+    sax OAM_SHIP+(4*7)+2
+    sax OAM_SHIP+(4*8)+2
+    stx OAM_SHADOW+(4*0)+2
+    stx OAM_SHADOW+(4*1)+2
+    stx OAM_SHADOW+(4*2)+2
+
+    ldx #%01000001
+    sax OAM_SHIP+(4*3)+2
+    sax OAM_SHIP+(4*4)+2
+    sax OAM_SHIP+(4*5)+2
+    sax OAM_SHIP+(4*9)+2
+    sax OAM_SHIP+(4*10)+2
+    sax OAM_SHIP+(4*11)+2
+    stx OAM_SHADOW+(4*3)+2
+    stx OAM_SHADOW+(4*4)+2
+    stx OAM_SHADOW+(4*5)+2
+
+    ; ship patterns
+    .repeat 3, i
+        lda #PATTERN($30+i)
+        sta OAM_SHIP+(4*(i+0))+1
+        lda #PATTERN($40+i)
+        sta OAM_SHIP+(4*(i+6))+1
+        lda #PATTERN($30+2-i)
+        sta OAM_SHIP+(4*(i+3))+1
+        lda #PATTERN($40+2-i)
+        sta OAM_SHIP+(4*(i+9))+1
+    .endrepeat
+
+    ; shadow patterns
+    .repeat 3, i
+        lda #PATTERN($35+i)
+        sta OAM_SHADOW+(4*(i))+1
+        sta OAM_SHADOW+(4*(5-i))+1
+    .endrepeat
+
+    ; y - positions
+    lda #154+32
+    .repeat 6, i
+        sta OAM_SHADOW+(4*(i))+0
+    .endrepeat
+    rts
+.endproc
 
 .proc prepare_player_sprites
+    ; y-positions
     lda p1_dir_speed
     cmp #$80
     arr #%11100000
     ror
     adc #4*8
     tay
-
-    ; y-positions
+    sec
     .repeat 6, i
         lda #154
-        clc
         adc ship_y_offsets+i, y
-        sta CPU_OAM+(4*(i+0))+0, x
+        sbc p1_lift
+        sta OAM_SHIP+(4*(i+0))+0
     .endrepeat
     .repeat 6, i
         lda #154+16
-        clc
         adc ship_y_offsets+i, y
-        sta CPU_OAM+(4*(i+6))+0, x
+        sbc p1_lift
+        sta OAM_SHIP+(4*(i+6))+0
+    .endrepeat
+
+    lda p1_buttons_held
+    and #BUTTON_LEFT | BUTTON_RIGHT
+    beq noFlaps
+    cmp #BUTTON_LEFT | BUTTON_RIGHT
+    beq noFlaps
+    and #BUTTON_LEFT
+    beq :+
+    lda #PATTERN($34)
+    sta OAM_SHIP+(4*0)+1
+    lda frame_number
+    anc #%110
+    adc #PATTERN($44)
+    sta OAM_SHIP+(4*6)+1
+    lda #PATTERN($33)
+    sta OAM_SHIP+(4*5)+1
+    lda #PATTERN($43)
+    sta OAM_SHIP+(4*11)+1
+:
+
+    lda p1_buttons_held
+    and #BUTTON_RIGHT
+    beq :+
+    lda #PATTERN($33)
+    sta OAM_SHIP+(4*0)+1
+    lda #PATTERN($43)
+    sta OAM_SHIP+(4*6)+1
+    lda #PATTERN($34)
+    sta OAM_SHIP+(4*5)+1
+    lda frame_number
+    anc #%110
+    adc #PATTERN($44)
+    sta OAM_SHIP+(4*11)+1
+:
+    rts
+
+noFlaps:
+    lda #PATTERN($30)
+    sta OAM_SHIP+(4*0)+1
+    sta OAM_SHIP+(4*5)+1
+    lda #PATTERN($40)
+    sta OAM_SHIP+(4*6)+1
+    sta OAM_SHIP+(4*11)+1
+    rts
+
+
+    lda #104
+    sta draw_x
+
+    lda #64
+    sec
+    sbc p1_lift
+    sta draw_y
+
+    ldy #1
+    store16into #metasprite::ship_const0, ptr_temp
+    ;jsr prepare_metasprite
+
+    ldy #$26
+    lda p1_buttons_held
+    and #BUTTON_B
+    bne :+
+    ldy #$06
+:
+    sty palette_buffer+16+7
+
+
+    ; SHADOW
+    ; y-positions
+    lda #154+18
+    .repeat 6, i
+        sta CPU_OAM+(4*(i+0))+0, x
     .endrepeat
 
     ; x-positions
     .repeat 6, i
         lda #104+8*i
         sta CPU_OAM+(4*(i+0))+3, x
-        sta CPU_OAM+(4*(i+6))+3, x
     .endrepeat
 
     ; patterns
     .repeat 3, i
-        lda #PATTERN(i)
+        lda #PATTERN($35+i)
         sta CPU_OAM+(4*(i+0))+1, x
-        ora #32
-        sta CPU_OAM+(4*(i+6))+1, x
-        lda #PATTERN(2-i)
-        sta CPU_OAM+(4*(i+3))+1, x
-        ora #32
-        sta CPU_OAM+(4*(i+9))+1, x
+        sta CPU_OAM+(4*(5-i))+1, x
     .endrepeat
 
     ; attributes
-    lda #%00000000
-    sta CPU_OAM+(4*0)+2, x
-    sta CPU_OAM+(4*1)+2, x
-    sta CPU_OAM+(4*2)+2, x
-    lda #%01000000
-    sta CPU_OAM+(4*3)+2, x
-    sta CPU_OAM+(4*4)+2, x
-    sta CPU_OAM+(4*5)+2, x
-    lda #%00000001
-    sta CPU_OAM+(4*6)+2, x
-    sta CPU_OAM+(4*7)+2, x
-    sta CPU_OAM+(4*8)+2, x
-    lda #%01000001
-    sta CPU_OAM+(4*9)+2, x
-    sta CPU_OAM+(4*10)+2, x
-    sta CPU_OAM+(4*11)+2, x
+    lda #%00000010
+    .repeat 3, i
+        sta CPU_OAM+(4*(i+0))+2, x
+    .endrepeat
+    lda #%01000010
+    .repeat 3, i
+        sta CPU_OAM+(4*(i+3))+2, x
+    .endrepeat
 
     txa
-    axs #.lobyte(-4*12)
+    axs #.lobyte(-4*6)
     rts
 .endproc
 
@@ -187,10 +329,7 @@ badPos:
     sta draw_y
 
     ldy #0
-    lda metasprite::menu_p2, y
-    sta ptr_temp+0
-    lda metasprite::menu_p2+1, y
-    sta ptr_temp+1
+    store16into #metasprite::menu_p2_const0, ptr_temp
     jsr prepare_metasprite
 doneRadSprite:
 

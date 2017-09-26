@@ -10,6 +10,7 @@
 .import sprites_chr, rad_chr
 .import read_gamepads
 .import init_game
+.import menu_palette
 
 .export init_menu
 .export update_menu
@@ -91,7 +92,7 @@ doneNTSwaps:
 
     ldx #0
 paletteLoop:
-    lda palette, x
+    lda menu_palette, x
     sta palette_buffer, x
     inx
     cpx #32
@@ -100,12 +101,12 @@ paletteLoop:
     lda #PPUCTRL_NMI_ON | PPUCTRL_8X16_SPR
     bit PPUSTATUS
     sta PPUCTRL
+    jmp init_game ; TODO
     jmp init_scroll_in
 .endproc
 
 .proc update_menu
     jsr read_gamepads
-    jsr prepare_menu_sprites
 
     lda p1_buttons_pressed
     and #BUTTON_SELECT
@@ -145,13 +146,16 @@ doneDown:
     bankswitch_to update_scroll_in
     jmp (menu_update_ptr)
 .endproc
+menu_update_return:
+    jsr prepare_menu_sprites
+    jmp update_return
 
 .segment "B2_CODE"
 
 .proc init_scroll_in
     store16into #update_scroll_in, menu_update_ptr
     store8into #16, menu_timer
-    jmp update_return
+    jmp menu_update_return
 .endproc
 
 .proc update_scroll_in
@@ -168,13 +172,13 @@ doneDown:
     bne :+
     jmp init_text_in
 :
-    jmp update_return
+    jmp menu_update_return
 .endproc
 
 
 .proc init_text_in
     store16into #update_text_in, menu_update_ptr
-    jmp update_return
+    jmp menu_update_return
 .endproc
 
 .proc update_text_in
@@ -237,7 +241,7 @@ storePalette:
     sta palette_buffer+3
     sta palette_buffer+11
 
-    jmp update_return
+    jmp menu_update_return
 .endproc
 
 .proc init_text_out
@@ -246,7 +250,7 @@ storePalette:
     sta menu_state
     store8into #36, menu_timer
     store16into #update_text_out, menu_update_ptr
-    jmp update_return
+    jmp menu_update_return
 .endproc
 
 .proc update_text_out
@@ -265,13 +269,13 @@ storePalette:
 done:
     dec menu_timer
     beq init_fadeout
-    jmp update_return
+    jmp menu_update_return
 .endproc
 
 .proc init_fadeout
     store8into #16, menu_timer
     store16into #update_fadeout, menu_update_ptr
-    jmp update_return
+    jmp menu_update_return
 .endproc
 
 .proc update_fadeout
@@ -294,5 +298,5 @@ done:
     bne :+
     jmp init_game
 :
-    jmp update_return
+    jmp menu_update_return
 .endproc
