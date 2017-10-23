@@ -231,7 +231,7 @@ paletteLoop:
     store16into #rtx_hi, rx_hi_ptr
     store16into #rty_lo, ry_lo_ptr
     store16into #rty_hi, ry_hi_ptr
-    lda #12
+    lda track_size
     sta level_length
 
     bankswitch_to ppu_load_4x4_pixels_chr

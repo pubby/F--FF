@@ -33,7 +33,7 @@ dir_accel_table_right:
 
     ; Left/Right: Change direction
     lax P i, _buttons_held
-    anc #BUTTON_LEFT | BUTTON_RIGHT
+    and #BUTTON_LEFT | BUTTON_RIGHT
     bne checkLeft
     ; TODO
     lda P i, _dir_speed
@@ -46,20 +46,23 @@ checkLeft:
     anc #BUTTON_LEFT    ; Clears carry
     beq notPressingLeft
     lda P i, _dir_speed
-    ;sbc dir_accel_table_left, y
-    sbc #50-1
-    bvs :+
-    sta P i, _dir_speed
+    sbc #24-1
+    bvc :+
+    lda #.lobyte(-127 + 20)
 :
+    sta P i, _dir_speed
+    dec 1+P i, _dir
 notPressingLeft:
     txa                 ; X = buttons_held
     anc #BUTTON_RIGHT   ; Clears carry
     beq notPressingRight
     lda P i, _dir_speed
-    adc #50
-    bvs :+
-    sta P i, _dir_speed
+    adc #24
+    bvc :+
+    lda #127 - 20
 :
+    sta P i, _dir_speed
+    inc 1+P i, _dir
 notPressingRight:
 doneLeftRight:
 
@@ -112,7 +115,7 @@ doneAccelerate:
     ldx #0
     jsr multiply+1
     stx subroutine_temp
-    .repeat 4
+    .repeat 3
         asl
         rol subroutine_temp
     .endrepeat
