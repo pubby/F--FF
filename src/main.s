@@ -6,7 +6,7 @@
 .importzp multiply_store
 .import copy_multiply_code
 .import p1_move, p2_move
-.import render
+.import p1_render, p2_render
 .import init_menu
 .import read_gamepads
 .import init_flag
@@ -78,6 +78,7 @@ renderFrame:
     ; Do OAM DMA (without reading controllers)
     lda #.hibyte(CPU_OAM) ; A = $03
     sta OAMDMA
+    lda #%111
     sta subframes_left
 
     bit PPUSTATUS
@@ -118,12 +119,10 @@ return:
     lda $8000 ; current bank
     sta nmi_bank
     bankswitch_to game_nmi
-    sta debug
     jmp (nmi_ptr)
 .endproc
 
 .proc nmi_return
-    sta debug
     ; Restore registers and return.
     ldy nmi_bank
     bankswitch_y
@@ -149,16 +148,26 @@ update_return:
 .proc update_game
     lda #0
     sta frame_ready
+    sta debug
 
     jsr prepare_game_sprites
 
     bankswitch_to clear_nt_buffer
     jsr clear_nt_buffer
     jsr read_gamepads
+
     jsr p1_move
-    jsr render
+    lda #SPLITSCREEN_LEFT
+    sta line_splitscreen
+    jsr p1_render
+
+    jsr p2_move
+    lda #SPLITSCREEN_RIGHT
+    sta line_splitscreen
+    jsr p2_render
 
     lda #1 
+    sta debug
     sta frame_ready
     jmp update_return
 .endproc
@@ -175,6 +184,12 @@ main:
     stx frame_ready
     store16into #game_nmi, nmi_ptr
     store16into #update_game, update_ptr
+
+    lda #PLAYERS_2
+    sta game_flags
+
+    lda #64
+    sta p1_boost_tank
 
     ; Setup attributes.
     bit PPUSTATUS
@@ -219,7 +234,7 @@ paletteLoop:
     ; Sprites
     jsr init_game_sprites
 
-    lda #128
+    lda #140
     sta camera_height
 
     ; setup pointers (TODO)
@@ -240,8 +255,8 @@ paletteLoop:
     lda #0
     sta p1_dir_speed
     sta p1_dir+0
-    lda #180
-    sta p1_dir+1
+    ;lda #180
+    ;sta p1_dir+1
 
     lda #PPUCTRL_NMI_ON | PPUCTRL_8X16_SPR
     bit PPUSTATUS

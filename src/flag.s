@@ -16,7 +16,7 @@ nmi_sync_count = l1100+2
 pal_ptr = l1100+3 ; 2 bytes
 fade_state = l1100+5
 
-.segment "RODATA"
+.segment "FLAG_DATA"
 flag_nt:
     .include "flag_nt.inc"
 flag_chr:
@@ -282,6 +282,7 @@ pal_table_hi:
     store16into #flag_nmi, nmi_ptr
     store16into #flag_pal3, pal_ptr
 
+    bankswitch_to flag_chr
     ldx #0
 :
     lda flag_chr, x
@@ -307,6 +308,7 @@ pal_table_hi:
     bne :-
     
 
+    bankswitch_to flag_nt
     bit PPUSTATUS
     lda #$20
     sta PPUADDR

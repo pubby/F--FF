@@ -28,6 +28,11 @@ p1_dir:   .res 2
 p1_speed: .res 2
 p1_dir_speed: .res 1
 p1_lift: .res 1
+p1_track_index: .res 1
+p1_boost_tank: .res 1
+p1_boost_timer: .res 1
+p1_boost: .res 1
+p1_slowdown: .res 1
 
 p2:
 p2_buttons_held: .res 1
@@ -38,8 +43,13 @@ p2_dir:   .res 2
 p2_speed: .res 2
 p2_dir_speed: .res 1
 p2_lift: .res 1
+p2_track_index: .res 1
+p2_boost_tank: .res 1
+p2_boost_timer: .res 1
+p2_boost: .res 1
+p2_slowdown: .res 1
 
-level_length: .res 2
+level_length: .res 1
 
 lx_lo_ptr: .res 2
 lx_hi_ptr: .res 2
@@ -104,6 +114,9 @@ depthpad_rx_lo: .res pad_size
 depthpad_rx_hi: .res pad_size
 depthpad_ry_lo: .res pad_size
 depthpad_ry_hi: .res pad_size
+
+boost_regen_timer: .res 1
+game_flags: .res 1
 
 .align 256
 nt_buffer: .res 32*22

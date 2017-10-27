@@ -36,6 +36,8 @@ menu_update_ptr = scratchpad+8 ; 2 bytes
 MENU_2P = 1
 MENU_SHOW_CURSOR = 2
 
+PLAYERS_2 = %10000000
+
 
 multiply = $78
 .define multiply_label(l, o) .lobyte(multiply + .ident(.sprintf("mvar_%s", .string(l))) - multiply_code + o)
@@ -81,6 +83,11 @@ multiply = $78
 .globalzp p1_speed
 .globalzp p1_dir_speed
 .globalzp p1_lift
+.globalzp p1_track_index
+.globalzp p1_boost_tank
+.globalzp p1_boost_timer
+.globalzp p1_boost
+.globalzp p1_slowdown
 
 .globalzp p2
 .globalzp p2_buttons_held
@@ -91,6 +98,11 @@ multiply = $78
 .globalzp p2_speed
 .globalzp p2_dir_speed
 .globalzp p2_lift
+.globalzp p2_track_index
+.globalzp p2_boost_tank
+.globalzp p2_boost_timer
+.globalzp p2_boost
+.globalzp p2_slowdown
 
 .globalzp level_length
 
@@ -185,6 +197,8 @@ multiply = $78
 .global positive_asl
 .global negative_asl
 
+.global boost_regen_timer
+.global game_flags
 
 ; Multiply Labels
 .global multiply_code

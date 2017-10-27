@@ -115,7 +115,7 @@ $(srcdir)/clip.inc: clip
 $(srcdir)/recip.inc: recip
 	./recip $@
 
-$(srcdir)/sprpack.chr: $(srcdir)/rad316.chr $(srcdir)/menutext16.chr $(srcdir)/ship16.chr
+$(srcdir)/sprpack.chr: $(srcdir)/rad316.chr $(srcdir)/menutext16.chr $(srcdir)/ship16.chr $(srcdir)/ui16.chr
 	cat $^ > $@
 
 $(srcdir)/rad.inc: rad $(srcdir)/rad16.chr $(srcdir)/rad216.chr  $(srcdir)/rad316.chr

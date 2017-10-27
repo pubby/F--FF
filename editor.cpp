@@ -5,7 +5,7 @@
 
 #include <SFML/Graphics.hpp>
 
-constexpr float segment_length = 16.0f;
+constexpr float segment_length = 24.0f;
 constexpr float quarter_angle = 1.57079632679f;
 constexpr float turn_increment = quarter_angle * 0.1;
 
@@ -303,7 +303,7 @@ int main(int argc, char** argv)
     
     editor e = load(argv[1]);
 
-    sf::RenderWindow window(sf::VideoMode(512, 512), "Track Editor");
+    sf::RenderWindow window(sf::VideoMode(800, 800), "Track Editor");
     window.setFramerateLimit(60);
 
     while(true)
@@ -350,16 +350,16 @@ int main(int argc, char** argv)
                     e.active_segment().angle += turn_increment;
                     break;
                 case sf::Keyboard::Num1:
-                    e.active_segment().wl -= 0.5f;
+                    e.active_segment().wl -= 1;
                     break;
                 case sf::Keyboard::Num2:
-                    e.active_segment().wl += 0.5f;
+                    e.active_segment().wl += 1;
                     break;
                 case sf::Keyboard::Num3:
-                    e.active_segment().wr -= 0.5f;
+                    e.active_segment().wr -= 1;
                     break;
                 case sf::Keyboard::Num4:
-                    e.active_segment().wr += 0.5f;
+                    e.active_segment().wr += 1;
                     break;
                 }
                 break;

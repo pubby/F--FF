@@ -306,7 +306,7 @@ positive:
     lda #$60            ; RTS
     sta multiply_label r2, 0
     pla
-    jmp store
+    jmp store_multiply_vars
 overflowSet:
     bmi positive
 negative:
@@ -326,7 +326,8 @@ negative:
     pla
     eor #$FF
     adc #0
-store:
+.endproc
+.proc store_multiply_vars
 
     ; Hi
     sta multiply_label s1, 1

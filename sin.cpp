@@ -5,8 +5,6 @@ constexpr double pi = 3.14159265359;
 
 unsigned sin_(unsigned d)
 {
-    if(d >= 63)
-        return 0xFFFF;
     return std::round(std::sin(d * (pi / 128.0)) * 65536.0);
 }
 
@@ -24,7 +22,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    std::fprintf(fp, "sin_table_lo:");
+    std::fprintf(fp, "\nsin_table_lo:");
     for(unsigned i = 0; i != 64; ++i)
     {
         if(i % 8 == 0) std::fprintf(fp,"\n.byt ");

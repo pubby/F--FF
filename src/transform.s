@@ -11,7 +11,7 @@
 .import clip_to_y_top_sub
 .import clip_to_y_top_add
 
-.export render
+.export p1_render, p2_render
 
 draw_distance = 5
 
@@ -462,22 +462,23 @@ cull:
     rts
 .endproc
 
-.proc render
+.repeat 2, i
+.proc P i, _render 
     ; Levels are in bank 2
     bankswitch 2
 
     sec
     lda #64
-    sbc 1+p1_dir
+    sbc 1+P i, _dir
     jsr setup_cos
     ldy #draw_distance - 1
 cosLoop:
     sec
     lda (ly_lo_ptr), y
-    sbc p1_y+0
+    sbc 0+P i, _y
     sta multiply_store
     lda (ly_hi_ptr), y
-    sbc p1_y+1
+    sbc 1+P i, _y
     jsr multiply
     sta scratchpad_ly_lo, y
     txa
@@ -485,10 +486,10 @@ cosLoop:
 
     sec
     lda (lx_lo_ptr), y
-    sbc p1_x+0
+    sbc 0+P i, _x
     sta multiply_store
     lda (lx_hi_ptr), y
-    sbc p1_x+1
+    sbc 1+P i, _x
     jsr multiply
     sta scratchpad_lx_lo, y
     txa
@@ -496,10 +497,10 @@ cosLoop:
 
     sec
     lda (ry_lo_ptr), y
-    sbc p1_y+0
+    sbc 0+P i, _y
     sta multiply_store
     lda (ry_hi_ptr), y
-    sbc p1_y+1
+    sbc 1+P i, _y
     jsr multiply
     sta scratchpad_ry_lo, y
     txa
@@ -507,10 +508,10 @@ cosLoop:
 
     sec
     lda (rx_lo_ptr), y
-    sbc p1_x+0
+    sbc 0+P i, _x
     sta multiply_store
     lda (rx_hi_ptr), y
-    sbc p1_x+1
+    sbc 1+P i, _x
     jsr multiply
     sta scratchpad_rx_lo, y
     txa
@@ -521,16 +522,16 @@ cosLoop:
 
     sec
     lda #64
-    sbc 1+p1_dir
+    sbc 1+P i, _dir
     jsr setup_sin
     ldy #draw_distance - 1
 sinLoop:
     sec
     lda (ly_lo_ptr), y
-    sbc p1_y+0
+    sbc 0+P i, _y
     sta multiply_store
     lda (ly_hi_ptr), y
-    sbc p1_y+1
+    sbc 1+P i, _y
     jsr multiply
     sec
     sbc scratchpad_lx_lo, y
@@ -541,10 +542,10 @@ sinLoop:
 
     sec
     lda (lx_lo_ptr), y
-    sbc p1_x+0
+    sbc 0+P i, _x
     sta multiply_store
     lda (lx_hi_ptr), y
-    sbc p1_x+1
+    sbc 1+P i, _x
     jsr multiply
     clc
     adc scratchpad_ly_lo, y
@@ -560,10 +561,10 @@ sinLoop:
 
     sec
     lda (ry_lo_ptr), y
-    sbc p1_y+0
+    sbc 0+P i, _y
     sta multiply_store
     lda (ry_hi_ptr), y
-    sbc p1_y+1
+    sbc 1+P i, _y
     jsr multiply
     sec
     sbc scratchpad_rx_lo, y
@@ -574,10 +575,10 @@ sinLoop:
 
     sec
     lda (rx_lo_ptr), y
-    sbc p1_x+0
+    sbc 0+P i, _x
     sta multiply_store
     lda (rx_hi_ptr), y
-    sbc p1_x+1
+    sbc 1+P i, _x
     jsr multiply
     clc
     adc scratchpad_ry_lo, y
@@ -593,10 +594,14 @@ sinLoop:
 
     dey
     bpl sinLoop
+    jmp draw_lines_and_shit
+.endproc
+.endrepeat
 
     ;;;;;;;;;;;;;;;;;;;;;;;;;;
     ; Draw the lines and shit
     ;;;;;;;;;;;;;;;;;;;;;;;;;;
+.proc draw_lines_and_shit
 
     ; Gonna use line routines in bank 0.
     bankswitch 0

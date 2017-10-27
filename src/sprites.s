@@ -8,8 +8,10 @@
 .export prepare_menu_sprites
 
 OAM_SHIP = CPU_OAM + 0
-OAM_SHADOW = CPU_OAM + 12*4
-OAM_START = OAM_SHADOW + 6*4
+OAM_SHADOW = OAM_SHIP + 12*4
+OAM_BOOST_BLACK = OAM_SHADOW + 6*4
+OAM_BOOST_BAR = OAM_BOOST_BLACK + 4*4
+OAM_START = OAM_BOOST_BAR + 4*4
 
 .segment "RODATA"
 .include "metasprites.inc"
@@ -31,6 +33,17 @@ draw_y = 1
     ; Use X as an index into CPU_OAM. The 'prepare_sprite' functions will
     ; use and increment X as they write to 'CPU_OAM'.
     ldx #.lobyte(OAM_START)
+
+
+    clc
+    lda p1_boost_tank
+    adc #64
+.repeat 4, j
+    .if j <> 0
+        adc #16
+    .endif
+    sta OAM_BOOST_BLACK+(j*4)+0
+.endrepeat
 
     ; Clear the remaining portion of CPU_OAM so that unused/glitchy
     ; sprites aren't drawn.
@@ -131,11 +144,48 @@ ship_y_offsets:
         sta OAM_SHADOW+(4*(5-i))+1
     .endrepeat
 
-    ; y - positions
+    ; y-positions
     lda #154+32
     .repeat 6, i
         sta OAM_SHADOW+(4*(i))+0
     .endrepeat
+
+
+    ;;;;;;;;;;;;;;;;;;
+    ; Boost bar shit ;
+    ;;;;;;;;;;;;;;;;;;
+    
+
+    ; x-positions
+    lda #4
+    .repeat 4, i
+        sta OAM_BOOST_BLACK+(4*i)+3
+        sta OAM_BOOST_BAR+(4*i)+3
+    .endrepeat
+    
+    ; y-positions
+    .repeat 4, i
+        lda #64+16*i
+        sta OAM_BOOST_BLACK+(4*i)+0
+        sta OAM_BOOST_BAR+(4*i)+0
+    .endrepeat
+
+    ; pattern
+    lda #PATTERN($50)
+    ldy #PATTERN($51)
+    .repeat 4, i
+        sta OAM_BOOST_BLACK+(4*i)+1
+        sty OAM_BOOST_BAR+(4*i)+1
+    .endrepeat
+
+    ; attributes
+    lda #3 | %00100000
+    ldy #3
+    .repeat 4, i
+        sta OAM_BOOST_BLACK+(4*i)+2
+        sty OAM_BOOST_BAR+(4*i)+2
+    .endrepeat
+
     rts
 .endproc
 
