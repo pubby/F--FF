@@ -20,6 +20,22 @@ shadow_const0 = m5
 shadow_tight:
 .addr m6
 shadow_tight_const0 = m6
+explosion:
+.addr m7
+explosion_const0 = m7
+.addr m8
+explosion_const1 = m8
+.addr m9
+explosion_const2 = m9
+lap:
+.addr m10
+lap_const0 = m10
+.addr m11
+lap_const1 = m11
+.addr m12
+lap_const2 = m12
+.addr m13
+lap_const3 = m13
 
 m0:
 .byt 124
@@ -103,4 +119,66 @@ m6:
 .byt $40, $69, $20, $01
 .byt $40, $67, $26, $02
 .byt $00, $67, $02, $02
+m7:
+.byt 32
+.byt $00, $e1, $08, $00
+.byt $00, $e3, $10, $00
+.byt $40, $e3, $18, $00
+.byt $40, $e1, $20, $00
+.byt $80, $e1, $08, $10
+.byt $80, $e3, $10, $10
+.byt $c0, $e3, $18, $10
+.byt $c0, $e1, $20, $10
+m8:
+.byt 48
+.byt $00, $e5, $00, $00
+.byt $00, $e7, $08, $00
+.byt $00, $e9, $10, $00
+.byt $40, $e9, $18, $00
+.byt $40, $e7, $20, $00
+.byt $40, $e5, $28, $00
+.byt $80, $e5, $00, $10
+.byt $80, $e7, $08, $10
+.byt $80, $e9, $10, $10
+.byt $c0, $e9, $18, $10
+.byt $c0, $e7, $20, $10
+.byt $c0, $e5, $28, $10
+m9:
+.byt 48
+.byt $00, $eb, $00, $00
+.byt $00, $ed, $08, $00
+.byt $00, $ef, $10, $00
+.byt $40, $ef, $18, $00
+.byt $40, $ed, $20, $00
+.byt $40, $eb, $28, $00
+.byt $80, $eb, $00, $10
+.byt $80, $ed, $08, $10
+.byt $80, $ef, $10, $10
+.byt $c0, $ef, $18, $10
+.byt $c0, $ed, $20, $10
+.byt $c0, $eb, $28, $10
+m10:
+.byt 16
+.byt $00, $a7, $00, $00
+.byt $00, $a9, $0a, $00
+.byt $00, $ab, $14, $00
+.byt $00, $b1, $28, $00
+m11:
+.byt 16
+.byt $00, $a7, $00, $00
+.byt $00, $a9, $0a, $00
+.byt $00, $ab, $14, $00
+.byt $00, $b3, $28, $00
+m12:
+.byt 16
+.byt $00, $a7, $00, $00
+.byt $00, $a9, $0a, $00
+.byt $00, $ab, $14, $00
+.byt $00, $c1, $28, $00
+m13:
+.byt 16
+.byt $00, $a7, $00, $00
+.byt $00, $a9, $0a, $00
+.byt $00, $ab, $14, $00
+.byt $00, $c3, $28, $00
 .endscope

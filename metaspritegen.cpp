@@ -164,6 +164,74 @@ static std::vector<animation_t> const animations =
             { 8* 0+2, 2, PATTERN(0x33), 0 },
         },
     }},
+
+    { "explosion", 0, 0, 0, {
+        { 
+            { 8* 1,  0, PATTERN(0x70), 0 },
+            { 8* 2,  0, PATTERN(0x71), 0 },
+            { 8* 3,  0, PATTERN(0x71), HFLIP },
+            { 8* 4,  0, PATTERN(0x70), HFLIP },
+            { 8* 1, 16, PATTERN(0x70), VFLIP },
+            { 8* 2, 16, PATTERN(0x71), VFLIP },
+            { 8* 3, 16, PATTERN(0x71), HFLIP | VFLIP },
+            { 8* 4, 16, PATTERN(0x70), HFLIP | VFLIP },
+        },
+        { 
+            { 8* 0,  0, PATTERN(0x72), 0 },
+            { 8* 1,  0, PATTERN(0x73), 0 },
+            { 8* 2,  0, PATTERN(0x74), 0 },
+            { 8* 3,  0, PATTERN(0x74), HFLIP },
+            { 8* 4,  0, PATTERN(0x73), HFLIP },
+            { 8* 5,  0, PATTERN(0x72), HFLIP },
+            { 8* 0, 16, PATTERN(0x72), VFLIP },
+            { 8* 1, 16, PATTERN(0x73), VFLIP },
+            { 8* 2, 16, PATTERN(0x74), VFLIP },
+            { 8* 3, 16, PATTERN(0x74), HFLIP | VFLIP },
+            { 8* 4, 16, PATTERN(0x73), HFLIP | VFLIP },
+            { 8* 5, 16, PATTERN(0x72), HFLIP | VFLIP },
+        },
+        { 
+            { 8* 0,  0, PATTERN(0x75), 0 },
+            { 8* 1,  0, PATTERN(0x76), 0 },
+            { 8* 2,  0, PATTERN(0x77), 0 },
+            { 8* 3,  0, PATTERN(0x77), HFLIP },
+            { 8* 4,  0, PATTERN(0x76), HFLIP },
+            { 8* 5,  0, PATTERN(0x75), HFLIP },
+            { 8* 0, 16, PATTERN(0x75), VFLIP },
+            { 8* 1, 16, PATTERN(0x76), VFLIP },
+            { 8* 2, 16, PATTERN(0x77), VFLIP },
+            { 8* 3, 16, PATTERN(0x77), HFLIP | VFLIP },
+            { 8* 4, 16, PATTERN(0x76), HFLIP | VFLIP },
+            { 8* 5, 16, PATTERN(0x75), HFLIP | VFLIP },
+        },
+    }},
+
+    { "lap", 0, 0, 0, {
+        { 
+            { 10* 0,  0, PATTERN(0x53), 0 },
+            { 10* 1,  0, PATTERN(0x54), 0 },
+            { 10* 2,  0, PATTERN(0x55), 0 },
+            { 10* 4,  0, PATTERN(0x58), 0 },
+        },
+        { 
+            { 10* 0,  0, PATTERN(0x53), 0 },
+            { 10* 1,  0, PATTERN(0x54), 0 },
+            { 10* 2,  0, PATTERN(0x55), 0 },
+            { 10* 4,  0, PATTERN(0x59), 0 },
+        },
+        { 
+            { 10* 0,  0, PATTERN(0x53), 0 },
+            { 10* 1,  0, PATTERN(0x54), 0 },
+            { 10* 2,  0, PATTERN(0x55), 0 },
+            { 10* 4,  0, PATTERN(0x60), 0 },
+        },
+        { 
+            { 10* 0,  0, PATTERN(0x53), 0 },
+            { 10* 1,  0, PATTERN(0x54), 0 },
+            { 10* 2,  0, PATTERN(0x55), 0 },
+            { 10* 4,  0, PATTERN(0x61), 0 },
+        },
+    }},
 } ;
 
 int get_width(std::vector<sprite_t> const& sprites)

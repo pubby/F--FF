@@ -23,20 +23,40 @@ dir_accel_table_right:
 .endrepeat
 
 .macro handle_move i, mul, div
+    lda P i, _pre_explosion
+    beq :+
+    dec P i, _pre_explosion
+    bne :+
+    inc P i, _explosion
+:
+
     ; Left/Right: Change direction
     lax P i, _buttons_held
+    ldy P i, _pre_explosion
+    bne doneLeftRight
     and #BUTTON_LEFT | BUTTON_RIGHT
     bne checkLeft
+applyDirSlowdown:
     lda P i, _dir_speed
-    cmp #$80
-    ror
+    bmi :+
+    sec
+    sbc #32*mul/div
+    bpl @store
+    bmi @load0
+:
+    clc
+    adc #32*mul/div
+    bmi @store
+@load0:
+    lda #0
+@store:
     sta P i, _dir_speed
     jmp doneLeftRight
 checkLeft:
     anc #BUTTON_LEFT    ; Clears carry
     beq notPressingLeft
     lda P i, _dir_speed
-    sbc #16*mul/div-1
+    sbc #12*mul/div-1
     bvs @cap
     bpl @store
     cmp #.lobyte(-56*mul/div)
@@ -51,7 +71,7 @@ notPressingLeft:
     anc #BUTTON_RIGHT   ; Clears carry
     beq notPressingRight
     lda P i, _dir_speed
-    adc #16*mul/div
+    adc #12*mul/div
     bvs @cap
     bmi @store
     cmp #.lobyte(56*mul/div)
@@ -65,29 +85,13 @@ notPressingRight:
 doneLeftRight:
 
     ; A: Boost
-    ldy P i, _lift
-    txa                 ; X = buttons_held
-    and #BUTTON_A
-    bne pressingA
-    iny
-    cpy #7
-    bcc storeLift
-    ldy #7
-    jmp storeLift
-pressingA:
-    dey
-    cpy #4
-    bcs storeLift
-    ldy #4
-storeLift:
-    sty P i, _lift
-
-    ; A: Boost
+    lda P i, _pre_explosion
+    bne notBoosting
     lda P i, _buttons_pressed
     asl                 ; Test for button A
     bcc notPressingA
     lda P i, _boost_tank
-    sbc #24
+    sbc #20
     bcc notBoosting
     beq notBoosting
     sta P i, _boost_tank
@@ -99,6 +103,8 @@ notBoosting:
 notPressingA:
 
     ; B: Accelerate
+    lda P i, _pre_explosion
+    bne doneAccelerate
     txa                 ; X = buttons_held
     anc #BUTTON_B       ; Clears carry
     beq notPressingB
@@ -124,24 +130,27 @@ doneAccelerate:
     bcc addSlowdown
 reduceSlowdown:
     lda P i, _slowdown
-    sbc #2*mul/div
+    sbc #4*mul/div
     bcs storeSlowdown
     lda #0
     beq storeSlowdown   ; Guaranteed branch
 addSlowdown:
     lda P i, _slowdown
-    adc #8*mul/div
-    cmp #32*mul/div
+    adc #2*mul/div
+    cmp #16*mul/div
     bcc storeSlowdown
-    lda #32*mul/div
+    lda #16*mul/div
 storeSlowdown:
     sta P i, _slowdown
 
     ; Boost
-    txa
+    txa                 ; X = _boost_timer
     anc #%01111111      ; Clears carry
     bne boost
 
+    lda palette_buffer+22
+    and #$10 ^ $FF
+    sta palette_buffer+22
     lda P i, _boost
     sec
     sbc #2*mul/div
@@ -149,9 +158,12 @@ storeSlowdown:
     lda #0
     beq storeBoost      ; Guaranteed branch
 boost:
+    lda palette_buffer+22
+    eor #$10
+    sta palette_buffer+22
     dec P i, _boost_timer
     lda P i, _boost
-    adc #8*mul/div
+    adc #12*mul/div
     cmp #48*mul/div
     bcc storeBoost
     lda #48*mul/div
@@ -161,7 +173,24 @@ doneBoost:
 
 .endmacro
 
+explosion_palette_table:
+    .byt $15, $30, $25, $15, $0F
+
 .repeat 2, i
+.proc P i, _handle_explosion
+    cpx #4
+    bcs :+
+    lda frame_number
+    and #1
+    beq :+
+    inx
+:
+    stx P i, _explosion
+    lda explosion_palette_table, x
+    sta palette_buffer+16
+    rts
+.endproc
+
 .proc P i, _move 
     front_edge_result_lo = scratchpad + 0
     front_edge_result_hi = scratchpad + 1
@@ -173,7 +202,32 @@ doneBoost:
     right_edge_result_hi = scratchpad + 3
     oob = scratchpad+4
 
-    handle_move i, 3, 2
+    ldx P i, _explosion
+    bne P i, _handle_explosion
+
+    handle_move i, 2, 2
+
+    ; lift
+    ldy P i, _lift
+    lda P i, _boost_timer
+    bmi liftUp
+    lda frame_number
+    and #%00000011
+    bne liftUp
+    dey 
+    dey 
+    cpy #4
+    bcs storeLift
+    ldy #4
+    jmp storeLift
+liftUp:
+    iny
+    cpy #7
+    bcc storeLift
+    ldy #7
+storeLift:
+    sty P i, _lift
+
 
     ; Apply dir_speed to dir
     ldx #0
@@ -397,6 +451,9 @@ doneBoost:
     inx
     cpx level_length
     bcc :+
+    lda #30 ; TODO
+    sta P i, _text_timer
+    inc P i, _lap
     ldx #0
 :
     stx P i, _track_index
@@ -405,9 +462,14 @@ doneOutsideFrontRailing:
     lda P i, _boost_timer
     ldx oob
     bpl inBounds
+outOfBounds:
     and #%01111111
     sta P i, _boost_timer
     dec P i, _boost_tank
+    bne notDead
+    lda #25
+    sta P i, _pre_explosion
+notDead:
     rts
 
 inBounds:

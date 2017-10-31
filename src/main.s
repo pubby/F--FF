@@ -78,7 +78,7 @@ renderFrame:
     ; Do OAM DMA (without reading controllers)
     lda #.hibyte(CPU_OAM) ; A = $03
     sta OAMDMA
-    lda #%111
+    ;lda #%111
     sta subframes_left
 
     bit PPUSTATUS
@@ -141,7 +141,6 @@ update_return:
 :
     cmp nmi_counter
     beq :-
-    inc frame_number
     jmp (update_ptr)
 
 
@@ -149,6 +148,7 @@ update_return:
     lda #0
     sta frame_ready
     sta debug
+    inc frame_number
 
     jsr prepare_game_sprites
 
@@ -157,14 +157,39 @@ update_return:
     jsr read_gamepads
 
     jsr p1_move
-    lda #SPLITSCREEN_LEFT
-    sta line_splitscreen
+    ;lda #SPLITSCREEN_LEFT
+    ;sta line_splitscreen
     jsr p1_render
 
-    jsr p2_move
-    lda #SPLITSCREEN_RIGHT
-    sta line_splitscreen
-    jsr p2_render
+    ;jsr p2_move
+    ;lda #SPLITSCREEN_RIGHT
+    ;sta line_splitscreen
+    ;jsr p2_render
+
+    clc
+    lda time_sub
+    adc #2
+    sta time_sub
+    sbc #60-1
+    bne doneDigitUpdate
+    sta time_sub
+    lda #10
+    isc time_digits+0
+    bne doneDigitUpdate
+    sta time_digits+0
+    lda #6
+    isc time_digits+1
+    bne doneDigitUpdate
+    sta time_digits+1
+    lda #10
+    isc time_digits+2
+    bne doneDigitUpdate
+    sta time_digits+2
+    lda #6
+    isc time_digits+3
+    bne doneDigitUpdate
+    sta time_digits+3
+doneDigitUpdate:
 
     lda #1 
     sta debug

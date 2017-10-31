@@ -399,7 +399,7 @@ cull:
     jsr setup_depth
     lda from_y+0
     clc
-    adc camera_height
+    adc local_camera_height
     sta multiply_store
     bcc :+
     inx
@@ -434,7 +434,7 @@ cull:
     jsr setup_depth
     lda to_y+0
     clc
-    adc camera_height
+    adc local_camera_height
     sta multiply_store
     bcc :+
     inx
@@ -466,6 +466,12 @@ cull:
 .proc P i, _render 
     ; Levels are in bank 2
     bankswitch 2
+
+    lda camera_height
+    sec
+    sbc P i, _boost
+    sta local_camera_height
+
 
     sec
     lda #64

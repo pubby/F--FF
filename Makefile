@@ -58,7 +58,8 @@ $(objdir)/%.o: $(srcdir)/%.s $(srcdir)/nes.inc $(srcdir)/globals.inc \
                $(srcdir)/clip.inc $(srcdir)/sin.inc $(srcdir)/recip.inc \
                $(srcdir)/foo.level.inc $(srcdir)/rad.inc \
                $(srcdir)/metasprites.inc $(srcdir)/flag_nt.inc \
-               $(srcdir)/sin_scroll.inc $(srcdir)/flag_chr.inc
+               $(srcdir)/sin_scroll.inc $(srcdir)/flag_chr.inc \
+			   $(srcdir)/time_digit.inc
 	$(AS65) $(CFLAGS65) $< -o $@
 
 $(objdir)/%.o: $(objdir)/%.s
@@ -94,6 +95,9 @@ editor: editor.cpp
 sin: sin.cpp
 	 $(CXX) -std=c++17 $< -o $@
 
+time_digit: time_digit.cpp
+	 $(CXX) -std=c++17 $< -o $@
+
 recip: recip.cpp
 	 $(CXX) -std=c++17 $< -o $@
 
@@ -106,6 +110,9 @@ $(srcdir)/line.chr: chrc
 $(srcdir)/sin.inc: sin
 	./sin $@
 
+$(srcdir)/time_digit.inc: time_digit
+	./time_digit $@
+
 $(srcdir)/line_unrolled.s: line
 	./line $@
 
@@ -115,7 +122,8 @@ $(srcdir)/clip.inc: clip
 $(srcdir)/recip.inc: recip
 	./recip $@
 
-$(srcdir)/sprpack.chr: $(srcdir)/rad316.chr $(srcdir)/menutext16.chr $(srcdir)/ship16.chr $(srcdir)/ui16.chr
+$(srcdir)/sprpack.chr: $(srcdir)/rad316.chr $(srcdir)/menutext16.chr \
+$(srcdir)/ship16.chr $(srcdir)/ui16.chr $(srcdir)/explode16.chr
 	cat $^ > $@
 
 $(srcdir)/rad.inc: rad $(srcdir)/rad16.chr $(srcdir)/rad216.chr  $(srcdir)/rad316.chr

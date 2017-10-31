@@ -90,8 +90,6 @@ multiply_sub: .res 1
 y_temp: .res 1
 recip_ptr: .res 2
 
-camera_height: .res 1
-
 .segment "BSS" ; RAM
 pad_size = 6
 
@@ -115,8 +113,21 @@ depthpad_rx_hi: .res pad_size
 depthpad_ry_lo: .res pad_size
 depthpad_ry_hi: .res pad_size
 
+time_sub: .res 1
+time_digits: .res 4
+
 boost_regen_timer: .res 1
 game_flags: .res 1
+camera_height: .res 1
+local_camera_height: .res 1
+p1_pre_explosion: .res 1
+p1_explosion: .res 1
+p1_lap: .res 1
+p1_text_timer: .res 1
+p2_pre_explosion: .res 1
+p2_explosion: .res 1
+p2_lap: .res 1
+p2_text_timer: .res 1
 
 .align 256
 nt_buffer: .res 32*22

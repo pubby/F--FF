@@ -145,8 +145,6 @@ multiply = $78
 .globalzp y_temp
 .globalzp recip_ptr
 
-.globalzp camera_height
-
 .global tokumaru_storage
 .global scratchpad
 .global scratchpad_lx_lo
@@ -197,8 +195,21 @@ multiply = $78
 .global positive_asl
 .global negative_asl
 
+.global time_sub
+.global time_digits
+
 .global boost_regen_timer
 .global game_flags
+.global camera_height
+.global local_camera_height
+.global p1_pre_explosion
+.global p1_explosion
+.global p1_lap
+.global p1_text_timer
+.global p2_pre_explosion
+.global p2_explosion
+.global p2_lap
+.global p2_text_timer
 
 ; Multiply Labels
 .global multiply_code
