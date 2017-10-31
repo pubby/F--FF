@@ -157,7 +157,7 @@ update_return:
     jsr read_gamepads
 
     jsr p1_move
-    ;lda #SPLITSCREEN_LEFT
+    lda #SPLITSCREEN_LEFT
     ;sta line_splitscreen
     jsr p1_render
 
@@ -191,11 +191,40 @@ update_return:
     sta time_digits+3
 doneDigitUpdate:
 
+    lda frame_number
+    lsr
+    bcc doneRainbowPalette
+
+    ldx #%11110000
+    ldy #1
+rainbowPaletteLoop:
+    lda palette_buffer, y
+    sax subroutine_temp
+    anc #%00001111
+    adc #1
+    cmp #$D
+    bne :+
+    lda #$1
+:
+    ora subroutine_temp
+    sta palette_buffer, y
+    lda next_palette_index, y
+    tay
+    bne rainbowPaletteLoop
+doneRainbowPalette:
+
+
     lda #1 
     sta debug
     sta frame_ready
     jmp update_return
 .endproc
+
+next_palette_index:
+.byt 0,  2,  3,  5
+.byt 0,  6,  7,  9
+.byt 0, 10, 11, 13
+.byt 0, 14, 15,  0
 
 main:
     jmp init_menu

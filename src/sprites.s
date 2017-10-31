@@ -172,6 +172,7 @@ doneExclamationMark:
     sta draw_y
     lda p1_lap
     asl
+    sbc #1
     tay
     lda metasprite::lap, y
     sta ptr_temp+0

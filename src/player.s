@@ -288,25 +288,26 @@ storeLift:
     ;int a = to_signed(c.x - lx) * to_signed(ry - ly);
     ;int b = to_signed(c.y - ly) * to_signed(rx - lx);
 
-    lda #0
-    sta oob
 
     ; Levels are in bank 2
     bankswitch 2
 
     lda P i, _track_index
     sta lx_lo_ptr
-    sta lx_hi_ptr
     sta ly_lo_ptr
-    sta ly_hi_ptr
     sta rx_lo_ptr
-    sta rx_hi_ptr
     sta ry_lo_ptr
+    ora #128
+    sta lx_hi_ptr
+    sta ly_hi_ptr
+    sta rx_hi_ptr
     sta ry_hi_ptr
 
+    lda #0
+    sta oob
 
     ; Back railing (and set up multiply for right railing)
-    ldy #0
+    tay                 ; Y = 0
     sec
     lda 0+P i, _x
     sbc (rx_lo_ptr), y
@@ -325,16 +326,21 @@ storeLift:
     stx back_edge_result_hi
 
     ; Right railing
-    ldy #128
-    lda (ry_lo_ptr), y  ; (ry[1] - ry[0]) is stored in Y=128
+    sec
+    lda (ry_lo_ptr), y
+    iny                 ; Y = 1
+    sbc (ry_lo_ptr), y
     sta multiply_store
+    dey                 ; Y = 0
     lda (ry_hi_ptr), y
+    iny                 ; Y = 1
+    sbc (ry_hi_ptr), y
     jsr multiply
     sta right_edge_result_lo
     stx right_edge_result_hi
 
     ; Back railing
-    ldy #0
+    dey                 ; Y = 0
     sec
     lda 0+P i, _y
     sbc (ry_lo_ptr), y
@@ -344,11 +350,16 @@ storeLift:
     jsr setup_multiply
 
     ; Right railing
-    ldy #128
-    lda (rx_lo_ptr), y  ; (rx[1] - rx[0]) is stored in Y=128
+    sec
+    lda (rx_lo_ptr), y
+    iny                 ; Y = 1
+    sbc (rx_lo_ptr), y
     sta multiply_store
-    lax (rx_hi_ptr), y
-    jsr multiply+1      ; +1 to skip TAX
+    dey                 ; Y = 0
+    lda (rx_hi_ptr), y
+    iny                 ; Y = 1
+    sbc (rx_hi_ptr), y
+    jsr multiply
     cmp right_edge_result_lo
     txa
     sbc right_edge_result_hi
@@ -359,7 +370,7 @@ storeLift:
     sta oob
 
     ; Back railing
-    ldy #0
+    dey                 ; Y = 0
     sec
     lda (lx_lo_ptr), y
     sbc (rx_lo_ptr), y
@@ -377,7 +388,7 @@ storeLift:
     sta oob
 
     ; Front railing (and set up multiply for left railing)
-    ldy #1
+    iny                 ; Y = 1
     sec
     lda 0+P i, _x
     sbc (lx_lo_ptr), y
@@ -396,16 +407,21 @@ storeLift:
     stx front_edge_result_hi
 
     ; Left railing
-    ldy #128
-    lda (ly_lo_ptr), y  ; (ly[1] - ly[0]) is stored in Y=128
+    sec
+    lda (ly_lo_ptr), y
+    dey                 ; Y = 0
+    sbc (ly_lo_ptr), y
     sta multiply_store
+    iny                 ; Y = 1
     lda (ly_hi_ptr), y
+    dey                 ; Y = 0
+    sbc (ly_hi_ptr), y
     jsr multiply
     sta left_edge_result_lo
     stx left_edge_result_hi
 
     ; Front railing
-    ldy #1
+    iny                 ; Y = 1
     sec
     lda 0+P i, _y
     sbc (ly_lo_ptr), y
@@ -414,23 +430,28 @@ storeLift:
     sbc (ly_hi_ptr), y
     jsr setup_multiply
 
-    ; Left railing
-    ldy #128
-    lda (lx_lo_ptr), y  ; (lx[1] - lx[0]) is stored in Y=128
+    ; Left railing (lx[1] - lx[0])
+    sec
+    lda (lx_lo_ptr), y
+    dey                 ; Y = 0
+    sbc (lx_lo_ptr), y
     sta multiply_store
-    lax (lx_hi_ptr), y
-    jsr multiply+1      ; +1 to skip TAX
+    iny                 ; Y = 1
+    lda (lx_hi_ptr), y
+    dey                 ; Y = 0
+    sbc (lx_hi_ptr), y
+    jsr multiply
     cmp left_edge_result_lo
     txa
     sbc left_edge_result_hi
-    bvs :+
+    bvc :+
     eor #$80
 :
     ora oob
     sta oob
 
     ; Front railing
-    ldy #1
+    iny                 ; Y = 1
     sec
     lda (rx_lo_ptr), y
     sbc (lx_lo_ptr), y

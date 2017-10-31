@@ -132,27 +132,11 @@ void save_asm(char const* filename, editor const& e)
         std::fprintf(fp, "    .byt .lobyte(%i)\n", 
                      to_short(l_nodes[i % l_nodes.size()].x - 256.0f));
     }
-    std::fprintf(fp, "    ; precomputes:\n");
-    for(unsigned i = 0; i != 128; ++i)
-    {
-        std::fprintf(fp, "    .byt .lobyte(%i)\n", 
-                     to_short(l_nodes[(i) % l_nodes.size()].x 
-                              - l_nodes[(i+1) % l_nodes.size()].x));
-    }
-
-    std::fprintf(fp, ".align 256\n");
     std::fprintf(fp, "ltx_hi:\n");
     for(unsigned i = 0; i != 128; ++i)
     {
         std::fprintf(fp, "    .byt .hibyte(%i)\n", 
                      to_short(l_nodes[i % l_nodes.size()].x - 256.0f));
-    }
-    std::fprintf(fp, "    ; precomputes:\n");
-    for(unsigned i = 0; i != 128; ++i)
-    {
-        std::fprintf(fp, "    .byt .hibyte(%i)\n", 
-                     to_short(l_nodes[(i) % l_nodes.size()].x 
-                              - l_nodes[(i+1) % l_nodes.size()].x));
     }
 
     std::fprintf(fp, ".align 256\n");
@@ -162,26 +146,11 @@ void save_asm(char const* filename, editor const& e)
         std::fprintf(fp, "    .byt .lobyte(%i)\n", 
                      to_short(l_nodes[i % l_nodes.size()].y - 256.0f));
     }
-    std::fprintf(fp, "    ; precomputes:\n");
-    for(unsigned i = 0; i != 128; ++i)
-    {
-        std::fprintf(fp, "    .byt .lobyte(%i)\n", 
-                     to_short(l_nodes[(i) % l_nodes.size()].y
-                              - l_nodes[(i+1) % l_nodes.size()].y));
-    }
-    std::fprintf(fp, ".align 256\n");
     std::fprintf(fp, "lty_hi:\n");
     for(unsigned i = 0; i != 128; ++i)
     {
         std::fprintf(fp, "    .byt .hibyte(%i)\n", 
                      to_short(l_nodes[i % l_nodes.size()].y - 256.0f));
-    }
-    std::fprintf(fp, "    ; precomputes:\n");
-    for(unsigned i = 0; i != 128; ++i)
-    {
-        std::fprintf(fp, "    .byt .hibyte(%i)\n", 
-                     to_short(l_nodes[(i) % l_nodes.size()].y
-                              - l_nodes[(i+1) % l_nodes.size()].y));
     }
 
     std::fprintf(fp, ".align 256\n");
@@ -191,26 +160,11 @@ void save_asm(char const* filename, editor const& e)
         std::fprintf(fp, "    .byt .lobyte(%i)\n", 
                      to_short(r_nodes[i % r_nodes.size()].x - 256.0f));
     }
-    std::fprintf(fp, "    ; precomputes:\n");
-    for(unsigned i = 0; i != 128; ++i)
-    {
-        std::fprintf(fp, "    .byt .lobyte(%i)\n", 
-                     to_short(r_nodes[(i) % r_nodes.size()].x
-                              - r_nodes[(i+1) % r_nodes.size()].x));
-    }
-    std::fprintf(fp, ".align 256\n");
     std::fprintf(fp, "rtx_hi:\n");
     for(unsigned i = 0; i != 128; ++i)
     {
         std::fprintf(fp, "    .byt .hibyte(%i)\n", 
                      to_short(r_nodes[i % r_nodes.size()].x - 256.0f));
-    }
-    std::fprintf(fp, "    ; precomputes:\n");
-    for(unsigned i = 0; i != 128; ++i)
-    {
-        std::fprintf(fp, "    .byt .hibyte(%i)\n", 
-                     to_short(r_nodes[(i) % r_nodes.size()].x
-                              - r_nodes[(i+1) % r_nodes.size()].x));
     }
 
     std::fprintf(fp, ".align 256\n");
@@ -220,26 +174,11 @@ void save_asm(char const* filename, editor const& e)
         std::fprintf(fp, "    .byt .lobyte(%i)\n", 
                      to_short(r_nodes[i % r_nodes.size()].y - 256.0f));
     }
-    std::fprintf(fp, "    ; precomputes:\n");
-    for(unsigned i = 0; i != 128; ++i)
-    {
-        std::fprintf(fp, "    .byt .lobyte(%i)\n", 
-                     to_short(r_nodes[(i) % r_nodes.size()].y
-                              - r_nodes[(i+1) % r_nodes.size()].y));
-    }
-    std::fprintf(fp, ".align 256\n");
     std::fprintf(fp, "rty_hi:\n");
     for(unsigned i = 0; i != 128; ++i)
     {
         std::fprintf(fp, "    .byt .hibyte(%i)\n", 
                      to_short(r_nodes[i % r_nodes.size()].y - 256.0f));
-    }
-    std::fprintf(fp, "    ; precomputes:\n");
-    for(unsigned i = 0; i != 128; ++i)
-    {
-        std::fprintf(fp, "    .byt .hibyte(%i)\n", 
-                     to_short(r_nodes[(i) % r_nodes.size()].y
-                              - r_nodes[(i+1) % r_nodes.size()].y));
     }
 
     std::fclose(fp);
@@ -360,6 +299,10 @@ int main(int argc, char** argv)
                     break;
                 case sf::Keyboard::Num4:
                     e.active_segment().wr += 1;
+                    break;
+                case sf::Keyboard::Num0:
+                    e.active_segment().wl = 6.0f;
+                    e.active_segment().wr = 6.0f;
                     break;
                 }
                 break;
