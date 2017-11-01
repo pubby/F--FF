@@ -5,7 +5,6 @@
 .import setup_cos, setup_sin
 .importzp multiply_store
 .import setup_depth
-.import asl_code
 .import clip_from_y_top_sub
 .import clip_from_y_top_add
 .import clip_to_y_top_sub
@@ -17,9 +16,9 @@ draw_distance = 5
 
 .segment "CODE"
 
-.macro wall_line offset
+.macro wall_line nth, offset
 from:
-    lda scratchpad_ly_hi+offset, y
+.if nth
     jmp doneReuse
     ; Reuse previous calculations.
     lda depthpad_lx_lo+offset, y
@@ -31,6 +30,7 @@ from:
     lda depthpad_ly_hi+offset, y
     sta from_y+1
     jmp to
+.endif
 doneReuse:
     lda scratchpad_lx_lo+offset, y
     sta from_x+0
@@ -99,6 +99,7 @@ doneReuse:
     stx from_y+0
 @zeroHi:
     ; ly_lo (from_y+0) in X.
+    bankswitch_to recip_asl_table
     lda recip_asl_table, x
     sta multiply_label jump_pos, 1
     clc
@@ -110,8 +111,9 @@ doneReuse:
     lda #$60            ; RTS
     sta multiply_label r2, 0
 
+    bankswitch_to recip_asl_table
     jsr multiply_from
-
+    bankswitch_to draw_line
 to:
     lda scratchpad_lx_lo+1+offset, y
     sta to_x+0
@@ -176,6 +178,7 @@ to:
     stx to_y+0
 @zeroHi:
     ; ly_lo (to_y+0) in X.
+    bankswitch_to recip_asl_table
     lda recip_asl_table, x
     sta multiply_label jump_pos, 1
     clc
@@ -187,7 +190,9 @@ to:
     lda #$60            ; RTS
     sta multiply_label r2, 0
 
+    bankswitch_to recip_asl_table
     jsr multiply_to
+    bankswitch_to draw_line
 
     lda to_x+0
     sta depthpad_lx_lo+1+offset, y
@@ -197,7 +202,9 @@ to:
     sta depthpad_ly_lo+1+offset, y
     lda to_y+1
     sta depthpad_ly_hi+1+offset, y
-
+    lda (tf_ptr), y
+    and #TF_BLANK | TF_JUMP
+    bne cull
     jsr draw_line
 cull:
     ldy y_temp
@@ -284,6 +291,7 @@ from:
     stx from_y+0
 @zeroHi:
     ; ly_lo (from_y+0) in X.
+    bankswitch_to recip_asl_table
     lda recip_asl_table, x
     sta multiply_label jump_pos, 1
     clc
@@ -295,8 +303,9 @@ from:
     lda #$60            ; RTS
     sta multiply_label r2, 0
 
+    bankswitch_to recip_asl_table
     jsr multiply_from
-
+    bankswitch_to draw_line
 to:
     lda scratchpad_ry_hi, y
     bmi @doneReuse
@@ -373,6 +382,7 @@ to:
     stx to_y+0
 @zeroHi:
     ; ly_lo (to_y+0) in X.
+    bankswitch_to recip_asl_table
     lda recip_asl_table, x
     sta multiply_label jump_pos, 1
     clc
@@ -384,8 +394,13 @@ to:
     lda #$60            ; RTS
     sta multiply_label r2, 0
 
+    bankswitch_to recip_asl_table
     jsr multiply_to
+    bankswitch_to draw_line
 draw:
+    lda (tf_ptr), y
+    and #TF_BLANK
+    bne cull
     jsr draw_line
 cull:
     ldy y_temp
@@ -467,8 +482,11 @@ cull:
     ; Levels are in bank 2
     bankswitch 2
 
-    lda camera_height
-    sec
+    clc
+    lda 1+P i, _z
+    asl
+    asl
+    adc camera_height
     sbc P i, _boost
     sta local_camera_height
 
@@ -604,13 +622,11 @@ sinLoop:
 .endproc
 .endrepeat
 
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ; Draw the lines and shit
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ; Draw the lines and shit ;
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;
 .proc draw_lines_and_shit
-
-    ; Gonna use line routines in bank 0.
-    bankswitch 0
+    bankswitch_to draw_line
 
     ; Setup color shit
     lda #%1100
@@ -657,10 +673,10 @@ sinLoop:
     sty y_temp
     jmp doneReuse
 renderWallsLoop:
-    wall_line 0
+    wall_line 0, 0
     .scope right
         beq right::doneReuse        ; Zero flag = Y
-        wall_line (scratchpad_rx_lo - scratchpad_lx_lo)
+        wall_line 1, (scratchpad_rx_lo - scratchpad_lx_lo)
     .endscope
 nextIteration:
     iny
@@ -695,6 +711,7 @@ renderFloorsLoop:
     .scope floor
         floor_line
     .endscope
+nextFloorIteration:
     iny
     cpy #draw_distance
     bcs :+

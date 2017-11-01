@@ -6,6 +6,9 @@
 .export setup_depth
 .export setup_multiply
 
+.segment "RECIP_TABLES"
+.include "recip.inc"
+
 .segment "MULT_TABLES"
 square1_lo:
     .repeat 512, i
@@ -23,8 +26,6 @@ square2_hi:
     .repeat 512, i
         .byt .hibyte(((i-255)*(i-255))/4)
     .endrepeat
-
-.include "recip.inc"
 
 .proc positive_asl
     .repeat 6

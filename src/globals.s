@@ -59,6 +59,7 @@ rx_lo_ptr: .res 2
 rx_hi_ptr: .res 2
 ry_lo_ptr: .res 2
 ry_hi_ptr: .res 2
+tf_ptr: .res 2
 
 ; Line Drawing
 from_x_sub:  .res 1
@@ -120,14 +121,20 @@ boost_regen_timer: .res 1
 game_flags: .res 1
 camera_height: .res 1
 local_camera_height: .res 1
+
 p1_pre_explosion: .res 1
 p1_explosion: .res 1
 p1_lap: .res 1
 p1_text_timer: .res 1
+p1_z: .res 2
+p1_zspeed: .res 2
+
 p2_pre_explosion: .res 1
 p2_explosion: .res 1
 p2_lap: .res 1
 p2_text_timer: .res 1
+p2_z: .res 2
+p2_zspeed: .res 2
 
 .align 256
 nt_buffer: .res 32*22

@@ -90,6 +90,16 @@ doneLeftRight:
     lda P i, _buttons_pressed
     asl                 ; Test for button A
     bcc notPressingA
+
+    lda #0
+    sta 0+P i, _z
+    sta 1+P i, _z
+    lda #128
+    sta 0+P i, _zspeed
+    lda #3
+    sta 1+P i, _zspeed
+
+.if 0
     lda P i, _boost_tank
     sbc #20
     bcc notBoosting
@@ -99,6 +109,7 @@ doneLeftRight:
     and #%10000000
     ora #16
     sta P i, _boost_timer
+.endif
 notBoosting:
 notPressingA:
 
@@ -170,6 +181,23 @@ boost:
 storeBoost:
     sta P i, _boost
 doneBoost:
+
+    lda 1+P i, _z
+    bmi doneZ
+    lda 0+P i, _zspeed
+    sec
+    sbc #64*mul/div
+    sta 0+P i, _zspeed
+    bcs :+
+    dec 1+P i, _zspeed
+:
+    clc
+    adc 0+P i, _z
+    sta 0+P i, _z
+    lda 1+P i, _zspeed
+    adc 1+P i, _z
+    sta 1+P i, _z
+doneZ:
 
 .endmacro
 
@@ -297,6 +325,7 @@ storeLift:
     sta ly_lo_ptr
     sta rx_lo_ptr
     sta ry_lo_ptr
+    sta tf_ptr
     ora #128
     sta lx_hi_ptr
     sta ly_hi_ptr
@@ -480,10 +509,11 @@ storeLift:
     stx P i, _track_index
 doneOutsideFrontRailing:
 
-    lda P i, _boost_timer
-    ldx oob
+    lda oob
+    and 1+P i, _z
     bpl inBounds
 outOfBounds:
+    lda P i, _boost_timer
     and #%01111111
     sta P i, _boost_timer
     dec P i, _boost_tank
@@ -494,6 +524,7 @@ notDead:
     rts
 
 inBounds:
+    lda P i, _boost_timer
     ora #%10000000
     sta P i, _boost_timer
     lax boost_regen_timer

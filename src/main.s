@@ -19,30 +19,30 @@
 .export sprites_chr, rad_chr
 .export init_game
 
-.segment "P0B"
+.segment "BANK0_END"
 .byt 0
-.segment "P1B"
+.segment "BANK1_END"
 .byt 1
-.segment "P2B"
+.segment "BANK2_END"
 .byt 2
+.segment "BANK3_END"
+.byt 3
+
+.segment "CODE"
+track_size: .byt 64
 
 .segment "LEVELS"
-.include "foo.level.inc"
+.scope l1
+    .include "foo.level.inc"
+.endscope
+.scope l2
+    .include "foo.level.inc"
+.endscope
+.scope l3
+    .include "foo.level.inc"
+.endscope
 
 .segment "NMI_CODE"
-
-.proc copy_palette_buffer
-    ppu_palette_address = $3F00
-    lda #.hibyte(ppu_palette_address)
-    sta PPUADDR
-    lda #.lobyte(ppu_palette_address)
-    sta PPUADDR
-    .repeat 32, i
-        lda palette_buffer+i
-        sta PPUDATA
-    .endrepeat
-    rts
-.endproc
 
 .proc game_nmi
     lsr subframes_left
@@ -82,15 +82,25 @@ renderFrame:
     sta subframes_left
 
     bit PPUSTATUS
-
     lda #$20
     sta PPUADDR
     ldx #$00
     stx PPUADDR
     stx PPUMASK
-
-    .repeat 32*22, i
-        lda nt_buffer+i
+    lda #$FF
+    .repeat 2, i
+    :
+        .repeat 64, j
+            ldy nt_buffer+(i*256)+j, x
+            sty PPUDATA
+        .endrepeat
+        axs #.lobyte(-64)
+        beq :+
+        jmp :-
+    :
+    .endrepeat
+    .repeat 32*22-512, i
+        lda nt_buffer+i+512
         sta PPUDATA
     .endrepeat
 
@@ -116,7 +126,7 @@ return:
     pha
     stx nmi_x
     sty nmi_y
-    lda $8000 ; current bank
+    lda $BFFF ; current bank
     sta nmi_bank
     bankswitch_to game_nmi
     jmp (nmi_ptr)
@@ -147,7 +157,7 @@ update_return:
 .proc update_game
     lda #0
     sta frame_ready
-    sta debug
+    ;sta debug
     inc frame_number
 
     jsr prepare_game_sprites
@@ -215,7 +225,7 @@ doneRainbowPalette:
 
 
     lda #1 
-    sta debug
+    ;sta debug
     sta frame_ready
     jmp update_return
 .endproc
@@ -227,8 +237,8 @@ next_palette_index:
 .byt 0, 14, 15,  0
 
 main:
-    jmp init_menu
-    ;jmp init_flag
+    ;jmp init_menu
+    jmp init_flag
 .proc init_game
     ldx #0
     stx PPUMASK
@@ -292,15 +302,18 @@ paletteLoop:
     sta camera_height
 
     ; setup pointers (TODO)
-    store16into #ltx_lo, lx_lo_ptr
-    store16into #ltx_hi, lx_hi_ptr
-    store16into #lty_lo, ly_lo_ptr
-    store16into #lty_hi, ly_hi_ptr
-    store16into #rtx_lo, rx_lo_ptr
-    store16into #rtx_hi, rx_hi_ptr
-    store16into #rty_lo, ry_lo_ptr
-    store16into #rty_hi, ry_hi_ptr
-    lda track_size
+    store16into #l1::ltx_lo, lx_lo_ptr
+    store16into #l1::ltx_hi, lx_hi_ptr
+    store16into #l1::lty_lo, ly_lo_ptr
+    store16into #l1::lty_hi, ly_hi_ptr
+    store16into #l1::rtx_lo, rx_lo_ptr
+    store16into #l1::rtx_hi, rx_hi_ptr
+    store16into #l1::rty_lo, ry_lo_ptr
+    store16into #l1::rty_hi, ry_hi_ptr
+    store16into #l1::tf, tf_ptr
+    ; TODO
+    ;bankswitch_to track_size
+    lda #l1::track_size
     sta level_length
 
     bankswitch_to ppu_load_4x4_pixels_chr

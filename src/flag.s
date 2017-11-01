@@ -17,10 +17,9 @@ pal_ptr = l1100+3 ; 2 bytes
 fade_state = l1100+5
 
 .segment "FLAG_DATA"
-flag_nt:
-    .include "flag_nt.inc"
 flag_chr:
     .include "flag_chr.inc"
+    .include "flag_nt.inc"
 
 .segment "SIN_SCROLL"
 .include "sin_scroll.inc"
@@ -307,20 +306,43 @@ pal_table_hi:
     dex
     bne :-
     
-
-    bankswitch_to flag_nt
+    bankswitch_to flag_nt_data
     bit PPUSTATUS
     lda #$20
     sta PPUADDR
-    ldx #$00
-    stx PPUADDR
-    .repeat 4, i
-    :
-        lda flag_nt+256*i, x
-        sta PPUDATA
-        inx
-        bne :-
+    ldy #$00
+    sty PPUADDR
+    store16into #flag_nt_data, ptr_temp
+readBytesLoop:
+    lda (ptr_temp), y
+    cmp #$FF
+    beq exitLoop
+    ldx #%00011111
+    axs #0
+    .repeat 5
+        lsr
     .endrepeat
+    bne shortLength
+longLength:
+    inc ptr_temp+0
+    bne :+
+    inc ptr_temp+1
+:
+    lda (ptr_temp), y
+shortLength:
+    sta subroutine_temp
+    lda flag_nt_map, x
+    ldx subroutine_temp
+runLengthLoop:
+    sta PPUDATA
+    dex
+    bne runLengthLoop
+    inc ptr_temp+0
+    bne :+
+    inc ptr_temp+1
+:
+    jmp readBytesLoop
+exitLoop:
 
     store8into #8, fade_state
     ldx #0

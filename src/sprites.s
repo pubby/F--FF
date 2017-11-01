@@ -202,6 +202,131 @@ clearOAMLoop:
     rts
 .endproc
 
+.proc prepare_player_sprites
+    ; y-positions
+    lda p1_dir_speed
+    anc #%11110000
+    ror
+    adc #4*8
+    tay
+    sec
+    .repeat 6, i
+        lda #178
+        adc ship_y_offsets+i, y
+        sbc p1_z+1
+        sbc p1_lift
+        sta OAM_SHIP+(4*(i+0))+0
+    .endrepeat
+    .repeat 6, i
+        lda #178+16
+        adc ship_y_offsets+i, y
+        sbc p1_z+1
+        sbc p1_lift
+        sta OAM_SHIP+(4*(i+6))+0
+    .endrepeat
+
+    lda p1_buttons_held
+    and #BUTTON_LEFT | BUTTON_RIGHT
+    beq noFlaps
+    cmp #BUTTON_LEFT | BUTTON_RIGHT
+    beq noFlaps
+    and #BUTTON_LEFT
+    beq :+
+    lda #PATTERN($34)
+    sta OAM_SHIP+(4*0)+1
+    lda frame_number
+    anc #%110
+    adc #PATTERN($44)
+    sta OAM_SHIP+(4*6)+1
+    lda #PATTERN($33)
+    sta OAM_SHIP+(4*5)+1
+    lda #PATTERN($43)
+    sta OAM_SHIP+(4*11)+1
+:
+
+    lda p1_buttons_held
+    and #BUTTON_RIGHT
+    beq :+
+    lda #PATTERN($33)
+    sta OAM_SHIP+(4*0)+1
+    lda #PATTERN($43)
+    sta OAM_SHIP+(4*6)+1
+    lda #PATTERN($34)
+    sta OAM_SHIP+(4*5)+1
+    lda frame_number
+    anc #%110
+    adc #PATTERN($44)
+    sta OAM_SHIP+(4*11)+1
+:
+    rts
+
+noFlaps:
+    lda #PATTERN($30)
+    sta OAM_SHIP+(4*0)+1
+    sta OAM_SHIP+(4*5)+1
+    lda #PATTERN($40)
+    sta OAM_SHIP+(4*6)+1
+    sta OAM_SHIP+(4*11)+1
+    rts
+
+
+    lda #104
+    sta draw_x
+
+    lda #64
+    sec
+    sbc p1_lift
+    sta draw_y
+
+    ldy #1
+    store16into #metasprite::ship_const0, ptr_temp
+    ; TODO
+    ;jsr prepare_metasprite
+
+    ldy #$26
+    lda p1_buttons_held
+    and #BUTTON_B
+    bne :+
+    ldy #$06
+:
+    sty palette_buffer+16+7
+
+
+    ; SHADOW
+    ; y-positions
+    lda #154+18
+    .repeat 6, i
+        sta CPU_OAM+(4*(i+0))+0, x
+    .endrepeat
+
+    ; x-positions
+    .repeat 6, i
+        lda #104+8*i
+        sta CPU_OAM+(4*(i+0))+3, x
+    .endrepeat
+
+    ; patterns
+    .repeat 3, i
+        lda #PATTERN($35+i)
+        sta CPU_OAM+(4*(i+0))+1, x
+        sta CPU_OAM+(4*(5-i))+1, x
+    .endrepeat
+
+    ; attributes
+    lda #%00000010
+    .repeat 3, i
+        sta CPU_OAM+(4*(i+0))+2, x
+    .endrepeat
+    lda #%01000010
+    .repeat 3, i
+        sta CPU_OAM+(4*(i+3))+2, x
+    .endrepeat
+
+    txa
+    axs #.lobyte(-4*6)
+    rts
+.endproc
+
 ship_y_offsets:
     .byt  <(+3-7), <+2, <+1, <-0, <-1, <(-2-7), $FF, $FF
     .byt  <(+2-7), <+1, <+0, <-0, <-1, <(-2-7), $FF, $FF
@@ -336,129 +461,6 @@ ship_y_offsets:
         sta OAM_TIME+(4*i)+2
     .endrepeat
 
-    rts
-.endproc
-
-.proc prepare_player_sprites
-    ; y-positions
-    lda p1_dir_speed
-    anc #%11110000
-    ror
-    adc #4*8
-    tay
-    sec
-    .repeat 6, i
-        lda #178
-        adc ship_y_offsets+i, y
-        sbc p1_lift
-        sta OAM_SHIP+(4*(i+0))+0
-    .endrepeat
-    .repeat 6, i
-        lda #178+16
-        adc ship_y_offsets+i, y
-        sbc p1_lift
-        sta OAM_SHIP+(4*(i+6))+0
-    .endrepeat
-
-    lda p1_buttons_held
-    and #BUTTON_LEFT | BUTTON_RIGHT
-    beq noFlaps
-    cmp #BUTTON_LEFT | BUTTON_RIGHT
-    beq noFlaps
-    and #BUTTON_LEFT
-    beq :+
-    lda #PATTERN($34)
-    sta OAM_SHIP+(4*0)+1
-    lda frame_number
-    anc #%110
-    adc #PATTERN($44)
-    sta OAM_SHIP+(4*6)+1
-    lda #PATTERN($33)
-    sta OAM_SHIP+(4*5)+1
-    lda #PATTERN($43)
-    sta OAM_SHIP+(4*11)+1
-:
-
-    lda p1_buttons_held
-    and #BUTTON_RIGHT
-    beq :+
-    lda #PATTERN($33)
-    sta OAM_SHIP+(4*0)+1
-    lda #PATTERN($43)
-    sta OAM_SHIP+(4*6)+1
-    lda #PATTERN($34)
-    sta OAM_SHIP+(4*5)+1
-    lda frame_number
-    anc #%110
-    adc #PATTERN($44)
-    sta OAM_SHIP+(4*11)+1
-:
-    rts
-
-noFlaps:
-    lda #PATTERN($30)
-    sta OAM_SHIP+(4*0)+1
-    sta OAM_SHIP+(4*5)+1
-    lda #PATTERN($40)
-    sta OAM_SHIP+(4*6)+1
-    sta OAM_SHIP+(4*11)+1
-    rts
-
-
-    lda #104
-    sta draw_x
-
-    lda #64
-    sec
-    sbc p1_lift
-    sta draw_y
-
-    ldy #1
-    store16into #metasprite::ship_const0, ptr_temp
-    ; TODO
-    ;jsr prepare_metasprite
-
-    ldy #$26
-    lda p1_buttons_held
-    and #BUTTON_B
-    bne :+
-    ldy #$06
-:
-    sty palette_buffer+16+7
-
-
-    ; SHADOW
-    ; y-positions
-    lda #154+18
-    .repeat 6, i
-        sta CPU_OAM+(4*(i+0))+0, x
-    .endrepeat
-
-    ; x-positions
-    .repeat 6, i
-        lda #104+8*i
-        sta CPU_OAM+(4*(i+0))+3, x
-    .endrepeat
-
-    ; patterns
-    .repeat 3, i
-        lda #PATTERN($35+i)
-        sta CPU_OAM+(4*(i+0))+1, x
-        sta CPU_OAM+(4*(5-i))+1, x
-    .endrepeat
-
-    ; attributes
-    lda #%00000010
-    .repeat 3, i
-        sta CPU_OAM+(4*(i+0))+2, x
-    .endrepeat
-    lda #%01000010
-    .repeat 3, i
-        sta CPU_OAM+(4*(i+3))+2, x
-    .endrepeat
-
-    txa
-    axs #.lobyte(-4*6)
     rts
 .endproc
 

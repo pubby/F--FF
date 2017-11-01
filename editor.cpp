@@ -9,11 +9,15 @@ constexpr float segment_length = 24.0f;
 constexpr float quarter_angle = 1.57079632679f;
 constexpr float turn_increment = quarter_angle * 0.1;
 
+constexpr unsigned char TF_BLANK = 1 << 0;
+constexpr unsigned char TF_JUMP = 1 << 1;
+
 struct segment_t
 {
     float angle;
     float wl = 6.0f;
     float wr = 6.0f;
+    unsigned char flags = 0;
 };
 
 struct node_t
@@ -82,7 +86,11 @@ void save(char const* filename, editor const& e)
     if(!fp)
         throw std::runtime_error("can't open file");
     for(unsigned i = 0; i != e.segments.size(); ++i)
-        std::fprintf(fp, "%f %f %f\n", e.segments[i].angle, e.segments[i].wl, e.segments[i].wr);
+        std::fprintf(fp, "%f %f %f %i\n", 
+                     e.segments[i].angle, 
+                     e.segments[i].wl, 
+                     e.segments[i].wr,
+                     e.segments[i].flags);
     std::fclose(fp);
 }
 
@@ -94,8 +102,10 @@ editor load(char const* filename)
     {
         while(true)
         {
-            segment_t s;
-            if(std::fscanf(fp, "%f %f %f\n", &s.angle, &s.wl, &s.wr) != 3)
+            segment_t s = {};
+            int const read = std::fscanf(fp, "%f %f %f %i\n", 
+               &s.angle, &s.wl, &s.wr, &s.flags);
+            if(read <= 0)
                 break;
             e.segments.push_back(s);
         }
@@ -122,9 +132,9 @@ void save_asm(char const* filename, editor const& e)
     if(!fp)
         throw std::runtime_error("can't open file");
 
-    std::fprintf(fp, "track_size:\n");
-        std::fprintf(fp, "    .byt %i\n", l_nodes.size());
+    std::fprintf(fp, "track_size = %i\n", l_nodes.size());
 
+    std::fprintf(fp, ".segment \"LEVELS\"");
     std::fprintf(fp, ".align 256\n");
     std::fprintf(fp, "ltx_lo:\n");
     for(unsigned i = 0; i != 128; ++i)
@@ -181,6 +191,11 @@ void save_asm(char const* filename, editor const& e)
                      to_short(r_nodes[i % r_nodes.size()].y - 256.0f));
     }
 
+    std::fprintf(fp, ".segment \"LEVEL_FLAGS\"");
+    std::fprintf(fp, "tf:\n");
+    for(unsigned i = 0; i != 128; ++i)
+        std::fprintf(fp, "    .byt %i\n", e.segments[i % e.segments.size()].flags);
+
     std::fclose(fp);
 }
 
@@ -195,8 +210,21 @@ void draw(sf::RenderTarget& rt, editor const& e)
         sf::VertexArray line(sf::LinesStrip, 2);
         line[0].position = sf::Vector2f(l_nodes[i].x, l_nodes[i].y);
         line[1].position = sf::Vector2f(r_nodes[i].x, r_nodes[i].y);
-        line[0].color = sf::Color::Yellow;
-        line[1].color = sf::Color::Yellow;
+        if(e.segments[i].flags & TF_BLANK)
+        {
+            line[0].color = sf::Color(40, 40, 40);
+            line[1].color = sf::Color(40, 40, 40);
+        }
+        else if(e.segments[i].flags & TF_JUMP)
+        {
+            line[0].color = sf::Color(80, 80, 80);
+            line[1].color = sf::Color(80, 80, 80);
+        }
+        else
+        {
+            line[0].color = sf::Color::Yellow;
+            line[1].color = sf::Color::Yellow;
+        }
         rt.draw(line);
     }
 
@@ -303,6 +331,14 @@ int main(int argc, char** argv)
                 case sf::Keyboard::Num0:
                     e.active_segment().wl = 6.0f;
                     e.active_segment().wr = 6.0f;
+                    break;
+                case sf::Keyboard::Num5:
+                    e.active_segment().flags &= ~TF_JUMP;
+                    e.active_segment().flags ^= TF_BLANK;
+                    break;
+                case sf::Keyboard::Num6:
+                    e.active_segment().flags &= ~TF_BLANK;
+                    e.active_segment().flags ^= TF_JUMP;
                     break;
                 }
                 break;

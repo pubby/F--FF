@@ -10,6 +10,9 @@ rom_bank = $3FFF
 FB_READY  = 1 << 0
 FPS_READY = 1 << 1
 
+TF_BLANK = 1 << 0
+TF_JUMP = 1 << 1
+
 SPLITSCREEN_LEFT = 1
 SPLITSCREEN_RIGHT = 2
 
@@ -114,6 +117,7 @@ multiply = $78
 .globalzp rx_hi_ptr
 .globalzp ry_lo_ptr
 .globalzp ry_hi_ptr
+.globalzp tf_ptr
 
 ; Line drawing
 .globalzp from_x_sub
@@ -202,14 +206,20 @@ multiply = $78
 .global game_flags
 .global camera_height
 .global local_camera_height
+
 .global p1_pre_explosion
 .global p1_explosion
 .global p1_lap
 .global p1_text_timer
+.global p1_z
+.global p1_zspeed
+
 .global p2_pre_explosion
 .global p2_explosion
 .global p2_lap
 .global p2_text_timer
+.global p2_z
+.global p2_zspeed
 
 ; Multiply Labels
 .global multiply_code
