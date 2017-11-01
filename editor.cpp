@@ -5,7 +5,7 @@
 
 #include <SFML/Graphics.hpp>
 
-constexpr float segment_length = 24.0f;
+float segment_length = 24.0f;
 constexpr float quarter_angle = 1.57079632679f;
 constexpr float turn_increment = quarter_angle * 0.1;
 
@@ -15,8 +15,8 @@ constexpr unsigned char TF_JUMP = 1 << 1;
 struct segment_t
 {
     float angle;
-    float wl = 6.0f;
-    float wr = 6.0f;
+    float wl = 5.0f;
+    float wr = 5.0f;
     unsigned char flags = 0;
 };
 
@@ -134,7 +134,7 @@ void save_asm(char const* filename, editor const& e)
 
     std::fprintf(fp, "track_size = %i\n", l_nodes.size());
 
-    std::fprintf(fp, ".segment \"LEVELS\"");
+    std::fprintf(fp, ".segment \"LEVELS\"\n");
     std::fprintf(fp, ".align 256\n");
     std::fprintf(fp, "ltx_lo:\n");
     for(unsigned i = 0; i != 128; ++i)
@@ -191,7 +191,7 @@ void save_asm(char const* filename, editor const& e)
                      to_short(r_nodes[i % r_nodes.size()].y - 256.0f));
     }
 
-    std::fprintf(fp, ".segment \"LEVEL_FLAGS\"");
+    std::fprintf(fp, ".segment \"LEVEL_FLAGS\"\n");
     std::fprintf(fp, "tf:\n");
     for(unsigned i = 0; i != 128; ++i)
         std::fprintf(fp, "    .byt %i\n", e.segments[i % e.segments.size()].flags);
@@ -329,16 +329,25 @@ int main(int argc, char** argv)
                     e.active_segment().wr += 1;
                     break;
                 case sf::Keyboard::Num0:
-                    e.active_segment().wl = 6.0f;
-                    e.active_segment().wr = 6.0f;
+                    e.active_segment().wl = 5.0f;
+                    e.active_segment().wr = 5.0f;
                     break;
                 case sf::Keyboard::Num5:
+                    e.active_segment().flags &= ~TF_BLANK;
+                    e.active_segment().flags ^= TF_JUMP;
+                    break;
+                case sf::Keyboard::Num6:
                     e.active_segment().flags &= ~TF_JUMP;
                     e.active_segment().flags ^= TF_BLANK;
                     break;
-                case sf::Keyboard::Num6:
-                    e.active_segment().flags &= ~TF_BLANK;
-                    e.active_segment().flags ^= TF_JUMP;
+                case sf::Keyboard::Num7:
+                    segment_length -= 1.0f;
+                    break;
+                case sf::Keyboard::Num8:
+                    segment_length += 1.0f;
+                    break;
+                case sf::Keyboard::Num9:
+                    segment_length = 24.0f;
                     break;
                 }
                 break;

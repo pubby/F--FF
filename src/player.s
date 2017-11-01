@@ -91,6 +91,7 @@ doneLeftRight:
     asl                 ; Test for button A
     bcc notPressingA
 
+.if 0
     lda #0
     sta 0+P i, _z
     sta 1+P i, _z
@@ -98,8 +99,7 @@ doneLeftRight:
     sta 0+P i, _zspeed
     lda #3
     sta 1+P i, _zspeed
-
-.if 0
+.else
     lda P i, _boost_tank
     sbc #20
     bcc notBoosting
@@ -182,22 +182,13 @@ storeBoost:
     sta P i, _boost
 doneBoost:
 
-    lda 1+P i, _z
-    bmi doneZ
-    lda 0+P i, _zspeed
-    sec
-    sbc #64*mul/div
-    sta 0+P i, _zspeed
+    lax P i, _jump
+    ;axs #2*mul/div
+    axs #2
     bcs :+
-    dec 1+P i, _zspeed
+    ldx #0
 :
-    clc
-    adc 0+P i, _z
-    sta 0+P i, _z
-    lda 1+P i, _zspeed
-    adc 1+P i, _z
-    sta 1+P i, _z
-doneZ:
+    stx P i, _jump
 
 .endmacro
 
@@ -496,6 +487,20 @@ storeLift:
 :
     bpl doneOutsideFrontRailing
 
+    ; Initiate jump
+    lda P i, _pre_explosion
+    bne doneJump
+    lda oob
+    bmi doneJump
+    bankswitch 0 ; level flags in bank 0
+    lda (tf_ptr), y
+    and #TF_JUMP
+    beq doneJump
+    lda #60
+    sta P i, _jump
+doneJump:
+    bankswitch 2
+
     ; Increment the level pointers.
     ldx P i, _track_index
     inx
@@ -509,8 +514,14 @@ storeLift:
     stx P i, _track_index
 doneOutsideFrontRailing:
 
+    lda P i, _jump
+    bne inBounds
+    ldy #0
+    bankswitch_y ; level flags in bank 0
+    lda (tf_ptr), y
+    and #TF_JUMP | TF_BLANK
+    bne outOfBounds
     lda oob
-    and 1+P i, _z
     bpl inBounds
 outOfBounds:
     lda P i, _boost_timer
@@ -522,7 +533,6 @@ outOfBounds:
     sta P i, _pre_explosion
 notDead:
     rts
-
 inBounds:
     lda P i, _boost_timer
     ora #%10000000
@@ -548,5 +558,6 @@ doneRegen:
     stx boost_regen_timer
     rts
 .endproc
+
 .endrepeat
 

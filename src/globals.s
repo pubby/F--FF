@@ -126,15 +126,13 @@ p1_pre_explosion: .res 1
 p1_explosion: .res 1
 p1_lap: .res 1
 p1_text_timer: .res 1
-p1_z: .res 2
-p1_zspeed: .res 2
+p1_jump: .res 1
 
 p2_pre_explosion: .res 1
 p2_explosion: .res 1
 p2_lap: .res 1
 p2_text_timer: .res 1
-p2_z: .res 2
-p2_zspeed: .res 2
+p2_jump: .res 1
 
 .align 256
 nt_buffer: .res 32*22
@@ -146,3 +144,68 @@ banktable:
 .repeat 16, i
     .byt i
 .endrepeat
+ship_jump_table:
+.byt 0
+.byt 1
+.byt 3
+.byt 5
+.byt 6
+.byt 8
+.byt 9
+.byt 11
+.byt 12
+.byt 14
+.byt 15
+.byt 16
+.byt 17
+.byt 18
+.byt 19
+.byt 20
+.byt 21
+.byt 22
+.byt 23
+.byt 23
+.byt 24
+.byt 24
+.byt 25
+.byt 25
+.byt 26
+.byt 26
+.byt 26
+.byt 27
+.byt 27
+.byt 27
+.byt 27
+.byt 27
+.byt 27
+.byt 26
+.byt 26
+.byt 26
+.byt 25
+.byt 25
+.byt 24
+.byt 24
+.byt 23
+.byt 23
+.byt 22
+.byt 21
+.byt 20
+.byt 19
+.byt 18
+.byt 17
+.byt 16
+.byt 15
+.byt 14
+.byt 12
+.byt 11
+.byt 9
+.byt 8
+.byt 6
+.byt 5
+.byt 3
+.byt 1
+.byt 0
+.byt 0
+.byt 0
+.byt 0
+.byt 0

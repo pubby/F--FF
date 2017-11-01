@@ -237,8 +237,8 @@ next_palette_index:
 .byt 0, 14, 15,  0
 
 main:
-    ;jmp init_menu
-    jmp init_flag
+    jmp init_menu
+    ;jmp init_flag
 .proc init_game
     ldx #0
     stx PPUMASK
@@ -298,7 +298,7 @@ paletteLoop:
     ; Sprites
     jsr init_game_sprites
 
-    lda #140
+    lda #146
     sta camera_height
 
     ; setup pointers (TODO)

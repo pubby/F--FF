@@ -211,15 +211,13 @@ multiply = $78
 .global p1_explosion
 .global p1_lap
 .global p1_text_timer
-.global p1_z
-.global p1_zspeed
+.global p1_jump
 
 .global p2_pre_explosion
 .global p2_explosion
 .global p2_lap
 .global p2_text_timer
-.global p2_z
-.global p2_zspeed
+.global p2_jump
 
 ; Multiply Labels
 .global multiply_code
@@ -260,5 +258,7 @@ multiply = $78
 
 ; Palette
 .global palette_buffer
+
+.global ship_jump_table
 
 .endif

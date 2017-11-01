@@ -203,24 +203,30 @@ clearOAMLoop:
 .endproc
 
 .proc prepare_player_sprites
+
     ; y-positions
     lda p1_dir_speed
     anc #%11110000
     ror
     adc #4*8
     tay
+    ldx p1_jump
     sec
+    lda #174
+    sbc ship_jump_table, x
+    sta subroutine_temp
     .repeat 6, i
-        lda #178
+        .if i > 0
+            lda subroutine_temp
+        .endif
         adc ship_y_offsets+i, y
-        sbc p1_z+1
         sbc p1_lift
         sta OAM_SHIP+(4*(i+0))+0
     .endrepeat
     .repeat 6, i
-        lda #178+16
+        lda subroutine_temp
+        adc #16
         adc ship_y_offsets+i, y
-        sbc p1_z+1
         sbc p1_lift
         sta OAM_SHIP+(4*(i+6))+0
     .endrepeat

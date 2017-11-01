@@ -482,8 +482,8 @@ cull:
     ; Levels are in bank 2
     bankswitch 2
 
-    clc
-    lda 1+P i, _z
+    ldx P i, _jump
+    lda ship_jump_table, x
     asl
     asl
     adc camera_height
