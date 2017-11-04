@@ -6,13 +6,16 @@
 .importzp multiply_store
 .import copy_multiply_code
 .import p1_move, p2_move
+.import p1_solo_move
 .import p1_render, p2_render
 .import init_menu
 .import read_gamepads
 .import init_flag
 .import ppu_copy_palette_buffer
-.import icy_palette
+.import icy_palette, spicy_palette, dicey_palette
+.import sprite_palette
 .import init_game_sprites
+.import init_timer_sprites
 
 .export main, nmi_handler, irq_handler, nmi_return
 .export update_return
@@ -33,13 +36,13 @@ track_size: .byt 64
 
 .segment "LEVELS"
 .scope l1
-    .include "foo.level.inc"
+    .include "icy.inc"
 .endscope
 .scope l2
-    .include "foo.level.inc"
+    .include "spicy.inc"
 .endscope
 .scope l3
-    .include "foo.level.inc"
+    .include "dicey.inc"
 .endscope
 
 .segment "NMI_CODE"
@@ -78,7 +81,7 @@ renderFrame:
     ; Do OAM DMA (without reading controllers)
     lda #.hibyte(CPU_OAM) ; A = $03
     sta OAMDMA
-    ;lda #%111
+    adc two_player      ; carry bit is irrelevant
     sta subframes_left
 
     bit PPUSTATUS
@@ -154,6 +157,24 @@ update_return:
     jmp (update_ptr)
 
 
+.proc p_move_update
+    lda two_player
+    beq oneP
+twoP:
+    jsr p1_move
+    lda #SPLITSCREEN_LEFT
+    sta line_splitscreen
+    jsr p1_render
+
+    jsr p2_move
+    lda #SPLITSCREEN_RIGHT
+    sta line_splitscreen
+    jmp p2_render
+oneP:
+    jsr p1_solo_move
+    jmp p1_render
+.endproc
+
 .proc update_game
     lda #0
     sta frame_ready
@@ -166,19 +187,12 @@ update_return:
     jsr clear_nt_buffer
     jsr read_gamepads
 
-    jsr p1_move
-    lda #SPLITSCREEN_LEFT
-    ;sta line_splitscreen
-    jsr p1_render
-
-    ;jsr p2_move
-    ;lda #SPLITSCREEN_RIGHT
-    ;sta line_splitscreen
-    ;jsr p2_render
+    jsr p_move_update
 
     clc
-    lda time_sub
-    adc #2
+    lda #2
+    adc two_player
+    adc time_sub
     sta time_sub
     sbc #60-1
     bne doneDigitUpdate
@@ -201,6 +215,7 @@ update_return:
     sta time_digits+3
 doneDigitUpdate:
 
+    .if 1
     lda frame_number
     lsr
     bcc doneRainbowPalette
@@ -222,7 +237,15 @@ rainbowPaletteLoop:
     tay
     bne rainbowPaletteLoop
 doneRainbowPalette:
+    .endif
 
+    lda timer
+    beq doneTimer
+    dec timer
+    bne doneTimer
+    lda #0
+    sta countdown
+doneTimer:
 
     lda #1 
     ;sta debug
@@ -236,24 +259,59 @@ next_palette_index:
 .byt 0, 10, 11, 13
 .byt 0, 14, 15,  0
 
+ltx_table_hi:
+.byt .hibyte(l1::ltx_lo)
+.byt .hibyte(l2::ltx_lo)
+.byt .hibyte(l3::ltx_lo)
+
+tf_table_hi:
+.byt .hibyte(l1::tf)
+.byt .hibyte(l2::tf)
+.byt .hibyte(l3::tf)
+
+track_size_table:
+.byt l1::track_size
+.byt l2::track_size
+.byt l3::track_size
+
 main:
-    jmp init_menu
-    ;jmp init_flag
+    ;jmp init_menu
+    jmp init_flag
+
 .proc init_game
-    ldx #0
-    stx PPUMASK
-    stx PPUCTRL
-    stx subframes_left
+    ; Zero-out bss
+    lda #0
+    tax
+zeroBSSLoop:
+    sta game_bss_start, x
+    inx
+    cpx #.lobyte(game_bss_end-game_bss_start)
+    bne zeroBSSLoop
+
+    ; Zero-out zeropage
+    sta PPUMASK
+    sta PPUCTRL
+    ldx #game_zp_start
+zeroZPLoop:
+    sta $00, x
+    inx
+    bne zeroZPLoop
     inx                 ; X = 1
     stx frame_ready
     store16into #game_nmi, nmi_ptr
-    store16into #update_game, update_ptr
+    store16into #game_fade_in, update_ptr
 
-    lda #PLAYERS_2
-    sta game_flags
+    ; Chr
+    bankswitch_to ppu_load_4x4_pixels_chr
+    jsr ppu_load_4x4_pixels_chr
 
-    lda #64
-    sta p1_boost_tank
+    ; Setup black palette
+    lda #$0F
+    ldx #32-1
+paletteLoop:
+    sta palette_buffer, x
+    dex
+    bne paletteLoop
 
     ; Setup attributes.
     bit PPUSTATUS
@@ -283,51 +341,185 @@ main:
     dex
     bne :-
 
+    ; Setup multiplication
     jsr copy_multiply_code
 
+    ; Level pointers
+    ldx track_number
+    lda track_size_table, x
+    sta level_length
+    ldy tf_table_hi, x
+    sty tf_ptr+1
+    ldy ltx_table_hi, x
+    ldx #$80
+    lda #$00
+    sta tf_ptr+0
+    .repeat 4, i
+        sta lx_lo_ptr+(4*i)+0
+        sty lx_lo_ptr+(4*i)+1
+        stx lx_hi_ptr+(4*i)+0
+        sty lx_hi_ptr+(4*i)+1
+        iny
+    .endrepeat
 
-    ; Palette
-    ldx #0
-paletteLoop:
-    lda icy_palette, x
-    sta palette_buffer, x
-    inx
-    cpx #32
-    bne paletteLoop
+    ; Variables
+    lda #64
+    sta p1_boost_tank
+    sta p2_boost_tank
+    lda #$FF
+    sta camera_height
+
+    lda #128
+    sta ship_entrance
+
+    lda #8
+    sta timer
+
+    lda #7
+    sta p1_lift
+    sta p2_lift
+
+    ; Render the first frame without player input.
+    lda #0
+    sta p1_buttons_held
+    sta p1_buttons_pressed
+    sta p2_buttons_held
+    sta p2_buttons_pressed
+    jsr prepare_game_sprites
+    bankswitch_to clear_nt_buffer
+    jsr clear_nt_buffer
+    jsr p_move_update
 
     ; Sprites
     jsr init_game_sprites
 
-    lda #146
-    sta camera_height
-
-    ; setup pointers (TODO)
-    store16into #l1::ltx_lo, lx_lo_ptr
-    store16into #l1::ltx_hi, lx_hi_ptr
-    store16into #l1::lty_lo, ly_lo_ptr
-    store16into #l1::lty_hi, ly_hi_ptr
-    store16into #l1::rtx_lo, rx_lo_ptr
-    store16into #l1::rtx_hi, rx_hi_ptr
-    store16into #l1::rty_lo, ry_lo_ptr
-    store16into #l1::rty_hi, ry_hi_ptr
-    store16into #l1::tf, tf_ptr
-    ; TODO
-    ;bankswitch_to track_size
-    lda #l1::track_size
-    sta level_length
-
-    bankswitch_to ppu_load_4x4_pixels_chr
-    jsr ppu_load_4x4_pixels_chr
-
-    lda #0
-    sta p1_dir_speed
-    sta p1_dir+0
-    ;lda #180
-    ;sta p1_dir+1
-
     lda #PPUCTRL_NMI_ON | PPUCTRL_8X16_SPR
     bit PPUSTATUS
     sta PPUCTRL
+    jmp update_return
+.endproc
+
+track_palette_lo:
+.byt .lobyte(icy_palette)
+.byt .lobyte(spicy_palette)
+.byt .lobyte(dicey_palette)
+
+track_palette_hi:
+.byt .hibyte(icy_palette)
+.byt .hibyte(spicy_palette)
+.byt .hibyte(dicey_palette)
+
+.proc game_fade_in
+
+    bankswitch_to clear_nt_buffer
+    jsr clear_nt_buffer
+    jsr p_move_update
+
+    ldx track_number
+    lda track_palette_lo, x
+    sta ptr_temp+0
+    lda track_palette_hi, x
+    sta ptr_temp+1
+
+    lda timer
+    asl
+    asl
+    asl
+    and #%11110000
+    sta subroutine_temp
+
+    ldy #15
+spritePaletteLoop:
+    lda sprite_palette, y
+    sec
+    sbc subroutine_temp
+    bcs :+
+    lda #$0F
+:
+    sta palette_buffer+16, y
+    dey
+    bne spritePaletteLoop
+
+    ldy #15
+bgPaletteLoop:
+    lda (ptr_temp), y
+    sec
+    sbc subroutine_temp
+    bcs :+
+    lda #$0F
+:
+    sta palette_buffer, y
+    dey
+    bne bgPaletteLoop
+
+    dec timer
+    beq game_init_ship_entrance
+    jmp update_return
+.endproc
+
+.proc game_init_ship_entrance
+    store16into #game_ship_entrance, update_ptr
+    jmp update_return
+.endproc
+
+.proc game_ship_entrance
+    jsr prepare_game_sprites
+    jsr dec_camera_height
+
+    lsr ship_entrance
+    beq game_init_countdown
+    jmp update_return
+.endproc
+
+.proc dec_camera_height
+    lda camera_height
+    sec
+    sbc #24
+    cmp #146
+    bcs :+
+    lda #146
+:
+    sta camera_height
+    bankswitch_to clear_nt_buffer
+    jsr clear_nt_buffer
+    jmp p_move_update
+.endproc
+
+
+.macro lda2p i
+    lda two_player
+    beq *+5
+    lda #i
+    .byt $0C ; IGN to skip LDA
+    lda #i*3/2
+.endmacro
+
+.proc game_init_countdown
+    lda #4
+    sta countdown
+    lda2p 20
+    sta timer
+    store16into #game_countdown, update_ptr
+    jmp update_return
+.endproc
+
+.proc game_countdown
+    dec timer
+    bne :+
+    lda2p 20
+    sta timer
+    lda #1
+    dcp countdown
+    beq game_init_start
+:
+    jsr prepare_game_sprites
+    jsr dec_camera_height
+    jmp update_return
+.endproc
+
+.proc game_init_start
+    jsr init_timer_sprites
+    store16into #update_game, update_ptr
     jmp update_return
 .endproc
 

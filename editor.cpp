@@ -61,7 +61,7 @@ struct editor
     {
         std::pair<std::vector<node_t>, std::vector<node_t>> ret;
         float angle = 0.0f;
-        node_t n = { 256.0f, 256.0f };
+        node_t n = { 256.0f - segment_length, 256.0f };
         node_t l;
         node_t r;
         for(segment_t const& s : segments)

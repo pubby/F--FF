@@ -32,10 +32,21 @@ lap:
 lap_const0 = m10
 .addr m11
 lap_const1 = m11
+win:
 .addr m12
-lap_const2 = m12
+win_const0 = m12
+lose:
 .addr m13
-lap_const3 = m13
+lose_const0 = m13
+countdown:
+.addr m14
+countdown_const0 = m14
+.addr m15
+countdown_const1 = m15
+.addr m16
+countdown_const2 = m16
+.addr m17
+countdown_const3 = m17
 
 m0:
 .byt 124
@@ -171,14 +182,42 @@ m11:
 .byt $00, $b3, $28, $00
 m12:
 .byt 16
-.byt $00, $a7, $00, $00
-.byt $00, $a9, $0a, $00
-.byt $00, $ab, $14, $00
-.byt $00, $c1, $28, $00
+.byt $00, $c5, $00, $00
+.byt $40, $c5, $08, $00
+.byt $00, $c7, $10, $00
+.byt $00, $c9, $1a, $00
 m13:
 .byt 16
 .byt $00, $a7, $00, $00
-.byt $00, $a9, $0a, $00
-.byt $00, $ab, $14, $00
-.byt $00, $c3, $28, $00
+.byt $00, $ad, $0a, $00
+.byt $00, $c1, $14, $00
+.byt $00, $c3, $1e, $00
+m14:
+.byt 32
+.byt $00, $dd, $00, $00
+.byt $40, $cd, $08, $00
+.byt $80, $dd, $00, $10
+.byt $00, $df, $08, $10
+.byt $00, $dd, $12, $00
+.byt $40, $dd, $1a, $00
+.byt $80, $dd, $12, $10
+.byt $c0, $dd, $1a, $10
+m15:
+.byt 16
+.byt $00, $d9, $0c, $00
+.byt $00, $db, $0a, $10
+.byt $40, $db, $11, $10
+.byt $40, $db, $11, $10
+m16:
+.byt 16
+.byt $00, $d3, $09, $00
+.byt $00, $d1, $11, $00
+.byt $00, $d5, $09, $10
+.byt $00, $d7, $11, $10
+m17:
+.byt 16
+.byt $00, $cf, $09, $00
+.byt $00, $d1, $11, $00
+.byt $80, $cf, $09, $10
+.byt $80, $d1, $11, $10
 .endscope

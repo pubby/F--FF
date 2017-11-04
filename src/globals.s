@@ -11,12 +11,14 @@ nmi_y: .res 1
 nmi_bank: .res 1
 nmi_ptr: .res 2
 
+update_ptr: .res 2
+
+game_zp_start:
+
 nmi_counter:    .res 1
 frame_number:   .res 1
 frame_ready:    .res 1
 subframes_left: .res 1
-
-update_ptr: .res 2
 
 ; Game
 p1:
@@ -114,11 +116,11 @@ depthpad_rx_hi: .res pad_size
 depthpad_ry_lo: .res pad_size
 depthpad_ry_hi: .res pad_size
 
+game_bss_start:
+
 time_sub: .res 1
 time_digits: .res 4
 
-boost_regen_timer: .res 1
-game_flags: .res 1
 camera_height: .res 1
 local_camera_height: .res 1
 
@@ -127,17 +129,27 @@ p1_explosion: .res 1
 p1_lap: .res 1
 p1_text_timer: .res 1
 p1_jump: .res 1
+p1_boost_tank_sub: .res 1
 
 p2_pre_explosion: .res 1
 p2_explosion: .res 1
 p2_lap: .res 1
 p2_text_timer: .res 1
 p2_jump: .res 1
+p2_boost_tank_sub: .res 1
+
+game_bss_end: .res 1
 
 .align 256
 nt_buffer: .res 32*22
 
 palette_buffer: .res 32
+
+track_number: .res 1
+timer: .res 1
+two_player: .res 1
+ship_entrance: .res 1
+countdown: .res 1
 
 .segment "SMALL_TABLES"
 banktable:

@@ -28,15 +28,12 @@ to_out_code = 6 ; 1 byte, shared with rounded_Dx
 
 menu_state = scratchpad+0
 menu_data = scratchpad+1
-menu_timer = scratchpad+2
 menu_scroll = scratchpad+3
 menu_icy_x = scratchpad+4
 menu_spicy_x = scratchpad+5
 menu_dicey_x = scratchpad+6
-menu_cursor = scratchpad+7
-menu_update_ptr = scratchpad+8 ; 2 bytes
+menu_update_ptr = scratchpad+7 ; 2 bytes
 
-MENU_2P = 1
 MENU_SHOW_CURSOR = 2
 
 PLAYERS_2 = %10000000
@@ -69,12 +66,21 @@ multiply = $78
 .globalzp nmi_bank
 .globalzp nmi_ptr
 
+.globalzp update_ptr
+    ; Zero-out zeropage
+    lda #0
+    sta PPUMASK
+    sta PPUCTRL
+    ldx #game_zp_start
+
+.globalzp game_zp_start
+.global game_bss_start
+.global game_bss_end
+
 .globalzp nmi_counter
 .globalzp frame_number
 .globalzp frame_ready
 .globalzp subframes_left
-
-.globalzp update_ptr
 
 ; Game
 .globalzp p1
@@ -172,6 +178,9 @@ multiply = $78
 ; Buffers
 .global nt_buffer
 
+; misc
+.global track_number
+
 ; tables
 .global banktable
 
@@ -202,8 +211,6 @@ multiply = $78
 .global time_sub
 .global time_digits
 
-.global boost_regen_timer
-.global game_flags
 .global camera_height
 .global local_camera_height
 
@@ -212,12 +219,14 @@ multiply = $78
 .global p1_lap
 .global p1_text_timer
 .global p1_jump
+.global p1_boost_tank_sub
 
 .global p2_pre_explosion
 .global p2_explosion
 .global p2_lap
 .global p2_text_timer
 .global p2_jump
+.global p2_boost_tank_sub
 
 ; Multiply Labels
 .global multiply_code
@@ -258,6 +267,10 @@ multiply = $78
 
 ; Palette
 .global palette_buffer
+.global timer
+.global two_player
+.global ship_entrance
+.global countdown
 
 .global ship_jump_table
 

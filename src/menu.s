@@ -27,8 +27,7 @@
     bit PPUSTATUS
     jsr ppu_copy_palette_buffer
 
-    lda menu_data
-    and #MENU_2P
+    lda two_player
     beq not2p
     jsr rad2_nt_swaps
     jmp doneNTSwaps
@@ -80,6 +79,7 @@ doneNTSwaps:
         bne :-
     .endrepeat
 
+    bankswitch_to rad_nt
     storePPUADDR #$2800
     tax                 ; X = 0
     .repeat 4, i
@@ -101,7 +101,7 @@ paletteLoop:
     lda #PPUCTRL_NMI_ON | PPUCTRL_8X16_SPR
     bit PPUSTATUS
     sta PPUCTRL
-    jmp init_game ; TODO
+    bankswitch_to init_scroll_in
     jmp init_scroll_in
 .endproc
 
@@ -113,34 +113,34 @@ paletteLoop:
     ora p2_buttons_pressed
     and #BUTTON_START | BUTTON_SELECT
     beq doneChangePlayers
-    lda menu_data
-    eor #MENU_2P
-    sta menu_data
+    lda two_player
+    eor #1
+    sta two_player
 doneChangePlayers:
 
     lda p1_buttons_pressed
     ora p2_buttons_pressed
     and #BUTTON_UP
     beq doneUp
-    ldx menu_cursor
+    ldx track_number
     dex
     bpl :+
     ldx #2
 :
-    stx menu_cursor
+    stx track_number
 doneUp:
 
     lda p1_buttons_pressed
     ora p2_buttons_pressed
     and #BUTTON_DOWN
     beq doneDown
-    ldx menu_cursor
+    ldx track_number
     inx
     cpx #3
     bcc :+
     ldx #0
 :
-    stx menu_cursor
+    stx track_number
 doneDown:
 
     bankswitch_to update_scroll_in
@@ -154,7 +154,7 @@ menu_update_return:
 
 .proc init_scroll_in
     store16into #update_scroll_in, menu_update_ptr
-    store8into #16, menu_timer
+    store8into #16, timer
     jmp menu_update_return
 .endproc
 
@@ -168,7 +168,7 @@ menu_update_return:
 :
     sta menu_scroll
 
-    dec menu_timer
+    dec timer
     bne :+
     jmp init_text_in
 :
@@ -223,10 +223,10 @@ doneDicey:
     and #BUTTON_START
     beq doneStart
     jmp init_text_out
-    stx menu_cursor
+    stx track_number
 doneStart:
 
-    ldx menu_cursor
+    ldx track_number
     bne notCursor0
         lda #$2C
         jmp storePalette
@@ -248,38 +248,68 @@ storePalette:
     lda menu_state
     and #$FF ^ MENU_SHOW_CURSOR
     sta menu_state
-    store8into #36, menu_timer
-    store16into #update_text_out, menu_update_ptr
+    store8into #36, timer
+    ldx track_number
+    lda update_text_lo, x
+    sta menu_update_ptr+0
+    lda update_text_hi, x
+    sta menu_update_ptr+1
     jmp menu_update_return
 .endproc
 
 .proc update_text_out
+icy:
     lsr menu_icy_x
     bne done
     lsr menu_spicy_x
     bne done
     lsr menu_dicey_x
     bne done
+    beq scrollOut
+spicy:
+    lsr menu_spicy_x
+    bne done
+    lsr menu_icy_x
+    bne done
+    lsr menu_dicey_x
+    bne done
+    beq scrollOut
+dicey:
+    lsr menu_dicey_x
+    bne done
+    lsr menu_spicy_x
+    bne done
+    lsr menu_icy_x
+    bne done
+scrollOut:
     lda menu_scroll
     alr #%11111110
     adc menu_scroll
     ror 
     sta menu_scroll
-    bne done
 done:
-    dec menu_timer
+    dec timer
     beq init_fadeout
     jmp menu_update_return
 .endproc
 
+update_text_lo:
+    .byt .lobyte(update_text_out::icy)
+    .byt .lobyte(update_text_out::spicy)
+    .byt .lobyte(update_text_out::dicey)
+update_text_hi:
+    .byt .hibyte(update_text_out::icy)
+    .byt .hibyte(update_text_out::spicy)
+    .byt .hibyte(update_text_out::dicey)
+
 .proc init_fadeout
-    store8into #16, menu_timer
+    store8into #30, timer
     store16into #update_fadeout, menu_update_ptr
     jmp menu_update_return
 .endproc
 
 .proc update_fadeout
-    lda frame_number
+    lda timer
     lsr
     bcc done
     ldx #31
@@ -294,7 +324,7 @@ loop:
     dex
     bne loop
 done:
-    dec menu_timer
+    dec timer
     bne :+
     jmp init_game
 :

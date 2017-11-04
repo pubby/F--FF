@@ -56,10 +56,11 @@ map.txt $(title).nes: uxrom.cfg $(objlistntsc)
 
 $(objdir)/%.o: $(srcdir)/%.s $(srcdir)/nes.inc $(srcdir)/globals.inc \
                $(srcdir)/clip.inc $(srcdir)/sin.inc $(srcdir)/recip.inc \
-               $(srcdir)/foo.level.inc $(srcdir)/rad.inc \
+               $(srcdir)/rad.inc \
                $(srcdir)/metasprites.inc $(srcdir)/flag_nt.inc \
                $(srcdir)/sin_scroll.inc $(srcdir)/flag_chr.inc \
-			   $(srcdir)/time_digit.inc
+               $(srcdir)/time_digit.inc \
+               $(srcdir)/icy.inc $(srcdir)/dicey.inc $(srcdir)/spicy.inc
 	$(AS65) $(CFLAGS65) $< -o $@
 
 $(objdir)/%.o: $(objdir)/%.s

@@ -5,13 +5,9 @@
 .importzp multiply_store
 
 .export p1_move, p2_move
+.export p1_solo_move
 
 .segment "CODE"
-
-SOLO_DIR_INCR = 12
-DIR_INCR = SOLO_DIR_INCR*3/2
-SOLO_DIR_MAX = 60
-DIR_MAX = SOLO_DIR_INCR*3/2
 
 dir_accel_table_left:
 .repeat 8, i
@@ -23,13 +19,6 @@ dir_accel_table_right:
 .endrepeat
 
 .macro handle_move i, mul, div
-    lda P i, _pre_explosion
-    beq :+
-    dec P i, _pre_explosion
-    bne :+
-    inc P i, _explosion
-:
-
     ; Left/Right: Change direction
     lax P i, _buttons_held
     ldy P i, _pre_explosion
@@ -90,16 +79,6 @@ doneLeftRight:
     lda P i, _buttons_pressed
     asl                 ; Test for button A
     bcc notPressingA
-
-.if 0
-    lda #0
-    sta 0+P i, _z
-    sta 1+P i, _z
-    lda #128
-    sta 0+P i, _zspeed
-    lda #3
-    sta 1+P i, _zspeed
-.else
     lda P i, _boost_tank
     sbc #20
     bcc notBoosting
@@ -109,7 +88,6 @@ doneLeftRight:
     and #%10000000
     ora #16
     sta P i, _boost_timer
-.endif
 notBoosting:
 notPressingA:
 
@@ -158,7 +136,6 @@ storeSlowdown:
     txa                 ; X = _boost_timer
     anc #%01111111      ; Clears carry
     bne boost
-
     lda palette_buffer+22
     and #$10 ^ $FF
     sta palette_buffer+22
@@ -183,8 +160,7 @@ storeBoost:
 doneBoost:
 
     lax P i, _jump
-    ;axs #2*mul/div
-    axs #2
+    axs #2*mul/div
     bcs :+
     ldx #0
 :
@@ -221,10 +197,18 @@ explosion_palette_table:
     right_edge_result_hi = scratchpad + 3
     oob = scratchpad+4
 
+    lda P i, _pre_explosion
+    beq :+
+    dec P i, _pre_explosion
+    bne :+
+    inc P i, _explosion
+:
     ldx P i, _explosion
     bne P i, _handle_explosion
 
-    handle_move i, 2, 2
+    handle_move i, 3, 2
+
+entrance:
 
     ; lift
     ldy P i, _lift
@@ -496,7 +480,7 @@ storeLift:
     lda (tf_ptr), y
     and #TF_JUMP
     beq doneJump
-    lda #60
+    lda #60-6
     sta P i, _jump
 doneJump:
     bankswitch 2
@@ -514,6 +498,8 @@ doneJump:
     stx P i, _track_index
 doneOutsideFrontRailing:
 
+    lda P i, _pre_explosion
+    bne doneBounds
     lda P i, _jump
     bne inBounds
     ldy #0
@@ -527,37 +513,64 @@ outOfBounds:
     lda P i, _boost_timer
     and #%01111111
     sta P i, _boost_timer
-    dec P i, _boost_tank
+
+    sec
+    lda P i, _boost_tank_sub
+    ldy two_player
+    beq :+
+    sbc #128
+:
+    sta P i, _boost_tank_sub
+    lda P i, _boost_tank
+    sbc #1
+    bcs :+
+    lda #0
+:
+    sta P i, _boost_tank
     bne notDead
     lda #25
     sta P i, _pre_explosion
 notDead:
+doneBounds:
     rts
 inBounds:
     lda P i, _boost_timer
     ora #%10000000
     sta P i, _boost_timer
-    lax boost_regen_timer
-    axs #.lobyte(-2)
-    lda game_flags
-    bpl :+
-    inx
+
+    clc
+    lda #128
+    ldy two_player
+    beq :+
+    lda #128*3/2
 :
-    cpx #6
-    bcc doneRegen
-    ldx #0
-    lda P i, _boost_timer
-    ldy P i, _boost_tank
-    iny
-    cpy #64
+    adc P i, _boost_tank_sub
+    sta P i, _boost_tank_sub
+    lda P i, _boost_tank
+    adc #0
+    cmp #64
     bcc :+
-    ldy #64
+    lda #64
 :
-    sty P i, _boost_tank
+    sta P i, _boost_tank
 doneRegen:
-    stx boost_regen_timer
     rts
 .endproc
 
 .endrepeat
+
+.proc p1_solo_move
+    lda p1_pre_explosion
+    beq :+
+    dec p1_pre_explosion
+    bne :+
+    inc p1_explosion
+:
+    ldx p1_explosion
+    beq :+
+    jmp p1_handle_explosion
+:
+    handle_move 0, 2, 2
+    jmp p1_move::entrance
+.endproc 
 

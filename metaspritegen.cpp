@@ -219,17 +219,55 @@ static std::vector<animation_t> const animations =
             { 10* 2,  0, PATTERN(0x55), 0 },
             { 10* 4,  0, PATTERN(0x59), 0 },
         },
+    }},
+
+    { "win", 0, 0, 0, {
         { 
-            { 10* 0,  0, PATTERN(0x53), 0 },
-            { 10* 1,  0, PATTERN(0x54), 0 },
-            { 10* 2,  0, PATTERN(0x55), 0 },
-            { 10* 4,  0, PATTERN(0x60), 0 },
+            { 0,     0, PATTERN(0x62), 0 },
+            { 8,     0, PATTERN(0x62), HFLIP },
+            { 8+8,  0, PATTERN(0x63), 0 },
+            { 8+18,  0, PATTERN(0x64), 0 },
+        },
+    }},
+
+    { "lose", 0, 0, 0, {
+        { 
+            { 10*0,  0, PATTERN(0x53), 0 },
+            { 10*1,  0, PATTERN(0x56), 0 },
+            { 10*2,  0, PATTERN(0x60), 0 },
+            { 10*3,  0, PATTERN(0x61), 0 },
+        },
+    }},
+
+    { "countdown", 0, 0, 0, {
+        { 
+            {  0,  0, PATTERN(0x6E), 0 },
+            {  8,  0, PATTERN(0x66), HFLIP },
+            {  0, 16, PATTERN(0x6E), VFLIP },
+            {  8, 16, PATTERN(0x6F), 0 },
+
+            { 16+2,  0, PATTERN(0x6E), 0 },
+            { 24+2,  0, PATTERN(0x6E), HFLIP },
+            { 16+2, 16, PATTERN(0x6E), VFLIP },
+            { 24+2, 16, PATTERN(0x6E), HFLIP | VFLIP },
         },
         { 
-            { 10* 0,  0, PATTERN(0x53), 0 },
-            { 10* 1,  0, PATTERN(0x54), 0 },
-            { 10* 2,  0, PATTERN(0x55), 0 },
-            { 10* 4,  0, PATTERN(0x61), 0 },
+            { 3+9,  0, PATTERN(0x6C), 0 },
+            { 1+9, 16, PATTERN(0x6D), 0 },
+            { 8+9, 16, PATTERN(0x6D), HFLIP },
+            { 8+9, 16, PATTERN(0x6D), HFLIP },
+        },
+        { 
+            { 0+9,  0, PATTERN(0x69), 0 },
+            { 8+9,  0, PATTERN(0x68), 0 },
+            { 0+9, 16, PATTERN(0x6A), 0 },
+            { 8+9, 16, PATTERN(0x6B), 0 },
+        },
+        { 
+            { 0+9,  0, PATTERN(0x67), 0 },
+            { 8+9,  0, PATTERN(0x68), 0 },
+            { 0+9, 16, PATTERN(0x67), VFLIP },
+            { 8+9, 16, PATTERN(0x68), VFLIP },
         },
     }},
 } ;
