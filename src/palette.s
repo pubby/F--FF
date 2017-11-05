@@ -12,18 +12,23 @@ sprite_palette:
     .byt $0F,$01,$11,$21
     .byt $0F,$0F,$14,$28
 
-dicey_palette:
 icy_palette:
-    .byt $0F,$14,$04,$14
-    .byt $0F,$25,$15,$25
-    .byt $0F,$36,$26,$36
-    .byt $0F,$30,$37,$30
+    .byt $0F,$13,$03,$13
+    .byt $0F,$22,$12,$22
+    .byt $0F,$31,$21,$31
+    .byt $0F,$20,$31,$20
 
 spicy_palette:
     .byt $0F,$14,$04,$14
     .byt $0F,$25,$15,$25
     .byt $0F,$36,$26,$36
     .byt $0F,$27,$37,$27
+
+dicey_palette:
+    .byt $0F,$17,$07,$17
+    .byt $0F,$28,$18,$28
+    .byt $0F,$39,$29,$39
+    .byt $0F,$2A,$3A,$2A
 
     ; MENU PALETTE:
 menu_palette:

@@ -27,26 +27,33 @@ explosion_const0 = m7
 explosion_const1 = m8
 .addr m9
 explosion_const2 = m9
-lap:
+explosion_small:
 .addr m10
-lap_const0 = m10
+explosion_small_const0 = m10
 .addr m11
-lap_const1 = m11
-win:
+explosion_small_const1 = m11
 .addr m12
-win_const0 = m12
-lose:
+explosion_small_const2 = m12
+lap:
 .addr m13
-lose_const0 = m13
-countdown:
+lap_const0 = m13
 .addr m14
-countdown_const0 = m14
+lap_const1 = m14
+win:
 .addr m15
-countdown_const1 = m15
+win_const0 = m15
+lose:
 .addr m16
-countdown_const2 = m16
+lose_const0 = m16
+countdown:
 .addr m17
-countdown_const3 = m17
+countdown_const0 = m17
+.addr m18
+countdown_const1 = m18
+.addr m19
+countdown_const2 = m19
+.addr m20
+countdown_const3 = m20
 
 m0:
 .byt 124
@@ -169,30 +176,54 @@ m9:
 .byt $c0, $ed, $20, $10
 .byt $c0, $eb, $28, $10
 m10:
+.byt 8
+.byt $00, $f1, $08, $08
+.byt $40, $f1, $10, $08
+m11:
+.byt 32
+.byt $00, $e1, $00, $00
+.byt $00, $e3, $08, $00
+.byt $40, $e3, $10, $00
+.byt $40, $e1, $18, $00
+.byt $80, $e1, $00, $10
+.byt $80, $e3, $08, $10
+.byt $c0, $e3, $10, $10
+.byt $c0, $e1, $18, $10
+m12:
+.byt 32
+.byt $00, $f3, $00, $00
+.byt $00, $f5, $08, $00
+.byt $40, $f5, $10, $00
+.byt $40, $f3, $18, $00
+.byt $80, $f3, $00, $10
+.byt $80, $f5, $08, $10
+.byt $c0, $f5, $10, $10
+.byt $c0, $f3, $18, $10
+m13:
 .byt 16
 .byt $00, $a7, $00, $00
 .byt $00, $a9, $0a, $00
 .byt $00, $ab, $14, $00
 .byt $00, $b1, $28, $00
-m11:
+m14:
 .byt 16
 .byt $00, $a7, $00, $00
 .byt $00, $a9, $0a, $00
 .byt $00, $ab, $14, $00
 .byt $00, $b3, $28, $00
-m12:
+m15:
 .byt 16
 .byt $00, $c5, $00, $00
 .byt $40, $c5, $08, $00
 .byt $00, $c7, $10, $00
 .byt $00, $c9, $1a, $00
-m13:
+m16:
 .byt 16
 .byt $00, $a7, $00, $00
 .byt $00, $ad, $0a, $00
 .byt $00, $c1, $14, $00
 .byt $00, $c3, $1e, $00
-m14:
+m17:
 .byt 32
 .byt $00, $dd, $00, $00
 .byt $40, $cd, $08, $00
@@ -202,19 +233,19 @@ m14:
 .byt $40, $dd, $1a, $00
 .byt $80, $dd, $12, $10
 .byt $c0, $dd, $1a, $10
-m15:
+m18:
 .byt 16
 .byt $00, $d9, $0c, $00
 .byt $00, $db, $0a, $10
 .byt $40, $db, $11, $10
 .byt $40, $db, $11, $10
-m16:
+m19:
 .byt 16
 .byt $00, $d3, $09, $00
 .byt $00, $d1, $11, $00
 .byt $00, $d5, $09, $10
 .byt $00, $d7, $11, $10
-m17:
+m20:
 .byt 16
 .byt $00, $cf, $09, $00
 .byt $00, $d1, $11, $00

@@ -215,11 +215,12 @@ oneP:
     sta time_digits+3
 doneDigitUpdate:
 
-    .if 1
+    lda track_number
+    cmp #2
+    bne doneRainbowPalette
     lda frame_number
     lsr
     bcc doneRainbowPalette
-
     ldx #%11110000
     ldy #1
 rainbowPaletteLoop:
@@ -237,7 +238,6 @@ rainbowPaletteLoop:
     tay
     bne rainbowPaletteLoop
 doneRainbowPalette:
-    .endif
 
     lda timer
     beq doneTimer

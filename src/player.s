@@ -86,7 +86,7 @@ doneLeftRight:
     sta P i, _boost_tank
     lda P i, _boost_timer
     and #%10000000
-    ora #16
+    ora #21*2/3
     sta P i, _boost_timer
 notBoosting:
 notPressingA:

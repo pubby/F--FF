@@ -9,13 +9,24 @@
 .export prepare_menu_sprites
 
 OAM_SHIP = CPU_OAM + 0
-OAM_SHIP_END = OAM_SHIP + 12*4
+OAM_SHIP_END = OAM_SHIP + 16*4
+
+p1_OAM_SHIP = OAM_SHIP
+p2_OAM_SHIP = OAM_SHIP + 8*4
+p1_OAM_SHIP_END = p2_OAM_SHIP
+p2_OAM_SHIP_END = OAM_SHIP_END
 
 OAM_BOOST_BLACK = OAM_SHIP_END
 OAM_BOOST_BLACK_END = OAM_BOOST_BLACK + 8*4
 
+p1_OAM_BOOST_BLACK = OAM_BOOST_BLACK
+p2_OAM_BOOST_BLACK = OAM_BOOST_BLACK + 4*4
+
 OAM_BOOST_BAR = OAM_BOOST_BLACK_END
 OAM_BOOST_BAR_END = OAM_BOOST_BAR + 8*4
+
+p1_OAM_BOOST_BAR = OAM_BOOST_BAR
+p2_OAM_BOOST_BAR = OAM_BOOST_BAR + 4*4
 
 OAM_TIME = OAM_BOOST_BAR_END
 OAM_TIME_END = OAM_TIME + 8*4
@@ -38,7 +49,7 @@ draw_y = 1
 
 ; This writes sprite data to CPU_OAM. Does not write to PPU.
 ; Clobbers A, X, Y.
-.proc prepare_game_sprites
+.proc prepare_1p_sprites
     ; player y-positions
     lda p1_dir_speed
     anc #%11110000
@@ -79,33 +90,43 @@ draw_y = 1
     cmp #BUTTON_LEFT | BUTTON_RIGHT
     beq noFlaps
     and #BUTTON_LEFT
-    beq :+
+    beq @doneLeft
     lda #PATTERN($34)
     sta OAM_SHIP+(4*0)+1
+    lda #0
+    ldy OAM_SHIP+(4*6)+0
+    cpy #178
+    bcc :+
     lda frame_number
     anc #%110
+:
     adc #PATTERN($44)
     sta OAM_SHIP+(4*6)+1
     lda #PATTERN($33)
     sta OAM_SHIP+(4*5)+1
     lda #PATTERN($43)
     sta OAM_SHIP+(4*11)+1
-:
+@doneLeft:
 
     lda p1_buttons_held
     and #BUTTON_RIGHT
-    beq :+
+    beq @doneRight
     lda #PATTERN($33)
     sta OAM_SHIP+(4*0)+1
     lda #PATTERN($43)
     sta OAM_SHIP+(4*6)+1
     lda #PATTERN($34)
     sta OAM_SHIP+(4*5)+1
+    lda #0
+    ldy OAM_SHIP+(4*11)+0
+    cpy #178
+    bcc :+
     lda frame_number
     anc #%110
+:
     adc #PATTERN($44)
     sta OAM_SHIP+(4*11)+1
-:
+@doneRight:
     jmp donePlayer
 
 noFlaps:
@@ -125,42 +146,11 @@ donePlayer:
     .if j <> 0
         adc #16
     .endif
-    sta OAM_BOOST_BLACK+(j*4)+0
+    sta p1_OAM_BOOST_BLACK+(j*4)+0
+    sta p2_OAM_BOOST_BLACK+(j*4)+0
 .endrepeat
 
-    ldy time_sub
-    lda time_digit_table, y
-    and #%00001111
-    asl
-    adc #PATTERN($56)
-    sta OAM_TIME+7*4+1
-
-    lda time_digit_table, y
-    alr #%11110000
-    lsr
-    lsr
-    adc #PATTERN($56)
-    sta OAM_TIME+6*4+1
-
-    lda time_digits+0
-    asl
-    adc #PATTERN($56)
-    sta OAM_TIME+4*4+1
-
-    lda time_digits+1
-    asl
-    adc #PATTERN($56)
-    sta OAM_TIME+3*4+1
-
-    lda time_digits+2
-    asl
-    adc #PATTERN($56)
-    sta OAM_TIME+1*4+1
-
-    lda time_digits+3
-    asl
-    adc #PATTERN($56)
-    sta OAM_TIME+0*4+1
+    jsr update_time_digits
 
     lda p1_explosion
     beq noExplosion
@@ -183,13 +173,15 @@ donePlayer:
     jsr prepare_metasprite
 
 blankExplosion:
+    cpx #.lobyte(OAM_SHIP_END)
+    beq doneExplosion
     lda #$FF
 :
     sta CPU_OAM, x
     axs #.lobyte(-4)
-    cpx #OAM_BOOST_BLACK-CPU_OAM
+    cpx #.lobyte(OAM_SHIP_END)
     bne :-
-
+doneExplosion:
 noExplosion:
 
     ; Use X as an index into CPU_OAM. The 'prepare_sprite' functions will
@@ -239,7 +231,7 @@ doneSmoke:
     lda frame_number
     lsr
     bcc doneExclamationMark
-    lda #150
+    lda #146
     sta CPU_OAM+0, x ; Set sprite's y-position.
     lda #128+-4
     sta CPU_OAM+3, x ; Set sprite's x-position.
@@ -272,6 +264,7 @@ doneExclamationMark:
     jsr prepare_metasprite
 doneText:
 
+finish:
     lda countdown
     beq doneCountdown
     asl
@@ -296,6 +289,209 @@ doneCountdown:
     jmp clear_remaining_cpu_oam ; X is 0 after clear_remaining_cpu_oam.
 .endproc
 
+.proc prepare_game_sprites
+    lda two_player
+    bne prepare_2p_sprites
+    jmp prepare_1p_sprites
+.endproc
+
+.proc prepare_2p_sprites
+    .repeat 2, i
+    .scope P i, _poopy_diaper
+        ; player y-positions
+        lda P i, _dir_speed
+        anc #%11110000
+        arr #$FF
+        ror
+        adc #6*4
+        tay
+        ldx P i, _jump
+        lda #174
+        clc
+        adc ship_entrance
+        bcc :+
+        lda #255
+        jmp :++
+    :
+        sec
+        sbc #0
+        sbc ship_jump_table, x
+    :
+        sta subroutine_temp
+        .repeat 3, k
+            .if k > 0
+                lda subroutine_temp
+            .endif
+            adc ship_y_offsets_2p+k, y
+            sbc P i, _lift
+            sta 0+(4*(k+0))+P i, _OAM_SHIP
+        .endrepeat
+        .repeat 3, k
+            lda subroutine_temp
+            adc #16
+            adc ship_y_offsets_2p+k, y
+            sbc P i, _lift
+            sta 0+(4*(k+3))+P i, _OAM_SHIP
+        .endrepeat
+
+        clc
+        lda P i, _boost_tank
+        adc #68
+        .repeat 4, j
+            .if j <> 0
+                adc #16
+            .endif
+            sta 0+(j*4)+P i, _OAM_BOOST_BLACK
+        .endrepeat
+
+        lda P i, _explosion
+        beq noExplosion
+        ldx #.lobyte(P i, _OAM_SHIP)
+        cmp #4
+        beq blankExplosion
+        asl
+        tay
+        dey
+        lda #(128-32)/2+128*i
+        sta draw_x
+        lda #168
+        sta draw_y
+        lda metasprite::explosion_small, y
+        sta ptr_temp+1
+        dey
+        lda metasprite::explosion_small, y
+        sta ptr_temp+0
+        ldy #0
+        jsr prepare_metasprite
+
+    blankExplosion:
+        cpx #.lobyte(P i, _OAM_SHIP_END)
+        bcs doneExplosion
+        lda #$FF
+    :
+        sta CPU_OAM, x
+        axs #.lobyte(-4)
+        cpx #.lobyte(OAM_SHIP_END)
+        bne :-
+    doneExplosion:
+    noExplosion:
+    .endscope
+    .endrepeat
+
+    jsr update_time_digits
+
+    ; Use X as an index into CPU_OAM. The 'prepare_sprite' functions will
+    ; use and increment X as they write to 'CPU_OAM'.
+    ldx #.lobyte(OAM_START)
+
+    .repeat 2, i
+    .scope P i, _stinky_butt
+        lda P i, _pre_explosion
+        beq doneExclamationMark
+        lda frame_number
+        lsr
+        bcc doneExclamationMark
+        lda #152
+        sta CPU_OAM+0, x ; Set sprite's y-position.
+        lda #64-4+128*i
+        sta CPU_OAM+3, x ; Set sprite's x-position.
+        lda #PATTERN($48)
+        sta CPU_OAM+1, x ; Set sprite's pattern.
+        lda #%00000000
+        sta CPU_OAM+2, x ; Set sprite's attributes.
+        txa
+        axs #.lobyte(-4)
+    doneExclamationMark:
+
+    lda P i, _text_timer
+    beq doneText
+    dec P i, _text_timer
+
+    lda #64-5*5+128*i
+    sta draw_x
+    lda #50
+    sta draw_y
+    lda P i, _lap
+    asl
+    sbc #1
+    tay
+    lda metasprite::lap, y
+    sta ptr_temp+0
+    iny
+    lda metasprite::lap, y
+    sta ptr_temp+1
+    ldy #0
+    jsr prepare_metasprite
+doneText:
+
+    .endscope
+    .endrepeat
+
+    jmp prepare_1p_sprites::finish
+.endproc
+
+.proc update_time_digits
+    ldy time_sub
+    lda time_digit_table, y
+    and #%00001111
+    asl
+    adc #PATTERN($56)
+    sta OAM_TIME+7*4+1
+
+    lda time_digit_table, y
+    alr #%11110000
+    lsr
+    lsr
+    adc #PATTERN($56)
+    sta OAM_TIME+6*4+1
+
+    lda time_digits+0
+    asl
+    adc #PATTERN($56)
+    sta OAM_TIME+4*4+1
+
+    lda time_digits+1
+    asl
+    adc #PATTERN($56)
+    sta OAM_TIME+3*4+1
+
+    lda time_digits+2
+    asl
+    adc #PATTERN($56)
+    sta OAM_TIME+1*4+1
+
+    lda time_digits+3
+    asl
+    adc #PATTERN($56)
+    sta OAM_TIME+0*4+1
+    rts
+.endproc
+
+
+ship_y_offsets:
+    .byt  <(+3-7), <+2, <+1, <-0, <-1, <(-2-7), $FF, $FF
+    .byt  <(+2-7), <+1, <+0, <-0, <-1, <(-2-7), $FF, $FF
+    .byt  <(+1-7), <+0, <+0, <-0, <-0, <(-1-7), $FF, $FF
+    .byt  <(+0-7), <+0, <+0, <-0, <-0, <(-0-7), $FF, $FF
+    .byt  <(-0-7), <-0, <-0, <+0, <+0, <(+0-7), $FF, $FF
+    .byt  <(-1-7), <-0, <-0, <+0, <+0, <(+1-7), $FF, $FF
+    .byt  <(-2-7), <-1, <-0, <+0, <+1, <(+2-7), $FF, $FF
+    .byt  <(-2-7), <-1, <-0, <+1, <+2, <(+3-7), $FF, $FF
+
+ship_y_offsets_2p:
+    .byt  <+1, <+0, <-2, $FF
+    .byt  <+1, <+0, <-2, $FF
+    .byt  <+1, <+0, <-2, $FF
+    .byt  <+1, <+0, <-1, $FF
+    .byt  <+1, <+0, <-0, $FF
+    .byt  <+0, <+0, <-0, $FF
+    .byt  <+0, <+0, <-0, $FF
+    .byt  <-0, <-0, <+1, $FF
+    .byt  <-1, <-0, <+1, $FF
+    .byt  <-2, <-0, <+1, $FF
+    .byt  <-2, <-0, <+1, $FF
+    .byt  <-2, <-0, <+1, $FF
+
 prepare_blank_sprites:
     ldx #0
     ; Fall-through to clear_remaining_cpu_oam
@@ -310,17 +506,7 @@ clearOAMLoop:
     rts
 .endproc
 
-ship_y_offsets:
-    .byt  <(+3-7), <+2, <+1, <-0, <-1, <(-2-7), $FF, $FF
-    .byt  <(+2-7), <+1, <+0, <-0, <-1, <(-2-7), $FF, $FF
-    .byt  <(+1-7), <+0, <+0, <-0, <-0, <(-1-7), $FF, $FF
-    .byt  <(+0-7), <+0, <+0, <-0, <-0, <(-0-7), $FF, $FF
-    .byt  <(-0-7), <-0, <-0, <+0, <+0, <(+0-7), $FF, $FF
-    .byt  <(-1-7), <-0, <-0, <+0, <+0, <(+1-7), $FF, $FF
-    .byt  <(-2-7), <-1, <-0, <+0, <+1, <(+2-7), $FF, $FF
-    .byt  <(-2-7), <-1, <-0, <+1, <+2, <(+3-7), $FF, $FF
-
-.proc init_game_sprites
+.proc init_1p_sprites
     ldx #0
     jsr clear_remaining_cpu_oam
 
@@ -362,41 +548,38 @@ ship_y_offsets:
     sta OAM_SHIP+(4*10)+2
     sta OAM_SHIP+(4*11)+2
 
-    ; ship patterns
-    .repeat 3, i
-        lda #PATTERN($30+i)
-        sta OAM_SHIP+(4*(i+0))+1
-        lda #PATTERN($40+i)
-        sta OAM_SHIP+(4*(i+6))+1
-        lda #PATTERN($30+2-i)
-        sta OAM_SHIP+(4*(i+3))+1
-        lda #PATTERN($40+2-i)
-        sta OAM_SHIP+(4*(i+9))+1
-    .endrepeat
-
     ;;;;;;;;;;;;;;;;;;
     ; Boost bar shit ;
     ;;;;;;;;;;;;;;;;;;
     
+boost_bar_shit:
 
     ; x-positions
     lda #4
     .repeat 4, i
-        sta OAM_BOOST_BLACK+(4*i)+3
-        sta OAM_BOOST_BAR+(4*i)+3
+        sta p1_OAM_BOOST_BLACK+(4*i)+3
+        sta p1_OAM_BOOST_BAR+(4*i)+3
+    .endrepeat
+
+    lda #256-8-4
+    .repeat 4, i
+        sta p2_OAM_BOOST_BLACK+(4*i)+3
+        sta p2_OAM_BOOST_BAR+(4*i)+3
     .endrepeat
     
     ; y-positions
     .repeat 4, i
         lda #68+16*i
-        sta OAM_BOOST_BLACK+(4*i)+0
-        sta OAM_BOOST_BAR+(4*i)+0
+        sta p1_OAM_BOOST_BLACK+(4*i)+0
+        sta p1_OAM_BOOST_BAR+(4*i)+0
+        sta p2_OAM_BOOST_BLACK+(4*i)+0
+        sta p2_OAM_BOOST_BAR+(4*i)+0
     .endrepeat
 
     ; pattern
     lda #PATTERN($50)
     ldy #PATTERN($51)
-    .repeat 4, i
+    .repeat 8, i
         sta OAM_BOOST_BLACK+(4*i)+1
         sty OAM_BOOST_BAR+(4*i)+1
     .endrepeat
@@ -404,17 +587,68 @@ ship_y_offsets:
     ; attributes
     lda #3 | %00100000
     ldy #3
-    .repeat 4, i
+    .repeat 8, i
         sta OAM_BOOST_BLACK+(4*i)+2
         sty OAM_BOOST_BAR+(4*i)+2
     .endrepeat
     rts
 .endproc
 
+.proc init_game_sprites
+    lda two_player
+    bne init_2p_sprites
+    jmp init_1p_sprites
+.endproc
+
+.proc init_2p_sprites
+    ldx #0
+    jsr clear_remaining_cpu_oam
+
+    ; x-positions
+    .repeat 3, i
+        lda #(128-24)/2+8*i
+        sta p1_OAM_SHIP+(4*(i+0))+3
+        sta p1_OAM_SHIP+(4*(i+3))+3
+        lda #128+(128-24)/2+8*i
+        sta p2_OAM_SHIP+(4*(i+0))+3
+        sta p2_OAM_SHIP+(4*(i+3))+3
+    .endrepeat
+
+    ; ship patterns
+    .repeat 2, i
+        lda #PATTERN($39)
+        sta 1+(4*0)+P i, _OAM_SHIP
+        sta 1+(4*2)+P i, _OAM_SHIP
+        lda #PATTERN($3A)
+        sta 1+(4*1)+P i, _OAM_SHIP
+        lda #PATTERN($49)
+        sta 1+(4*3)+P i, _OAM_SHIP
+        sta 1+(4*5)+P i, _OAM_SHIP
+        lda #PATTERN($4A)
+        sta 1+(4*4)+P i, _OAM_SHIP
+    .endrepeat
+
+    ; attributes
+    .repeat 2, i
+        lda #0
+        sta 2+(4*0)+P i, _OAM_SHIP
+        sta 2+(4*1)+P i, _OAM_SHIP
+        ora #%01000000
+        sta 2+(4*2)+P i, _OAM_SHIP
+        lda #1
+        sta 2+(4*3)+P i, _OAM_SHIP
+        sta 2+(4*4)+P i, _OAM_SHIP
+        ora #%01000000
+        sta 2+(4*5)+P i, _OAM_SHIP
+    .endrepeat
+
+    jmp init_1p_sprites::boost_bar_shit
+.endproc
+
 .proc init_timer_sprites
     ; x-positions
     .repeat 8, i
-        lda #(256-80)/2+10*i
+        lda #(256-80)/2+10*i+1
         sta OAM_TIME+(4*i)+3
     .endrepeat
     

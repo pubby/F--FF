@@ -206,6 +206,33 @@ static std::vector<animation_t> const animations =
         },
     }},
 
+    { "explosion_small", 0, 0, 0, {
+        { 
+            { 8* 1,  8, PATTERN(0x78), 0 },
+            { 8* 2,  8, PATTERN(0x78), HFLIP },
+        },
+        { 
+            { 8* 0,  0, PATTERN(0x70), 0 },
+            { 8* 1,  0, PATTERN(0x71), 0 },
+            { 8* 2,  0, PATTERN(0x71), HFLIP },
+            { 8* 3,  0, PATTERN(0x70), HFLIP },
+            { 8* 0, 16, PATTERN(0x70), VFLIP },
+            { 8* 1, 16, PATTERN(0x71), VFLIP },
+            { 8* 2, 16, PATTERN(0x71), HFLIP | VFLIP },
+            { 8* 3, 16, PATTERN(0x70), HFLIP | VFLIP },
+        },
+        { 
+            { 8* 0,  0, PATTERN(0x79), 0 },
+            { 8* 1,  0, PATTERN(0x7A), 0 },
+            { 8* 2,  0, PATTERN(0x7A), HFLIP },
+            { 8* 3,  0, PATTERN(0x79), HFLIP },
+            { 8* 0, 16, PATTERN(0x79), VFLIP },
+            { 8* 1, 16, PATTERN(0x7A), VFLIP },
+            { 8* 2, 16, PATTERN(0x7A), HFLIP | VFLIP },
+            { 8* 3, 16, PATTERN(0x79), HFLIP | VFLIP },
+        },
+    }},
+
     { "lap", 0, 0, 0, {
         { 
             { 10* 0,  0, PATTERN(0x53), 0 },
