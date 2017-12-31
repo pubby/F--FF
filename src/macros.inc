@@ -97,8 +97,14 @@
         sta PPUADDR
     .endif
 .endmacro
+
+;.define XYADDR(nt, xpos, ypos) ((nt) + (ypos)*$20 + (xpos))
+.define XYADDR(nt, xpos, ypos) (nt + (xpos) + ((ypos)*$20))
+
 .define P(i, str) .ident(.sprintf("p%i%s", (i)+1, .string(str)))
 ;.define P(i, str) .ident(.string(str))
+
+.define LAPTIME(i) .ident(.sprintf("lap_time_%i", (i)))
 
 .macro beq_aligned label
     beq label

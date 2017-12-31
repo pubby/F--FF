@@ -18,7 +18,8 @@ version := 0.01
 # PRG ROM.  If it gets too long for one line, you can add a backslash
 # (the \ character) at the end of the line and continue on the next.
 objlist := nrom init main globals palette line line_unrolled sprites player \
-           multiply transform tokumaru menu gamepad delay flag
+           multiply transform tokumaru menu gamepad delay flag results \
+           penguin gamesound
 
 
 AS65 := ca65
@@ -60,7 +61,10 @@ $(objdir)/%.o: $(srcdir)/%.s $(srcdir)/nes.inc $(srcdir)/globals.inc \
                $(srcdir)/metasprites.inc $(srcdir)/flag_nt.inc \
                $(srcdir)/sin_scroll.inc $(srcdir)/flag_chr.inc \
                $(srcdir)/time_digit.inc \
-               $(srcdir)/icy.inc $(srcdir)/dicey.inc $(srcdir)/spicy.inc
+               $(srcdir)/icy.inc $(srcdir)/dicey.inc $(srcdir)/spicy.inc \
+               $(srcdir)/strings.inc $(srcdir)/flag_chr.bin \
+               $(srcdir)/sfx.inc $(srcdir)/sfx_data.inc \
+               $(srcdir)/music_data.inc
 	$(AS65) $(CFLAGS65) $< -o $@
 
 $(objdir)/%.o: $(objdir)/%.s
@@ -105,6 +109,9 @@ recip: recip.cpp
 rad: rad.cpp
 	 $(CXX) -std=c++17 $< -o $@
 
+strings: strings.cpp
+	 $(CXX) -std=c++17 $< -o $@
+
 $(srcdir)/line.chr: chrc
 	./chrc $@
 
@@ -122,6 +129,9 @@ $(srcdir)/clip.inc: clip
 
 $(srcdir)/recip.inc: recip
 	./recip $@
+
+$(srcdir)/strings.inc: strings
+	./strings $@
 
 $(srcdir)/sprpack.chr: $(srcdir)/rad316.chr $(srcdir)/menutext16.chr \
 $(srcdir)/ship16.chr $(srcdir)/ui16.chr $(srcdir)/explode16.chr

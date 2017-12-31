@@ -11,6 +11,8 @@
 .import read_gamepads
 .import init_game
 .import menu_palette
+.import penguin_process
+.import penguin_set_song
 
 .export init_menu
 .export update_menu
@@ -47,6 +49,8 @@ doneNTSwaps:
     lda #PPUCTRL_NMI_ON | PPUCTRL_8X16_SPR | PPUCTRL_NT_2000
     sta PPUCTRL
 
+    jsr penguin_process
+
     inc nmi_counter
     jmp nmi_return
 .endproc
@@ -54,9 +58,10 @@ doneNTSwaps:
 .segment "CODE"
 .proc init_menu
     ldx #0
-    stx menu_scroll
+    stx $4015
     stx PPUMASK
     stx PPUCTRL
+    stx menu_scroll
     jsr clear_remaining_cpu_oam
     store16into #update_menu, update_ptr
     store16into #menu_nmi, nmi_ptr
@@ -97,6 +102,9 @@ paletteLoop:
     inx
     cpx #32
     bne paletteLoop
+
+    ldx #1
+    jsr penguin_set_song
 
     lda #PPUCTRL_NMI_ON | PPUCTRL_8X16_SPR
     bit PPUSTATUS

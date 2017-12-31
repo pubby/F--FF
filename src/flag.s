@@ -4,8 +4,11 @@
 .import read_gamepads
 .import ppu_copy_palette_buffer
 .import init_menu
+.import penguin_process
+.import penguin_set_song
 
 .export init_flag
+.export ppu_setup_text_chr
 
 chr_buffer = multiply
 shifted_sin_scroll_table = nt_buffer
@@ -17,8 +20,10 @@ pal_ptr = l1100+3 ; 2 bytes
 fade_state = l1100+5
 
 .segment "FLAG_DATA"
-flag_chr:
+flag_curve:
     .include "flag_chr.inc"
+flag_chr:
+    .incbin "flag_chr.bin"
     .include "flag_nt.inc"
 
 .segment "SIN_SCROLL"
@@ -95,8 +100,10 @@ doneCopyChrBuffer:
 
     bit PPUSTATUS
 
-    lda #106-27
+    lda #106-27-62
     jsr delay_A_plus_25_cycles
+
+    jsr set_scroll
 
 rorLoop:
     ; 42 cycles:
@@ -191,10 +198,15 @@ startScrollLoop:
 
     ; 8 cycles:
     lda y_scroll
-    cmp #213
+    ;cmp #213
+    cmp #231
     bcc scrollLoop
 :
     .assert .hibyte(scrollLoop) = .hibyte(:-), error, "fuck"
+
+    ldx #$FF
+    txs
+    jsr penguin_process
 
     ldx fade_state
     lda pal_table_lo, x
@@ -222,6 +234,8 @@ checkButton:
 decFade:
     dec fade_state
     bpl infiniteLoop
+    ldx #$FF
+    txs
     jmp init_menu
 infiniteLoop:
     jmp infiniteLoop
@@ -269,10 +283,35 @@ pal_table_hi:
 
 .segment "CODE"
 
+.proc ppu_setup_text_chr
+    bankswitch_to flag_chr
+    bit PPUSTATUS
+    ldx #0
+    stx PPUADDR
+    stx PPUADDR
+    tya
+:
+    sta PPUDATA
+    inx
+    bne :-
+.repeat 4, i
+:
+    lda flag_chr+(i*256), x
+    sta PPUDATA
+    inx
+    bne :-
+.endrepeat
+    rts
+.endproc
+
 .proc init_flag
     lda #0
+    sta $4015
     sta PPUMASK
     sta PPUCTRL
+
+    ldx #0
+    jsr penguin_set_song
 
     storePPUADDR #$3F00
     lda #$0F
@@ -281,31 +320,18 @@ pal_table_hi:
     store16into #flag_nmi, nmi_ptr
     store16into #flag_pal3, pal_ptr
 
-    bankswitch_to flag_chr
+    bankswitch_to flag_curve
     ldx #0
 :
-    lda flag_chr, x
+    lda flag_curve, x
     sta chr_buffer, x
     inx
     cpx #16*8
     bne :-
 
-    bit PPUSTATUS
-    lda #0
-    sta PPUADDR
-    sta PPUADDR
-    tax
-    lda #$FF
-:
-    sta PPUDATA
-    inx
-    bne :-
-    ldx #16
-:
-    sta PPUDATA
-    dex
-    bne :-
-    
+    ldy #$FF
+    jsr ppu_setup_text_chr
+
     bankswitch_to flag_nt_data
     bit PPUSTATUS
     lda #$20
@@ -344,7 +370,7 @@ runLengthLoop:
     jmp readBytesLoop
 exitLoop:
 
-    store8into #8, fade_state
+    store8into #7, fade_state
     ldx #0
     stx sin_scroll
     stx y_scroll

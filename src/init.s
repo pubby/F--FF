@@ -1,6 +1,7 @@
 .include "globals.inc"
 
-.import FT_BASE_ADR, main
+.import main
+.import penguin_init_ntsc
 
 .export reset_handler
 
@@ -18,6 +19,8 @@
 
     ; Disable DMC IRQ.
     sta $4010
+    ; Disable sound
+    sta $4015
 
     ; Read the status registers to handle stray NMIs and DMC IRQs across
     ; resets.
@@ -64,6 +67,10 @@ waitFrame1:
 waitFrame2:
     bit PPUSTATUS
     bpl waitFrame2
+
+    ; Init music engine
+    bankswitch 1
+    jsr penguin_init_ntsc
 
     ; Ok! Everything is initialized and we'll jump to 'main' at the start
     ; of vblank.

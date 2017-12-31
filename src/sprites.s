@@ -7,6 +7,8 @@
 .export prepare_game_sprites
 .export prepare_metasprite
 .export prepare_menu_sprites
+.export time_digit_table
+.export OAM_OPP
 
 OAM_SHIP = CPU_OAM + 0
 OAM_SHIP_END = OAM_SHIP + 16*4
@@ -16,7 +18,10 @@ p2_OAM_SHIP = OAM_SHIP + 8*4
 p1_OAM_SHIP_END = p2_OAM_SHIP
 p2_OAM_SHIP_END = OAM_SHIP_END
 
-OAM_BOOST_BLACK = OAM_SHIP_END
+OAM_OPP = OAM_SHIP_END
+OAM_OPP_END = OAM_OPP+2*4
+
+OAM_BOOST_BLACK = OAM_OPP_END
 OAM_BOOST_BLACK_END = OAM_BOOST_BLACK + 8*4
 
 p1_OAM_BOOST_BLACK = OAM_BOOST_BLACK
@@ -57,7 +62,7 @@ draw_y = 1
     adc #4*8
     tay
     ldx p1_jump
-    lda #174
+    lda #176
     clc
     adc ship_entrance
     bcc :+
@@ -95,7 +100,7 @@ draw_y = 1
     sta OAM_SHIP+(4*0)+1
     lda #0
     ldy OAM_SHIP+(4*6)+0
-    cpy #178
+    cpy #182
     bcc :+
     lda frame_number
     anc #%110
@@ -119,7 +124,7 @@ draw_y = 1
     sta OAM_SHIP+(4*5)+1
     lda #0
     ldy OAM_SHIP+(4*11)+0
-    cpy #178
+    cpy #182
     bcc :+
     lda frame_number
     anc #%110
@@ -138,7 +143,6 @@ noFlaps:
     sta OAM_SHIP+(4*11)+1
 donePlayer:
 
-
     clc
     lda p1_boost_tank
     adc #68
@@ -156,13 +160,13 @@ donePlayer:
     beq noExplosion
     ldx #.lobyte(OAM_SHIP)
     cmp #4
-    beq blankExplosion
+    bcs blankExplosion
     asl
     tay
     dey
     lda #128-8*3
     sta draw_x
-    lda #170
+    lda #172
     sta draw_y
     lda metasprite::explosion, y
     sta ptr_temp+1
@@ -188,7 +192,6 @@ noExplosion:
     ; use and increment X as they write to 'CPU_OAM'.
     ldx #.lobyte(OAM_START)
 
-
     lda p1_explosion
     bne doneSmoke
     lda p1_boost_tank
@@ -205,7 +208,7 @@ noExplosion:
     anc #%110
     adc #PATTERN($35)
     sta CPU_OAM+1, x ; Set sprite's pattern.
-    lda #0
+    lda #2
     sta CPU_OAM+2, x ; Set sprite's attributes.
     txa
     axs #.lobyte(-4)
@@ -220,7 +223,7 @@ noExplosion:
     anc #%110
     adc #PATTERN($35)
     sta CPU_OAM+1, x ; Set sprite's pattern.
-    lda #%01000000
+    lda #2 | %01000000
     sta CPU_OAM+2, x ; Set sprite's attributes.
     txa
     axs #.lobyte(-4)
@@ -306,7 +309,7 @@ doneCountdown:
         adc #6*4
         tay
         ldx P i, _jump
-        lda #174
+        lda #182
         clc
         adc ship_entrance
         bcc :+
@@ -348,13 +351,13 @@ doneCountdown:
         beq noExplosion
         ldx #.lobyte(P i, _OAM_SHIP)
         cmp #4
-        beq blankExplosion
+        bcs blankExplosion
         asl
         tay
         dey
         lda #(128-32)/2+128*i
         sta draw_x
-        lda #168
+        lda #168+8
         sta draw_y
         lda metasprite::explosion_small, y
         sta ptr_temp+1
@@ -530,20 +533,20 @@ clearOAMLoop:
     .endrepeat
 
     ; attributes
-    lda #0
+    lda #2
     sta OAM_SHIP+(4*0)+2
     sta OAM_SHIP+(4*1)+2
     sta OAM_SHIP+(4*2)+2
-    ora #1
+    lda #0
     sta OAM_SHIP+(4*6)+2
     sta OAM_SHIP+(4*7)+2
     sta OAM_SHIP+(4*8)+2
 
-    lda #%01000000
+    lda #2 | %01000000
     sta OAM_SHIP+(4*3)+2
     sta OAM_SHIP+(4*4)+2
     sta OAM_SHIP+(4*5)+2
-    ora #1
+    lda #0 | %01000000
     sta OAM_SHIP+(4*9)+2
     sta OAM_SHIP+(4*10)+2
     sta OAM_SHIP+(4*11)+2
@@ -619,7 +622,7 @@ boost_bar_shit:
         lda #PATTERN($39)
         sta 1+(4*0)+P i, _OAM_SHIP
         sta 1+(4*2)+P i, _OAM_SHIP
-        lda #PATTERN($3A)
+        lda #PATTERN($3A+i)
         sta 1+(4*1)+P i, _OAM_SHIP
         lda #PATTERN($49)
         sta 1+(4*3)+P i, _OAM_SHIP
@@ -630,16 +633,15 @@ boost_bar_shit:
 
     ; attributes
     .repeat 2, i
-        lda #0
+        lda #i
         sta 2+(4*0)+P i, _OAM_SHIP
-        sta 2+(4*1)+P i, _OAM_SHIP
-        ora #%01000000
-        sta 2+(4*2)+P i, _OAM_SHIP
-        lda #1
         sta 2+(4*3)+P i, _OAM_SHIP
         sta 2+(4*4)+P i, _OAM_SHIP
         ora #%01000000
         sta 2+(4*5)+P i, _OAM_SHIP
+        sta 2+(4*2)+P i, _OAM_SHIP
+        lda #2
+        sta 2+(4*1)+P i, _OAM_SHIP
     .endrepeat
 
     jmp init_1p_sprites::boost_bar_shit

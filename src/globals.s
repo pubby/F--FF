@@ -27,14 +27,6 @@ p1_buttons_pressed: .res 1
 p1_x:     .res 2
 p1_y:     .res 2
 p1_dir:   .res 2
-p1_speed: .res 2
-p1_dir_speed: .res 1
-p1_lift: .res 1
-p1_track_index: .res 1
-p1_boost_tank: .res 1
-p1_boost_timer: .res 1
-p1_boost: .res 1
-p1_slowdown: .res 1
 
 p2:
 p2_buttons_held: .res 1
@@ -42,14 +34,7 @@ p2_buttons_pressed: .res 1
 p2_x:     .res 2
 p2_y:     .res 2
 p2_dir:   .res 2
-p2_speed: .res 2
-p2_dir_speed: .res 1
-p2_lift: .res 1
-p2_track_index: .res 1
-p2_boost_tank: .res 1
-p2_boost_timer: .res 1
-p2_boost: .res 1
-p2_slowdown: .res 1
+
 
 level_length: .res 1
 
@@ -93,6 +78,11 @@ multiply_sub: .res 1
 y_temp: .res 1
 recip_ptr: .res 2
 
+draw_distance: .res 1
+draw_distance_minus_one: .res 1
+
+penguin_zp: .res 14
+
 .segment "BSS" ; RAM
 pad_size = 6
 
@@ -131,12 +121,39 @@ p1_text_timer: .res 1
 p1_jump: .res 1
 p1_boost_tank_sub: .res 1
 
+p1_speed: .res 2
+p1_dir_speed: .res 1
+p1_lift: .res 1
+p1_track_index: .res 1
+p1_boost_tank: .res 1
+p1_boost_timer: .res 1
+p1_boost: .res 1
+p1_slowdown: .res 1
+
 p2_pre_explosion: .res 1
 p2_explosion: .res 1
 p2_lap: .res 1
 p2_text_timer: .res 1
 p2_jump: .res 1
 p2_boost_tank_sub: .res 1
+
+p2_speed: .res 2
+p2_dir_speed: .res 1
+p2_lift: .res 1
+p2_track_index: .res 1
+p2_boost_tank: .res 1
+p2_boost_timer: .res 1
+p2_boost: .res 1
+p2_slowdown: .res 1
+
+needs_completion: .res 1
+completion_timer: .res 1
+
+lap_time_sub: .res 8
+lap_time_0: .res 8
+lap_time_1: .res 8
+lap_time_2: .res 8
+lap_time_3: .res 8
 
 game_bss_end: .res 1
 

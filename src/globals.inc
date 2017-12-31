@@ -89,14 +89,14 @@ multiply = $78
 .globalzp p1_x
 .globalzp p1_y
 .globalzp p1_dir
-.globalzp p1_speed
-.globalzp p1_dir_speed
-.globalzp p1_lift
-.globalzp p1_track_index
-.globalzp p1_boost_tank
-.globalzp p1_boost_timer
-.globalzp p1_boost
-.globalzp p1_slowdown
+.global p1_speed
+.global p1_dir_speed
+.global p1_lift
+.global p1_track_index
+.global p1_boost_tank
+.global p1_boost_timer
+.global p1_boost
+.global p1_slowdown
 
 .globalzp p2
 .globalzp p2_buttons_held
@@ -104,14 +104,14 @@ multiply = $78
 .globalzp p2_x
 .globalzp p2_y
 .globalzp p2_dir
-.globalzp p2_speed
-.globalzp p2_dir_speed
-.globalzp p2_lift
-.globalzp p2_track_index
-.globalzp p2_boost_tank
-.globalzp p2_boost_timer
-.globalzp p2_boost
-.globalzp p2_slowdown
+.global p2_speed
+.global p2_dir_speed
+.global p2_lift
+.global p2_track_index
+.global p2_boost_tank
+.global p2_boost_timer
+.global p2_boost
+.global p2_slowdown
 
 .globalzp level_length
 
@@ -154,6 +154,9 @@ multiply = $78
 ; Rendering
 .globalzp y_temp
 .globalzp recip_ptr
+
+; Music
+.globalzp penguin_zp
 
 .global tokumaru_storage
 .global scratchpad
@@ -227,6 +230,18 @@ multiply = $78
 .global p2_text_timer
 .global p2_jump
 .global p2_boost_tank_sub
+
+.global needs_completion
+.global completion_timer
+
+.globalzp draw_distance
+.globalzp draw_distance_minus_one
+
+.global lap_time_sub
+.global lap_time_0
+.global lap_time_1
+.global lap_time_2
+.global lap_time_3
 
 ; Multiply Labels
 .global multiply_code

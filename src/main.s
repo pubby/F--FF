@@ -13,15 +13,26 @@
 .import init_flag
 .import ppu_copy_palette_buffer
 .import icy_palette, spicy_palette, dicey_palette
-.import sprite_palette
+.import sprite_1p_palette
+.import sprite_2p_palette
 .import init_game_sprites
 .import init_timer_sprites
+.import penguin_init_ntsc
+.import penguin_process
+.import penguin_set_song
+.import init_game_sound
+.import process_game_sound
+.import init_results
 
 .export main, nmi_handler, irq_handler, nmi_return
 .export update_return
 .export sprites_chr, rad_chr
 .export init_game
 
+.segment "RESERVED"
+.repeat 41
+    .byt 0
+.endrepeat
 .segment "BANK0_END"
 .byt 0
 .segment "BANK1_END"
@@ -30,9 +41,6 @@
 .byt 2
 .segment "BANK3_END"
 .byt 3
-
-.segment "CODE"
-track_size: .byt 64
 
 .segment "LEVELS"
 .scope l1
@@ -62,6 +70,7 @@ track_size: .byt 64
 
     ldx #$00
     stx PPUMASK
+
     ldx #$20
 .repeat 3, i
 :
@@ -74,7 +83,7 @@ track_size: .byt 64
     lda $00
     dex
     bne :-
-    
+
     jmp return
 
 renderFrame:
@@ -107,6 +116,8 @@ renderFrame:
         sta PPUDATA
     .endrepeat
 
+    ldx #0
+
     inc nmi_counter
 return:
     stx PPUSCROLL
@@ -119,6 +130,8 @@ return:
     lda #PPUCTRL_NMI_ON | PPUCTRL_8X16_SPR
     sta PPUCTRL
 
+    ;jsr penguin_process
+    jsr process_game_sound
     jmp nmi_return
 .endproc
 
@@ -178,7 +191,7 @@ oneP:
 .proc update_game
     lda #0
     sta frame_ready
-    ;sta debug
+    sta debug
     inc frame_number
 
     jsr prepare_game_sprites
@@ -188,6 +201,15 @@ oneP:
     jsr read_gamepads
 
     jsr p_move_update
+
+    lda needs_completion
+    bne :+
+    inc completion_timer
+    lda completion_timer
+    cmp #32
+    bcc :+
+    jmp init_results
+:
 
     clc
     lda #2
@@ -248,7 +270,7 @@ doneRainbowPalette:
 doneTimer:
 
     lda #1 
-    ;sta debug
+    sta debug
     sta frame_ready
     jmp update_return
 .endproc
@@ -264,6 +286,11 @@ ltx_table_hi:
 .byt .hibyte(l2::ltx_lo)
 .byt .hibyte(l3::ltx_lo)
 
+tf_table_lo:
+.byt .lobyte(l1::tf)
+.byt .lobyte(l2::tf)
+.byt .lobyte(l3::tf)
+
 tf_table_hi:
 .byt .hibyte(l1::tf)
 .byt .hibyte(l2::tf)
@@ -275,8 +302,8 @@ track_size_table:
 .byt l3::track_size
 
 main:
-    ;jmp init_menu
     jmp init_flag
+    ;jmp init_menu
 
 .proc init_game
     ; Zero-out bss
@@ -348,12 +375,13 @@ paletteLoop:
     ldx track_number
     lda track_size_table, x
     sta level_length
+    ldy tf_table_lo, x
+    sty tf_ptr+0
     ldy tf_table_hi, x
     sty tf_ptr+1
     ldy ltx_table_hi, x
     ldx #$80
     lda #$00
-    sta tf_ptr+0
     .repeat 4, i
         sta lx_lo_ptr+(4*i)+0
         sty lx_lo_ptr+(4*i)+1
@@ -379,6 +407,13 @@ paletteLoop:
     sta p1_lift
     sta p2_lift
 
+    lda #1
+    ldx two_player
+    beq :+
+    ora #2
+:
+    sta needs_completion
+
     ; Render the first frame without player input.
     lda #0
     sta p1_buttons_held
@@ -392,6 +427,13 @@ paletteLoop:
 
     ; Sprites
     jsr init_game_sprites
+
+    ; Music
+    jsr penguin_init_ntsc
+    ldx #2
+    jsr penguin_set_song
+
+    jsr init_game_sound
 
     lda #PPUCTRL_NMI_ON | PPUCTRL_8X16_SPR
     bit PPUSTATUS
@@ -410,16 +452,9 @@ track_palette_hi:
 .byt .hibyte(dicey_palette)
 
 .proc game_fade_in
-
     bankswitch_to clear_nt_buffer
     jsr clear_nt_buffer
     jsr p_move_update
-
-    ldx track_number
-    lda track_palette_lo, x
-    sta ptr_temp+0
-    lda track_palette_hi, x
-    sta ptr_temp+1
 
     lda timer
     asl
@@ -428,9 +463,15 @@ track_palette_hi:
     and #%11110000
     sta subroutine_temp
 
+    store16into #sprite_1p_palette, ptr_temp
+    lda two_player
+    beq :+
+    store16into #sprite_2p_palette, ptr_temp
+:
+
     ldy #15
 spritePaletteLoop:
-    lda sprite_palette, y
+    lda (ptr_temp), y
     sec
     sbc subroutine_temp
     bcs :+
@@ -439,6 +480,12 @@ spritePaletteLoop:
     sta palette_buffer+16, y
     dey
     bne spritePaletteLoop
+
+    ldx track_number
+    lda track_palette_lo, x
+    sta ptr_temp+0
+    lda track_palette_hi, x
+    sta ptr_temp+1
 
     ldy #15
 bgPaletteLoop:
@@ -595,4 +642,3 @@ store:
     rts
 .endproc
 
-    ;.incbin "bullets.chr"

@@ -9,10 +9,12 @@
 .import clip_from_y_top_add
 .import clip_to_y_top_sub
 .import clip_to_y_top_add
+.import OAM_OPP
 
 .export p1_render, p2_render
 
-draw_distance = 5
+SPR_NT = 1
+.define PATTERN(i) ((i) * 2 + SPR_NT)
 
 .segment "CODE"
 
@@ -479,6 +481,7 @@ cull:
 
 .repeat 2, i
 .proc P i, _render 
+    o = (1 - i)
     ; Levels are in bank 2
     bankswitch 2
 
@@ -495,7 +498,37 @@ cull:
     lda #64
     sbc 1+P i, _dir
     jsr setup_cos
-    ldy #draw_distance - 1
+
+.if i = 0
+    lda two_player
+    beq @done2p
+.endif
+    sec
+    lda 0+P o, _x
+    sbc 0+P i, _x
+    sta multiply_store
+    lda 1+P o, _x
+    sbc 1+P i, _x
+    jsr multiply
+    sta from_x+0
+    stx from_x+1
+
+    sec
+    lda 0+P o, _y
+    sbc 0+P i, _y
+    sta multiply_store
+    lda 1+P o, _y
+    sbc 1+P i, _y
+    jsr multiply
+    sta from_y+0
+    stx from_y+1
+    ldy #4
+    .byt $0C ; IGN to skip next ldy
+@done2p:
+    ldy #6
+    sty draw_distance
+    dey
+    sty draw_distance_minus_one
 cosLoop:
     sec
     lda (ly_lo_ptr), y
@@ -548,7 +581,46 @@ cosLoop:
     lda #64
     sbc 1+P i, _dir
     jsr setup_sin
-    ldy #draw_distance - 1
+
+.if i = 0
+    lda two_player
+    beq @done2p
+.endif
+    sec
+    lda 0+P o, _y
+    sbc 0+P i, _y
+    sta multiply_store
+    lda 1+P o, _y
+    sbc 1+P i, _y
+    jsr multiply
+    sec
+    sbc from_x+0
+    sta from_x+0
+    txa
+    sbc from_x+1
+    sta from_x+1
+
+    sec
+    lda 0+P o, _x
+    sbc 0+P i, _x
+    sta multiply_store
+    lda 1+P o, _x
+    sbc 1+P i, _x
+    jsr multiply
+    clc
+    adc from_y+0
+    bcc :+
+    inx
+    clc
+:
+    adc #200
+    sta from_y+0
+    txa
+    adc from_y+1
+    sta from_y+1
+@done2p:
+
+    ldy draw_distance_minus_one
 sinLoop:
     sec
     lda (ly_lo_ptr), y
@@ -618,35 +690,72 @@ sinLoop:
 
     dey
     bpl sinLoop
+
+    jsr transform_setup_mult
+
+    lda two_player
+    beq @cull
+    bankswitch_to recip_asl_table
+    lda from_y+1
+    bmi @cull
+    bne @positive
+@zeroHi:
+    ldx from_y+0
+    lda recip_asl_table, x
+    sta multiply_label jump_pos, 1
+    clc
+    adc #.lobyte(negative_asl - positive_asl)
+    sta multiply_label jump_neg, 1
+    lda #$80            ; SKB
+    .byt $0C            ; IGN to skip next LDA.
+@positive:
+    lda #$60            ; RTS
+    sta multiply_label r2, 0
+    jsr multiply_from
+
+    lda from_x+1
+    ora from_y+1
+    bne @cull
+
+.if i = 0
+    lda from_x+0
+    alr #%11111110
+    sbc #2
+    bcc @cull
+    sta 0*4+OAM_OPP+3 ; Set sprite's x-position.
+    lda from_y+0
+    clc
+    adc #38-16
+    sta 0*4+OAM_OPP+0 ; Set sprite's y-position.
+    lda #PATTERN($4C)
+    sta 0*4+OAM_OPP+1 ; Set sprite's pattern.
+    lda #1
+    sta 0*4+OAM_OPP+2 ; Set sprite's attributes.
+.else
+    lda from_x+0
+    alr #%11111110
+    sbc #2
+    bcc @cull
+    ora #128
+    sta 1*4+OAM_OPP+3 ; Set sprite's x-position.
+    lda from_y+0
+    clc
+    adc #38-16
+    sta 1*4+OAM_OPP+0 ; Set sprite's y-position.
+    lda #PATTERN($4B)
+    sta 1*4+OAM_OPP+1 ; Set sprite's pattern.
+    lda #0
+    sta 1*4+OAM_OPP+2 ; Set sprite's attributes.
+.endif
+    jmp draw_lines_and_shit
+@cull:
+    lda #$FF
+    sta i*4+OAM_OPP+0 ; Set sprite's y-position.
     jmp draw_lines_and_shit
 .endproc
 .endrepeat
 
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    ; Draw the lines and shit ;
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;
-.proc draw_lines_and_shit
-    bankswitch_to draw_line
-
-    ; Setup color shit
-    lda #%1100
-    sta  l1100
-    ldx #%1010
-    stx  l1010
-    sax  l1000
-    lsr ;%0110
-    sta  l0110
-    ldx #%0101
-    stx  l0101
-    sax  l0100
-    lsr ;%0011
-    sta  l0011
-    ldx #%1001
-    stx  l1001
-    sax  l0001
-    lda #%0010
-    sta  l0010
-
+.proc transform_setup_mult
     ; Setup self-modifying multiplication code.
     ldx #$A5            ; LDA (zero page)
     stx multiply_label la, 0
@@ -667,6 +776,34 @@ sinLoop:
 
     ldx #$4C            ; JMP
     stx multiply_label jump_neg, 0
+    rts
+.endproc
+
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ; Draw the lines and shit ;
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;
+.proc draw_lines_and_shit
+    ; Setup color shit
+    lda #%1100
+    sta  l1100
+    ldx #%1010
+    stx  l1010
+    sax  l1000
+    lsr ;%0110
+    sta  l0110
+    ldx #%0101
+    stx  l0101
+    sax  l0100
+    lsr ;%0011
+    sta  l0011
+    ldx #%1001
+    stx  l1001
+    sax  l0001
+    lda #%0010
+    sta  l0010
+
+
+    bankswitch_to draw_line
 
     ldy #0
     sty ptr_temp+0
@@ -681,7 +818,7 @@ renderWallsLoop:
 nextIteration:
     iny
     sty y_temp
-    cpy #draw_distance - 1
+    cpy draw_distance_minus_one
     bcs :+
     jmp renderWallsLoop
 :
@@ -713,7 +850,7 @@ renderFloorsLoop:
     .endscope
 nextFloorIteration:
     iny
-    cpy #draw_distance
+    cpy draw_distance
     bcs :+
     jmp renderFloorsLoop
 :

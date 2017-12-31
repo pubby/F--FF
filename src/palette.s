@@ -1,15 +1,22 @@
 .include "globals.inc"
 
 .export ppu_copy_palette_buffer
-.export sprite_palette
+.export sprite_1p_palette
+.export sprite_2p_palette
 .export icy_palette, spicy_palette, dicey_palette
 .export menu_palette
 
 .segment "RODATA"
-sprite_palette:
-    .byt $0F,$11,$2A,$3A
+sprite_1p_palette:
     .byt $0F,$11,$26,$3A
     .byt $0F,$01,$11,$21
+    .byt $0F,$11,$2A,$3A
+    .byt $0F,$0F,$14,$28
+
+sprite_2p_palette:
+    .byt $0F,$11,$26,$3A
+    .byt $0F,$14,$21,$35
+    .byt $0F,$11,$2A,$14
     .byt $0F,$0F,$14,$28
 
 icy_palette:

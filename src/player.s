@@ -136,9 +136,9 @@ storeSlowdown:
     txa                 ; X = _boost_timer
     anc #%01111111      ; Clears carry
     bne boost
-    lda palette_buffer+22
+    lda palette_buffer+18+4*i
     and #$10 ^ $FF
-    sta palette_buffer+22
+    sta palette_buffer+18+4*i
     lda P i, _boost
     sec
     sbc #2*mul/div
@@ -146,9 +146,9 @@ storeSlowdown:
     lda #0
     beq storeBoost      ; Guaranteed branch
 boost:
-    lda palette_buffer+22
+    lda palette_buffer+18+4*i
     eor #$10
-    sta palette_buffer+22
+    sta palette_buffer+18+4*i
     dec P i, _boost_timer
     lda P i, _boost
     adc #12*mul/div
@@ -173,16 +173,21 @@ explosion_palette_table:
 
 .repeat 2, i
 .proc P i, _handle_explosion
-    cpx #4
-    bcs :+
     lda frame_number
     and #1
     beq :+
     inx
 :
+    cpx #5
+    bcs doneExplosion
     stx P i, _explosion
     lda explosion_palette_table, x
     sta palette_buffer+16
+    rts
+doneExplosion:
+    lda #(i+1) ^ $FF
+    and needs_completion
+    sta needs_completion
     rts
 .endproc
 
@@ -205,6 +210,12 @@ explosion_palette_table:
 :
     ldx P i, _explosion
     bne P i, _handle_explosion
+
+    lda needs_completion
+    and #i+1
+    bne :+
+    jmp entrance
+:
 
     handle_move i, 3, 2
 
@@ -300,12 +311,15 @@ storeLift:
     sta ly_lo_ptr
     sta rx_lo_ptr
     sta ry_lo_ptr
-    sta tf_ptr
     ora #128
     sta lx_hi_ptr
     sta ly_hi_ptr
     sta rx_hi_ptr
     sta ry_hi_ptr
+    asl
+    asl tf_ptr
+    ror
+    sta tf_ptr
 
     lda #0
     sta oob
@@ -492,10 +506,28 @@ doneJump:
     bcc :+
     lda #30 ; TODO
     sta P i, _text_timer
+    ; Save the lap time
+    lax P i, _lap
+    .if i > 0
+        axs #.lobyte(-4)
+    .endif
+    lda time_sub
+    sta lap_time_sub, x
+    .repeat 4, k
+        lda time_digits+k
+        sta LAPTIME k, x
+    .endrepeat
     inc P i, _lap
     ldx #0
 :
     stx P i, _track_index
+    lda P i, _lap
+    cmp #3
+    bcc doneOutsideFrontRailing
+    ; Handle completion
+    lda #(i+1) ^ $FF
+    and needs_completion
+    sta needs_completion
 doneOutsideFrontRailing:
 
     lda P i, _pre_explosion
@@ -513,6 +545,10 @@ outOfBounds:
     lda P i, _boost_timer
     and #%01111111
     sta P i, _boost_timer
+
+    lda needs_completion
+    and #i+1
+    beq notDead
 
     sec
     lda P i, _boost_tank_sub
@@ -570,6 +606,13 @@ doneRegen:
     beq :+
     jmp p1_handle_explosion
 :
+
+    lda needs_completion
+    and #1
+    bne :+
+    jmp p1_move::entrance
+:
+
     handle_move 0, 2, 2
     jmp p1_move::entrance
 .endproc 
