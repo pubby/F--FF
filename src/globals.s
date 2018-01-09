@@ -83,6 +83,8 @@ draw_distance_minus_one: .res 1
 
 penguin_zp: .res 14
 
+gs_zp: .res 3
+
 .segment "BSS" ; RAM
 pad_size = 6
 

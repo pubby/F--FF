@@ -187,7 +187,7 @@ results_pal3:
     jsr p2_write_total_time
 done2p:
 
-    ldx #2
+    ldx #3
     jsr penguin_set_song
 
     lda #PPUCTRL_NMI_ON | PPUCTRL_8X16_SPR

@@ -1,4 +1,5 @@
 .include "globals.inc"
+.include "sfx.inc"
 
 .import decompress_tokumaru
 .import prepare_game_sprites
@@ -20,6 +21,7 @@
 .import penguin_init_ntsc
 .import penguin_process
 .import penguin_set_song
+.import penguin_noise_stack
 .import init_game_sound
 .import process_game_sound
 .import init_results
@@ -130,7 +132,7 @@ return:
     lda #PPUCTRL_NMI_ON | PPUCTRL_8X16_SPR
     sta PPUCTRL
 
-    ;jsr penguin_process
+    jsr penguin_process
     jsr process_game_sound
     jmp nmi_return
 .endproc
@@ -430,8 +432,10 @@ paletteLoop:
 
     ; Music
     jsr penguin_init_ntsc
-    ldx #2
+    ldx #0
     jsr penguin_set_song
+    lda #0
+    sta penguin_noise_stack
 
     jsr init_game_sound
 
@@ -547,12 +551,16 @@ bgPaletteLoop:
     lda2p 20
     sta timer
     store16into #game_countdown, update_ptr
+    bankswitch 1
+    jsr square1_sfx_1
     jmp update_return
 .endproc
 
 .proc game_countdown
     dec timer
     bne :+
+    bankswitch 1
+    jsr square1_sfx_1
     lda2p 20
     sta timer
     lda #1
@@ -567,6 +575,9 @@ bgPaletteLoop:
 .proc game_init_start
     jsr init_timer_sprites
     store16into #update_game, update_ptr
+    lax track_number
+    axs #.lobyte(-4)
+    jsr penguin_set_song
     jmp update_return
 .endproc
 

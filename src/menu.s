@@ -1,4 +1,5 @@
 .include "globals.inc"
+.include "sfx.inc"
 
 .import clear_remaining_cpu_oam
 .import nmi_return
@@ -103,7 +104,7 @@ paletteLoop:
     cpx #32
     bne paletteLoop
 
-    ldx #1
+    ldx #2
     jsr penguin_set_song
 
     lda #PPUCTRL_NMI_ON | PPUCTRL_8X16_SPR
@@ -124,6 +125,8 @@ paletteLoop:
     lda two_player
     eor #1
     sta two_player
+    bankswitch 1
+    jsr triangle_sfx_0
 doneChangePlayers:
 
     lda p1_buttons_pressed
@@ -136,6 +139,8 @@ doneChangePlayers:
     ldx #2
 :
     stx track_number
+    bankswitch 1
+    jsr triangle_sfx_0
 doneUp:
 
     lda p1_buttons_pressed
@@ -149,6 +154,8 @@ doneUp:
     ldx #0
 :
     stx track_number
+    bankswitch 1
+    jsr triangle_sfx_0
 doneDown:
 
     bankswitch_to update_scroll_in

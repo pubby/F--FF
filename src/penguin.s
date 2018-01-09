@@ -5,6 +5,7 @@
 .export penguin_init_pal
 .export penguin_process
 .export penguin_set_song
+.export penguin_noise_stack
 
 .include "sfx.inc"
 
@@ -65,6 +66,8 @@ square1_stack_next  = PMEM2 + 12
 
 sfx_noise_play = PMEM2 + 13
 sfx_stack_temp = PMEM2 + 14
+
+penguin_noise_stack = noise_stack
 
 .segment "MUSIC_DATA"
 .include "music_data.inc"
@@ -724,6 +727,7 @@ done_triangle:
 
     ; Noise
     ldx noise_stack
+    beq done_noise
     txs
 
     ; Noise: Volume & Duty

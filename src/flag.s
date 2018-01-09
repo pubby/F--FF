@@ -310,7 +310,7 @@ pal_table_hi:
     sta PPUMASK
     sta PPUCTRL
 
-    ldx #0
+    ldx #1
     jsr penguin_set_song
 
     storePPUADDR #$3F00

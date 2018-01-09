@@ -157,6 +157,7 @@ multiply = $78
 
 ; Music
 .globalzp penguin_zp
+.globalzp gs_zp
 
 .global tokumaru_storage
 .global scratchpad

@@ -1,4 +1,5 @@
 .include "globals.inc"
+.include "sfx.inc"
 
 .import setup_cos, setup_sin
 .import setup_multiply
@@ -168,11 +169,19 @@ doneBoost:
 
 .endmacro
 
+.segment "RODATA"
 explosion_palette_table:
     .byt $15, $30, $25, $15, $0F
+.segment "CODE"
 
 .repeat 2, i
 .proc P i, _handle_explosion
+    cpx #1
+    bne :+
+    bankswitch 1
+    jsr square1_sfx_3
+    ldx #1
+:
     lda frame_number
     and #1
     beq :+
@@ -506,6 +515,8 @@ doneJump:
     bcc :+
     lda #30 ; TODO
     sta P i, _text_timer
+    bankswitch 1
+    jsr square1_sfx_4
     ; Save the lap time
     lax P i, _lap
     .if i > 0
@@ -574,12 +585,20 @@ inBounds:
     ora #%10000000
     sta P i, _boost_timer
 
+
     clc
     lda #128
     ldy two_player
     beq :+
     lda #128*3/2
 :
+    sta subroutine_temp
+    lda P i, _buttons_held
+    and #BUTTON_LEFT | BUTTON_RIGHT
+    beq :+
+    lsr subroutine_temp
+:
+    lda subroutine_temp
     adc P i, _boost_tank_sub
     sta P i, _boost_tank_sub
     lda P i, _boost_tank
