@@ -25,6 +25,7 @@
 .import init_game_sound
 .import process_game_sound
 .import init_results
+.import pubby_screen
 
 .export main, nmi_handler, irq_handler, nmi_return
 .export update_return
@@ -63,36 +64,30 @@
     lda frame_ready
     bne renderFrame
 :
-
-    ; Do OAM DMA
-    lda #.hibyte(CPU_OAM)
-    sta OAMDMA
-
     jsr ppu_copy_palette_buffer
 
     ldx #$00
     stx PPUMASK
 
-    ldx #$20
-.repeat 3, i
+    ldx #$1F
+.repeat 2, i
 :
-    lda $00
+    lda ($00, x)
+    lda ($00, x)
+    nop
     dex
     bne :-
 .endrepeat
-    ldx #$83
-:
-    lda $00
-    dex
-    bne :-
+    nop
+    nop
+    bit $00
 
     jmp return
 
 renderFrame:
-    ; Do OAM DMA (without reading controllers)
-    lda #.hibyte(CPU_OAM) ; A = $03
-    sta OAMDMA
+    lda #%11
     adc two_player      ; carry bit is irrelevant
+    lda #%111
     sta subframes_left
 
     bit PPUSTATUS
@@ -118,20 +113,21 @@ renderFrame:
         sta PPUDATA
     .endrepeat
 
-    ldx #0
-
     inc nmi_counter
 return:
+    ; Do OAM DMA
+    lda #.hibyte(CPU_OAM)
+    sta OAMDMA
+
     stx PPUSCROLL
     stx PPUSCROLL
     stx PPUADDR
     stx PPUADDR
 
-    lda #PPUMASK_BG_ON | PPUMASK_NO_BG_CLIP| PPUMASK_SPR_ON | PPUMASK_NO_SPR_CLIP
-    sta PPUMASK
     lda #PPUCTRL_NMI_ON | PPUCTRL_8X16_SPR
     sta PPUCTRL
-
+    lda #PPUMASK_BG_ON | PPUMASK_NO_BG_CLIP| PPUMASK_SPR_ON | PPUMASK_NO_SPR_CLIP
+    sta PPUMASK
     jsr penguin_process
     jsr process_game_sound
     jmp nmi_return
@@ -150,19 +146,15 @@ return:
     jmp (nmi_ptr)
 .endproc
 
-.proc nmi_return
+nmi_return:
     ; Restore registers and return.
     ldy nmi_bank
     bankswitch_y
     ldx nmi_x
     ldy nmi_y
     pla
+irq_handler:
     rti
-.endproc
-
-.proc irq_handler
-    rti
-.endproc
 
 update_return:
     lda nmi_counter
@@ -177,14 +169,23 @@ update_return:
     beq oneP
 twoP:
     jsr p1_move
+    lda needs_completion
+    and #%1
+    beq :+
     lda #SPLITSCREEN_LEFT
     sta line_splitscreen
     jsr p1_render
+:
 
     jsr p2_move
+    lda needs_completion
+    and #%10
+    beq :+
     lda #SPLITSCREEN_RIGHT
     sta line_splitscreen
     jmp p2_render
+:
+    rts
 oneP:
     jsr p1_solo_move
     jmp p1_render
@@ -193,7 +194,6 @@ oneP:
 .proc update_game
     lda #0
     sta frame_ready
-    sta debug
     inc frame_number
 
     jsr prepare_game_sprites
@@ -272,11 +272,11 @@ doneRainbowPalette:
 doneTimer:
 
     lda #1 
-    sta debug
     sta frame_ready
     jmp update_return
 .endproc
 
+.segment "RODATA"
 next_palette_index:
 .byt 0,  2,  3,  5
 .byt 0,  6,  7,  9
@@ -303,11 +303,52 @@ track_size_table:
 .byt l2::track_size
 .byt l3::track_size
 
+.segment "CODE"
 main:
+    ;jmp pubby_screen
     jmp init_flag
     ;jmp init_menu
 
 .proc init_game
+    bankswitch_to init_game_b1
+    jsr init_game_b1
+
+    ; Chr
+    bankswitch_to ppu_load_4x4_pixels_chr
+    jsr ppu_load_4x4_pixels_chr
+
+
+    ; Render the first frame without player input.
+    lda #0
+    sta p1_buttons_held
+    sta p1_buttons_pressed
+    sta p2_buttons_held
+    sta p2_buttons_pressed
+    jsr prepare_game_sprites
+    bankswitch_to clear_nt_buffer
+    jsr clear_nt_buffer
+    jsr p_move_update
+
+    ; Sprites
+    jsr init_game_sprites
+
+    ; Music
+    jsr penguin_init_ntsc
+    ldx #0
+    jsr penguin_set_song
+    lda #0
+    sta penguin_noise_stack
+
+    jsr init_game_sound
+
+    lda #PPUCTRL_NMI_ON | PPUCTRL_8X16_SPR
+    bit PPUSTATUS
+    sta PPUCTRL
+    jmp update_return
+.endproc
+
+.segment "B1_CODE"
+.proc init_game_b1
     ; Zero-out bss
     lda #0
     tax
@@ -329,10 +370,6 @@ zeroZPLoop:
     stx frame_ready
     store16into #game_nmi, nmi_ptr
     store16into #game_fade_in, update_ptr
-
-    ; Chr
-    bankswitch_to ppu_load_4x4_pixels_chr
-    jsr ppu_load_4x4_pixels_chr
 
     ; Setup black palette
     lda #$0F
@@ -415,35 +452,9 @@ paletteLoop:
     ora #2
 :
     sta needs_completion
-
-    ; Render the first frame without player input.
-    lda #0
-    sta p1_buttons_held
-    sta p1_buttons_pressed
-    sta p2_buttons_held
-    sta p2_buttons_pressed
-    jsr prepare_game_sprites
-    bankswitch_to clear_nt_buffer
-    jsr clear_nt_buffer
-    jsr p_move_update
-
-    ; Sprites
-    jsr init_game_sprites
-
-    ; Music
-    jsr penguin_init_ntsc
-    ldx #0
-    jsr penguin_set_song
-    lda #0
-    sta penguin_noise_stack
-
-    jsr init_game_sound
-
-    lda #PPUCTRL_NMI_ON | PPUCTRL_8X16_SPR
-    bit PPUSTATUS
-    sta PPUCTRL
-    jmp update_return
+    rts
 .endproc
+.segment "CODE"
 
 track_palette_lo:
 .byt .lobyte(icy_palette)

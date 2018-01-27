@@ -14,9 +14,13 @@
 .import menu_palette
 .import penguin_process
 .import penguin_set_song
+.import pubby_screen
 
 .export init_menu
 .export update_menu
+
+wait_timer = time_digits ; 2 bytes
+fade_ptr = time_digits+2 ; 2 bytes
 
 .segment "B2_CODE"
 .include "rad.inc"
@@ -58,14 +62,9 @@ doneNTSwaps:
 
 .segment "CODE"
 .proc init_menu
-    ldx #0
-    stx $4015
-    stx PPUMASK
-    stx PPUCTRL
-    stx menu_scroll
-    jsr clear_remaining_cpu_oam
-    store16into #update_menu, update_ptr
-    store16into #menu_nmi, nmi_ptr
+    bankswitch 1
+    jmp menu_setup
+setup_return:
 
     lda #0
     sta PPUADDR
@@ -114,8 +113,42 @@ paletteLoop:
     jmp init_scroll_in
 .endproc
 
+.segment "B1_CODE"
+.proc menu_setup
+    ldx #0
+    stx $4015
+    stx PPUMASK
+    stx PPUCTRL
+    stx menu_scroll
+    jsr clear_remaining_cpu_oam
+    store16into #update_menu, update_ptr
+    store16into #menu_nmi, nmi_ptr
+    store16into #60*30, wait_timer
+
+    jmp init_menu::setup_return
+.endproc
+
+.segment "CODE"
+
 .proc update_menu
     jsr read_gamepads
+
+    lda p1_buttons_pressed
+    beq :+
+    store16into #60*30, wait_timer
+:
+    sec
+    lda wait_timer+0
+    sbc #1
+    sta wait_timer+0
+    lda wait_timer+1
+    sbc #0
+    sta wait_timer+1
+    ora wait_timer+0
+    bne :+
+    store16into #pubby_screen, fade_ptr
+    jmp init_fadeout
+:
 
     lda p1_buttons_pressed
     and #BUTTON_SELECT
@@ -304,7 +337,7 @@ scrollOut:
     sta menu_scroll
 done:
     dec timer
-    beq init_fadeout
+    beq init_fadeout_1
     jmp menu_update_return
 .endproc
 
@@ -317,6 +350,8 @@ update_text_hi:
     .byt .hibyte(update_text_out::spicy)
     .byt .hibyte(update_text_out::dicey)
 
+init_fadeout_1:
+    store16into #init_game, fade_ptr
 .proc init_fadeout
     store8into #30, timer
     store16into #update_fadeout, menu_update_ptr
@@ -341,7 +376,7 @@ loop:
 done:
     dec timer
     bne :+
-    jmp init_game
+    jmp (fade_ptr)
 :
     jmp menu_update_return
 .endproc

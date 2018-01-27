@@ -1,0 +1,123 @@
+game_strings:
+pubby_presents = * - game_strings
+.byt $40
+.byt $45
+.byt $32
+.byt $32
+.byt $49
+.byt $13
+.byt $40
+.byt $42
+.byt $35
+.byt $43
+.byt $35
+.byt $3E
+.byt $44
+.byt $43
+.byt $00
+copyright = * - game_strings
+.byt $33
+.byt $3F
+.byt $40
+.byt $49
+.byt $42
+.byt $39
+.byt $37
+.byt $38
+.byt $44
+.byt $13
+.byt $22
+.byt $20
+.byt $21
+.byt $28
+.byt $00
+player1 = * - game_strings
+.byt $40
+.byt $3C
+.byt $31
+.byt $49
+.byt $35
+.byt $42
+.byt $13
+.byt $21
+.byt $00
+player2 = * - game_strings
+.byt $40
+.byt $3C
+.byt $31
+.byt $49
+.byt $35
+.byt $42
+.byt $13
+.byt $22
+.byt $00
+total_time = * - game_strings
+.byt $44
+.byt $3F
+.byt $44
+.byt $31
+.byt $3C
+.byt $13
+.byt $44
+.byt $39
+.byt $3D
+.byt $35
+.byt $2A
+.byt $13
+.byt $00
+lap1 = * - game_strings
+.byt $3C
+.byt $31
+.byt $40
+.byt $13
+.byt $21
+.byt $13
+.byt $44
+.byt $39
+.byt $3D
+.byt $35
+.byt $2A
+.byt $13
+.byt $00
+lap2 = * - game_strings
+.byt $3C
+.byt $31
+.byt $40
+.byt $13
+.byt $22
+.byt $13
+.byt $44
+.byt $39
+.byt $3D
+.byt $35
+.byt $2A
+.byt $13
+.byt $00
+lap3 = * - game_strings
+.byt $3C
+.byt $31
+.byt $40
+.byt $13
+.byt $23
+.byt $13
+.byt $44
+.byt $39
+.byt $3D
+.byt $35
+.byt $2A
+.byt $13
+.byt $00
+na = * - game_strings
+.byt $3E
+.byt $1F
+.byt $31
+.byt $00
+crashed = * - game_strings
+.byt $33
+.byt $42
+.byt $31
+.byt $43
+.byt $38
+.byt $35
+.byt $34
+.byt $00

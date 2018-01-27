@@ -5,14 +5,18 @@
 .import time_digit_table
 .import update_return
 .import init_menu
+.import init_flag
 .import read_gamepads
 .import penguin_process
 .import penguin_set_song
 
+.export pubby_screen
 .export init_results
 
 pal_ptr = l1100 ; 2 bytes
 pal_index = l1100 + 2 ; 1 bytes
+autofade = l1100 + 4 ; 1 bytes
+fade_out_to = l1100 + 6 ; 2 bytes
 
 .segment "RODATA"
 .scope strings
@@ -20,6 +24,7 @@ pal_index = l1100 + 2 ; 1 bytes
 .endscope
 
 .segment "CODE"
+
 .proc results_nmi
     bit PPUSTATUS
     storePPUADDR #$3F00
@@ -66,29 +71,17 @@ results_pal3:
 
 .segment "CODE"
 
-.proc init_results
+.proc results_prep
     lda #0
     sta $4015
     sta PPUMASK
     sta PPUCTRL
     sta pal_index
+    sta autofade
 
     store16into #results_fade_in, update_ptr
     store16into #results_pal0, pal_ptr
     store16into #results_nmi, nmi_ptr
-
-    ldy #0
-    jsr ppu_setup_text_chr
-
-    storePPUADDR #$3F00
-    ldy #0
-:
-    lda results_pal0, y
-    sta PPUDATA
-    iny
-    cpy #4
-    bne :-
-
     ; Clear NT
     bit PPUSTATUS
     ldx #$20
@@ -113,6 +106,24 @@ results_pal3:
         inx
         bne :-
     .endrepeat
+
+    ldy #0
+    jsr ppu_setup_text_chr
+
+    storePPUADDR #$3F00
+    ldy #0
+:
+    lda results_pal0, y
+    sta PPUDATA
+    iny
+    cpy #4
+    bne :-
+    rts
+.endproc
+
+.proc init_results
+    jsr results_prep
+    store16into #init_menu, fade_out_to
 
     ; Adjust p2_lap
     lax p2_lap
@@ -188,6 +199,7 @@ results_pal3:
 done2p:
 
     ldx #3
+return:
     jsr penguin_set_song
 
     lda #PPUCTRL_NMI_ON | PPUCTRL_8X16_SPR
@@ -211,10 +223,16 @@ done2p:
 :
     stx pal_index
 
+    lda autofade
+    beq :+
+    dec autofade
+    beq store
+:
     jsr read_gamepads
     lda p1_buttons_pressed
     and #BUTTON_START
     beq :+
+store:
     store16into #results_fade_out, update_ptr
 :
 
@@ -234,7 +252,7 @@ done2p:
     stx pal_index
     jmp update_return
 doneFadeOut:
-    jmp init_menu
+    jmp (fade_out_to)
 .endproc
 
 
@@ -357,3 +375,17 @@ calc:
 return:
     rts
 .endproc
+
+.segment "RODATA"
+.proc pubby_screen
+    jsr results_prep
+    store16into #init_flag, fade_out_to
+    storePPUADDR #XYADDR $2000, 9, 8
+    lda #120
+    sta autofade
+    ldy #strings::pubby_presents
+    jsr write_string
+    ldx #0
+    jmp init_results::return
+.endproc
+
